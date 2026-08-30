@@ -40,9 +40,6 @@ export function ProblemSection() {
     <section id="problem" className="py-20 sm:py-28 bg-transparent">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col items-center text-center space-y-4 mb-16">
-          <div className="text-xs font-semibold uppercase tracking-wider text-sky-800">
-            The problem
-          </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950 max-w-2xl">
             AI moves fast. Security gets skipped.
           </h2>

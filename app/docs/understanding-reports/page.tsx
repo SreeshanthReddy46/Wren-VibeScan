@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CornerSparks } from "@/components/ui/card";
-import { AlertOctagon, AlertTriangle, Info, CheckCircle2, Copy, FileText, ArrowRight } from "lucide-react";
+import { AlertOctagon, AlertTriangle, Info, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
@@ -13,9 +13,6 @@ export default function UnderstandingReportsPage() {
     <div className="space-y-10">
       {/* Header */}
       <div className="space-y-3 pb-6 border-b border-sky-200/60">
-        <div className="text-xs font-bold uppercase tracking-wider text-sky-800">
-          Report Analysis
-        </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
           How to Read Your Scan Report
         </h1>
@@ -35,7 +32,7 @@ export default function UnderstandingReportsPage() {
             <div className="flex items-center gap-2.5">
               <AlertOctagon className="h-5 w-5 text-red-600 shrink-0" />
               <span className="font-bold text-base text-red-950">
-                🚨 CRITICAL — Fix Before Deploying!
+                Critical — Fix Before Deploying
               </span>
             </div>
             <p className="text-xs sm:text-sm text-red-900/90 leading-relaxed">
@@ -49,7 +46,7 @@ export default function UnderstandingReportsPage() {
             <div className="flex items-center gap-2.5">
               <AlertTriangle className="h-5 w-5 text-orange-600 shrink-0" />
               <span className="font-bold text-base text-orange-950">
-                ⚠️ HIGH — Unprotected Actions &amp; Missing Logins
+                High — Unprotected Actions &amp; Missing Logins
               </span>
             </div>
             <p className="text-xs sm:text-sm text-orange-900/90 leading-relaxed">
@@ -63,7 +60,7 @@ export default function UnderstandingReportsPage() {
             <div className="flex items-center gap-2.5">
               <Info className="h-5 w-5 text-amber-700 shrink-0" />
               <span className="font-bold text-base text-amber-950">
-                🟡 MEDIUM — Weak Configuration
+                Medium — Weak Configuration
               </span>
             </div>
             <p className="text-xs sm:text-sm text-amber-900/90 leading-relaxed">
@@ -82,10 +79,10 @@ export default function UnderstandingReportsPage() {
 
         <div className="p-6 sm:p-8 rounded-3xl border border-sky-200/80 bg-white/90 shadow-sm space-y-5 backdrop-blur-md">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="font-mono text-xs font-bold text-sky-950 bg-sky-100/80 px-2.5 py-1 rounded-md border border-sky-200">
+            <span className="font-mono text-xs font-bold text-sky-950">
               1. File &amp; Line: src/app/api/summarize/route.ts:14
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-red-600 bg-red-50 px-2.5 py-1 rounded-md border border-red-200">
+            <span className="text-xs font-bold text-red-600">
               Critical Finding
             </span>
           </div>

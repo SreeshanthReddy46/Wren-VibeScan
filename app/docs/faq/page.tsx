@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Card } from "@/components/ui/card";
-import { HelpCircle } from "lucide-react";
 
 export const metadata = {
   title: "Beginner FAQ — Wren Docs",
@@ -38,10 +37,6 @@ export default function FAQPage() {
   return (
     <div className="space-y-10">
       <div className="space-y-3 pb-6 border-b border-sky-200/60">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-800">
-          <HelpCircle className="h-4 w-4 text-sky-700" />
-          <span>Frequently Asked Questions</span>
-        </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
           Beginner Questions Answered
         </h1>

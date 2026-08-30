@@ -54,9 +54,6 @@ export function PricingSection() {
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center space-y-4">
-          <div className="text-xs font-semibold uppercase tracking-wider text-sky-800">
-            Pricing
-          </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
             Simple plans with concrete limits
           </h2>
@@ -163,16 +160,16 @@ export function PricingSection() {
                         /mo
                       </span>
                     </div>
-                    <p
-                      className={cn(
-                        "text-xs",
-                        plan.highlight ? "text-zinc-400" : "text-zinc-600"
-                      )}
-                    >
-                      {billingCycle === "yearly" && plan.priceYearly > 0
-                        ? `billed $${plan.priceYearly} yearly`
-                        : plan.badge}
-                    </p>
+                    {billingCycle === "yearly" && plan.priceYearly > 0 && (
+                      <p
+                        className={cn(
+                          "text-xs",
+                          plan.highlight ? "text-zinc-400" : "text-zinc-600"
+                        )}
+                      >
+                        billed ${plan.priceYearly} yearly
+                      </p>
+                    )}
                   </div>
 
                   <div
@@ -184,14 +181,6 @@ export function PricingSection() {
 
                   {/* Feature List */}
                   <div className="space-y-3">
-                    <div
-                      className={cn(
-                        "text-xs font-semibold uppercase tracking-wider",
-                        plan.highlight ? "text-zinc-400" : "text-zinc-700"
-                      )}
-                    >
-                      Includes
-                    </div>
                     <ul className="space-y-3">
                       {plan.features.map((feature) => (
                         <li key={feature} className="flex items-center gap-3 text-sm">

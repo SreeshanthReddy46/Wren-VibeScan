@@ -81,6 +81,68 @@
 }
 
 /* =========================================================================
+   REALISTIC FLYING WREN COMPANION KEYFRAMES
+   ========================================================================= */
+
+@keyframes wren-wing-flutter {
+  0%, 100% {
+    transform: scaleY(1) scaleX(1);
+  }
+  50% {
+    transform: scaleY(0.78) scaleX(1.06) rotate(-2deg);
+  }
+}
+
+@keyframes wren-flight-bob {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes wren-perch-breathe {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  40% {
+    transform: translateY(-1.5px) rotate(1deg);
+  }
+  70% {
+    transform: translateY(1px) rotate(-1deg);
+  }
+}
+
+@keyframes feather-fade {
+  0% {
+    opacity: 0.9;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translateY(18px);
+  }
+}
+
+.animate-wren-wing-flutter {
+  animation: wren-wing-flutter 0.16s ease-in-out infinite alternate;
+  transform-origin: center center;
+}
+
+.animate-wren-flight-bob {
+  animation: wren-flight-bob 0.35s ease-in-out infinite alternate;
+}
+
+.animate-wren-perch-breathe {
+  animation: wren-perch-breathe 3.5s ease-in-out infinite;
+}
+
+.animate-feather-fade {
+  animation: feather-fade 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* =========================================================================
    TRUE FULL-SCREEN UNIFORM-SPEED CONTINUOUS DRIFT KEYFRAMES (Exact Same Velocity)
    ========================================================================= */
 
@@ -200,15 +262,6 @@
 
 .demo-text-box {
   transition: transform 0.3s ease;
-}
-
-.demo-text-box:hover .demo-badge {
-  transform: translateX(4px);
-  color: #0369a1;
-}
-
-.demo-badge {
-  transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .demo-paragraph {

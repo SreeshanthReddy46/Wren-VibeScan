@@ -4,7 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CornerSparks } from "@/components/ui/card";
-import { CheckCircle2, Loader2, ArrowRight, Sparkles, Building2 } from "lucide-react";
+import { CheckCircle2, Loader2, ArrowRight, Building2 } from "lucide-react";
 
 export function WaitlistSection() {
   const [email, setEmail] = React.useState("");
@@ -114,11 +114,6 @@ export function WaitlistSection() {
           
           {/* Top Section Header & Early Access Form */}
           <div className="space-y-6 max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-800">
-              <Sparkles className="h-4 w-4 text-amber-500 animate-pulse" />
-              <span>Private Early Access</span>
-            </div>
-
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-950 leading-[1.15]">
               Secure your AI apps before your users do.
             </h2>

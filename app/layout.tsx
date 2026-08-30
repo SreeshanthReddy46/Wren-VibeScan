@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { BackgroundClouds } from "@/components/marketing/BackgroundClouds";
+import { FlyingWren } from "@/components/marketing/FlyingWren";
 import "./globals.css";
 
 const inter = Inter({
@@ -39,6 +40,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="font-sans antialiased text-zinc-950 bg-transparent min-h-screen relative overflow-x-hidden">
         <BackgroundClouds />
+        <FlyingWren />
         {children}
       </body>
     </html>

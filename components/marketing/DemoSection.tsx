@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { Play, Sparkles } from "lucide-react";
+import { Play } from "lucide-react";
 import { Dialog, DialogClose } from "@/components/ui/dialog";
 import { ScrollImageEffect } from "@/components/marketing/ScrollImageEffect";
 import { CornerSparks } from "@/components/ui/card";
-import { ScrambleWord, ScrambleText } from "@/components/marketing/ScrambleText";
+import { ScrambleWord } from "@/components/marketing/ScrambleText";
 
 export function DemoSection() {
   const [videoModalOpen, setVideoModalOpen] = React.useState(false);
@@ -19,11 +19,6 @@ export function DemoSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Text Content with Matrix / Symbol Scramble Hover Animation */}
           <div className="lg:col-span-5 space-y-6 demo-text-box group/text">
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-800 demo-badge cursor-pointer">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
-              <ScrambleText text="Product demo" />
-            </div>
-
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-950 leading-[1.15] select-none">
               {headingWords.map((word, idx) => (
                 <ScrambleWord key={idx} word={word} />

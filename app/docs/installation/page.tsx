@@ -1,7 +1,6 @@
 import * as React from "react";
 import { CodeBlock } from "@/components/docs/CodeBlock";
-import { Card, CornerSparks } from "@/components/ui/card";
-import { Terminal, CheckCircle2, Zap, HelpCircle, ArrowRight } from "lucide-react";
+import { HelpCircle, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
@@ -14,9 +13,6 @@ export default function InstallationPage() {
     <div className="space-y-10">
       {/* Header */}
       <div className="space-y-3 pb-6 border-b border-sky-200/60">
-        <div className="text-xs font-bold uppercase tracking-wider text-sky-800">
-          Setup &amp; Commands
-        </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
           How to Run Wren on Your Computer
         </h1>
@@ -27,13 +23,7 @@ export default function InstallationPage() {
 
       {/* Option 1: On-Demand with npx (Recommended for Beginners) */}
       <div className="sky-glow-card sky-glow-cyan p-6 sm:p-8 rounded-3xl border border-sky-200/80 bg-white/85 shadow-xs space-y-4 backdrop-blur-md">
-        <CornerSparks color="cyan" />
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-900 border border-sky-200">
-            Recommended
-          </span>
-          <h2 className="text-xl font-bold text-zinc-950">Method 1: Instant Scan (No Install Needed)</h2>
-        </div>
+        <h2 className="text-xl font-bold text-zinc-950">Method 1: Instant Scan (No Install Needed)</h2>
         <p className="text-sm text-zinc-700 leading-relaxed">
           If you have <strong>Node.js</strong> installed on your computer, you can run Wren immediately using <code className="bg-sky-50 text-sky-900 px-1 py-0.5 rounded font-mono text-xs">npx</code> without downloading any global software:
         </p>

@@ -5,13 +5,10 @@ import { Card, CornerSparks } from "@/components/ui/card";
 import {
   ArrowRight,
   CheckCircle2,
-  Shield,
   Zap,
   HelpCircle,
-  Lightbulb,
   AlertTriangle,
   FileCode,
-  Terminal,
 } from "lucide-react";
 
 export const metadata = {
@@ -24,10 +21,6 @@ export default function DocsOverviewPage() {
     <div className="space-y-12">
       {/* Page Title & Intro */}
       <div className="space-y-4 pb-6 border-b border-sky-200/60">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-800">
-          <Lightbulb className="h-4 w-4 text-amber-500" />
-          <span>Beginner-Friendly Guide</span>
-        </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
           Getting Started with Wren
         </h1>
