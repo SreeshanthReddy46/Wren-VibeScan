@@ -283,8 +283,8 @@ export function FlyingWren() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden"
-      style={{ zIndex: 9999 }}
+      className="pointer-events-none fixed inset-0 z-[999999] overflow-hidden"
+      style={{ zIndex: 999999 }}
       aria-hidden="true"
     >
       {/* Golden Feather Breeze Particle Trail */}
@@ -296,15 +296,15 @@ export function FlyingWren() {
         />
       ))}
 
-      {/* Main Flying / Standing Wren Bird Companion (z-index 9999: always on top of all words) */}
+      {/* Main Flying / Standing Wren Bird Companion (100% solid opaque, in front of all words) */}
       <div
         id="flying-wren-companion"
         className="absolute top-0 left-0 will-change-transform pointer-events-none"
         style={{
-          width: "52px",
-          height: "52px",
+          width: "54px",
+          height: "54px",
           transform: `translate3d(${birdPos.current.x}px, ${birdPos.current.y}px, 0)`,
-          zIndex: 9999,
+          zIndex: 999999,
         }}
       >
         <div
@@ -312,7 +312,7 @@ export function FlyingWren() {
             isFlying ? "animate-wren-flight-bob" : "animate-wren-perch-breathe"
           }`}
         >
-          {/* Flying Pose (Active while user is scrolling) */}
+          {/* Flying Pose (Solid opaque body) */}
           <div
             className={`absolute inset-0 transition-opacity duration-100 ${
               isFlying ? "opacity-100 scale-100" : "opacity-0 scale-95"
@@ -323,12 +323,12 @@ export function FlyingWren() {
               alt="Flying Wren Bird"
               fill
               priority
-              className="object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.15)] animate-wren-wing-flutter"
-              sizes="52px"
+              className="object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.22)] animate-wren-wing-flutter"
+              sizes="54px"
             />
           </div>
 
-          {/* Standing Pose (Stops flying and stands directly on the last word's letters) */}
+          {/* Standing Pose (Solid opaque body, standing in front of words) */}
           <div
             className={`absolute inset-0 transition-opacity duration-100 ${
               perched ? "opacity-100 scale-100" : "opacity-0 scale-95"
@@ -339,8 +339,8 @@ export function FlyingWren() {
               alt="Standing Wren Bird"
               fill
               priority
-              className="object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
-              sizes="52px"
+              className="object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.25)]"
+              sizes="54px"
             />
           </div>
         </div>
