@@ -10,50 +10,73 @@ interface BirdPosition {
   scaleX: number;
 }
 
-const NAVBAR_SAFE_Y = 82; // Minimum Y boundary so bird never clips behind fixed navbar
+const NAVBAR_SAFE_Y = 82; // Safe distance below fixed navbar
 
-// Helper to extract the exact bounding rectangle of the LAST WORD in any heading
-function getLastWordBoundingBox(headingEl: HTMLElement): { x: number; y: number } {
-  // 1. Check for child word spans (like Hero words, demo words)
+// Helper to extract the exact coordinate of the LAST WORD on the UPPER/FIRST LINE of any heading
+function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number } {
+  // 1. Check for child word spans (like in Hero words, demo words, etc.)
   const childSpans = Array.from(
     headingEl.querySelectorAll(".word-reveal-wrapper, .demo-title-word, span")
   ).filter((el) => {
     const text = (el as HTMLElement).innerText || el.textContent || "";
     return text.trim().length > 0;
-  });
+  }) as HTMLElement[];
 
   if (childSpans.length > 0) {
-    const lastSpan = childSpans[childSpans.length - 1] as HTMLElement;
-    const r = lastSpan.getBoundingClientRect();
-    if (r.width > 0 && r.height > 0) {
-      // Claws rest directly on top of the last word's center
-      return {
-        x: Math.min(window.innerWidth - 56, Math.max(10, r.left + r.width * 0.5 - 26)),
-        y: Math.max(NAVBAR_SAFE_Y, r.top - 46),
-      };
+    // Find the topmost line (minimum top coordinate among words)
+    let minTop = Infinity;
+    childSpans.forEach((span) => {
+      const rect = span.getBoundingClientRect();
+      if (rect.top < minTop) {
+        minTop = rect.top;
+      }
+    });
+
+    // Collect all words belonging to this topmost line (within 18px threshold)
+    const upperLineWords = childSpans.filter((span) => {
+      const rect = span.getBoundingClientRect();
+      return Math.abs(rect.top - minTop) <= 18;
+    });
+
+    // The target is the LAST word on this upper line / first sentence!
+    const targetWord = upperLineWords[upperLineWords.length - 1];
+    if (targetWord) {
+      const r = targetWord.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        return {
+          x: Math.min(window.innerWidth - 56, Math.max(10, r.left + r.width * 0.5 - 26)),
+          y: Math.max(NAVBAR_SAFE_Y, r.top - 46),
+        };
+      }
     }
   }
 
-  // 2. Extract DOM Range on the final text node of the heading
+  // 2. Extract DOM Range on the first sentence / top text line
   try {
     const walker = document.createTreeWalker(headingEl, NodeFilter.SHOW_TEXT);
-    let lastTextNode: Node | null = null;
     let node: Node | null = null;
+    const textNodes: Node[] = [];
     while ((node = walker.nextNode())) {
       if (node.textContent && node.textContent.trim().length > 0) {
-        lastTextNode = node;
+        textNodes.push(node);
       }
     }
 
-    if (lastTextNode && lastTextNode.textContent) {
-      const text = lastTextNode.textContent;
-      const match = text.match(/\S+\s*$/);
-      if (match && match.index !== undefined) {
-        const startIdx = match.index;
-        const endIdx = text.length;
+    if (textNodes.length > 0) {
+      const firstTextNode = textNodes[0];
+      const text = firstTextNode.textContent || "";
+      
+      // Match first sentence or first phrase
+      const sentenceMatch = text.match(/^[^.!?\n]+[.!?]?/);
+      const targetStr = sentenceMatch ? sentenceMatch[0].trim() : text.trim();
+      const lastWordMatch = targetStr.match(/\S+$/);
+
+      if (lastWordMatch && lastWordMatch.index !== undefined) {
+        const startIdx = lastWordMatch.index;
+        const endIdx = startIdx + lastWordMatch[0].length;
         const range = document.createRange();
-        range.setStart(lastTextNode, startIdx);
-        range.setEnd(lastTextNode, endIdx);
+        range.setStart(firstTextNode, startIdx);
+        range.setEnd(firstTextNode, endIdx);
         const r = range.getBoundingClientRect();
         if (r.width > 0 && r.height > 0) {
           return {
@@ -64,10 +87,10 @@ function getLastWordBoundingBox(headingEl: HTMLElement): { x: number; y: number 
       }
     }
   } catch (e) {
-    // Range fallback
+    // Fallback
   }
 
-  // 3. Fallback: Right edge of heading box
+  // 3. Fallback: Upper right of heading bounding box
   const fallback = headingEl.getBoundingClientRect();
   return {
     x: Math.min(window.innerWidth - 56, Math.max(10, fallback.right - 46)),
@@ -90,7 +113,7 @@ export function FlyingWren() {
   const scrollStopTimer = React.useRef<NodeJS.Timeout | null>(null);
   const lastScrollY = React.useRef(0);
 
-  // Find the primary heading visible in current viewport
+  // Find primary heading visible in current viewport
   const findActiveHeading = React.useCallback((): HTMLElement | null => {
     const headings = Array.from(
       document.querySelectorAll("h1, h2, [data-bird-target]")
@@ -118,19 +141,19 @@ export function FlyingWren() {
     return bestHeading;
   }, []);
 
-  // Mount and set initial perch on the Hero heading's last word
+  // Mount and set initial perch on the Hero heading's upper-line last word
   React.useEffect(() => {
     setMounted(true);
     lastScrollY.current = window.scrollY;
 
-    const placeAtHeroLastWord = () => {
+    const placeAtHeroUpperWord = () => {
       const heroHeading =
         (document.getElementById("hero-heading") as HTMLElement) ||
         (document.querySelector("[data-bird-target='hero-heading']") as HTMLElement) ||
         (document.querySelector("h1") as HTMLElement);
 
       if (heroHeading) {
-        const initialPos = getLastWordBoundingBox(heroHeading);
+        const initialPos = getUpperLineLastWordBox(heroHeading);
         targetPos.current = initialPos;
         birdPos.current = { ...initialPos, rotation: 0, scaleX: 1 };
         currentHeadingRef.current = heroHeading;
@@ -139,13 +162,13 @@ export function FlyingWren() {
       }
     };
 
-    placeAtHeroLastWord();
-    const timer = setTimeout(placeAtHeroLastWord, 150);
+    placeAtHeroUpperWord();
+    const timer = setTimeout(placeAtHeroUpperWord, 150);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Scroll listener: Travels during scroll, stops flying on the last word when scroll stops
+  // Scroll listener: Travels during scroll, lands on upper line last word when scroll stops
   React.useEffect(() => {
     if (!mounted) return;
 
@@ -168,13 +191,13 @@ export function FlyingWren() {
 
       if (scrollStopTimer.current) clearTimeout(scrollStopTimer.current);
 
-      // When scroll stops for 120ms, lock onto the last word of the visible heading
+      // When scroll stops for 120ms, lock onto the upper-line last word of the visible heading
       scrollStopTimer.current = setTimeout(() => {
         isActivelyScrolling.current = false;
         const active = findActiveHeading();
         if (active) {
           currentHeadingRef.current = active;
-          targetPos.current = getLastWordBoundingBox(active);
+          targetPos.current = getUpperLineLastWordBox(active);
         }
       }, 120);
     };
@@ -182,7 +205,7 @@ export function FlyingWren() {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", () => {
       if (currentHeadingRef.current) {
-        targetPos.current = getLastWordBoundingBox(currentHeadingRef.current);
+        targetPos.current = getUpperLineLastWordBox(currentHeadingRef.current);
       }
     });
 
@@ -201,7 +224,7 @@ export function FlyingWren() {
 
       // If user is not scrolling, continuously sync target with the heading's real DOM position
       if (!isActivelyScrolling.current && currentHeadingRef.current) {
-        const livePos = getLastWordBoundingBox(currentHeadingRef.current);
+        const livePos = getUpperLineLastWordBox(currentHeadingRef.current);
         targetPos.current = livePos;
       }
 
@@ -236,7 +259,7 @@ export function FlyingWren() {
           setFeatherTrail((prev) => [...prev.slice(-6), newParticle]);
         }
       } else {
-        // Landing mode: decelerate towards the exact last word
+        // Landing mode: decelerate towards the exact upper word
         const speed = Math.min(0.16, Math.max(0.08, dist * 0.002));
 
         if (dist > 2.5) {
@@ -251,7 +274,7 @@ export function FlyingWren() {
           const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.35;
           current.rotation += (targetAngle - current.rotation) * 0.18;
         } else {
-          // Exact snap to the last word: STOP FLYING completely!
+          // Exact snap to the upper-line word: STOP FLYING completely!
           current.x = target.x;
           current.y = target.y;
           current.rotation += (0 - current.rotation) * 0.25;
@@ -296,7 +319,7 @@ export function FlyingWren() {
         />
       ))}
 
-      {/* Main Flying / Standing Wren Bird Companion (100% solid opaque, in front of all words) */}
+      {/* Main Flying / Standing Wren Bird Companion */}
       <div
         id="flying-wren-companion"
         className="absolute top-0 left-0 will-change-transform pointer-events-none"
@@ -312,7 +335,7 @@ export function FlyingWren() {
             isFlying ? "animate-wren-flight-bob" : "animate-wren-perch-breathe"
           }`}
         >
-          {/* Flying Pose (Solid opaque body) */}
+          {/* Flying Pose */}
           <div
             className={`absolute inset-0 transition-opacity duration-100 ${
               isFlying ? "opacity-100 scale-100" : "opacity-0 scale-95"
@@ -328,7 +351,7 @@ export function FlyingWren() {
             />
           </div>
 
-          {/* Standing Pose (Solid opaque body, standing in front of words) */}
+          {/* Standing Pose (Standing directly on the top-line word letters) */}
           <div
             className={`absolute inset-0 transition-opacity duration-100 ${
               perched ? "opacity-100 scale-100" : "opacity-0 scale-95"
