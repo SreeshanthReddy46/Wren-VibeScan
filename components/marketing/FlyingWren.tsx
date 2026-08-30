@@ -10,6 +10,8 @@ interface BirdPosition {
   scaleX: number;
 }
 
+const NAVBAR_SAFE_Y = 88; // Keeps the bird safely below the fixed navbar
+
 export function FlyingWren() {
   const [mounted, setMounted] = React.useState(false);
   const [isFlying, setIsFlying] = React.useState(false);
@@ -21,32 +23,52 @@ export function FlyingWren() {
   const currentHeadingRef = React.useRef<Element | null>(null);
   const animFrameRef = React.useRef<number | null>(null);
   const trailCount = React.useRef(0);
-  const lastScrollY = React.useRef(0);
   const isScrollingTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
-  // Mount on client
+  // Position calculation for a given heading element
+  const getHeadingPerchPos = (el: Element) => {
+    const rect = (el as HTMLElement).getBoundingClientRect();
+    const isWide = rect.width > 240;
+    // Perch cleanly on the upper right corner of the heading text
+    const posX = isWide
+      ? Math.min(rect.right - 10, window.innerWidth - 65)
+      : rect.left + rect.width + 10;
+    const posY = Math.max(NAVBAR_SAFE_Y, rect.top - 28);
+
+    return {
+      x: Math.min(window.innerWidth - 60, Math.max(15, posX)),
+      y: posY,
+    };
+  };
+
+  // Mount and set initial perch on the Hero heading corner
   React.useEffect(() => {
     setMounted(true);
-    lastScrollY.current = window.scrollY;
 
-    // Initial position on the first heading or hero title
-    const findInitialTarget = () => {
-      const heroTitle = document.querySelector("h1") || document.querySelector("h2");
-      if (heroTitle) {
-        const rect = heroTitle.getBoundingClientRect();
-        targetPos.current = {
-          x: Math.max(20, rect.left + rect.width - 40),
-          y: Math.max(60, rect.top - 35),
-        };
-        birdPos.current = { ...targetPos.current, rotation: 0, scaleX: 1 };
-        currentHeadingRef.current = heroTitle;
+    const placeAtHero = () => {
+      const heroHeading =
+        document.getElementById("hero-heading") ||
+        document.querySelector("[data-bird-target='hero-heading']") ||
+        document.querySelector("h1");
+
+      if (heroHeading) {
+        const initialPos = getHeadingPerchPos(heroHeading);
+        targetPos.current = initialPos;
+        birdPos.current = { ...initialPos, rotation: 0, scaleX: 1 };
+        currentHeadingRef.current = heroHeading;
+        setIsFlying(false);
+        setPerched(true);
       }
     };
 
-    findInitialTarget();
+    // Run on mount and slightly delayed after fonts/layout settle
+    placeAtHero();
+    const timer = setTimeout(placeAtHero, 150);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  // Update target heading based on current scroll position and viewport visibility
+  // Update target heading based on current scroll position
   const updateTarget = React.useCallback(() => {
     const headings = Array.from(
       document.querySelectorAll("h1, h2, [data-bird-target]")
@@ -55,16 +77,15 @@ export function FlyingWren() {
     if (!headings.length) return;
 
     const viewportHeight = window.innerHeight;
-    const centerY = viewportHeight * 0.35; // Target upper-middle focus
+    const focusY = viewportHeight * 0.35;
 
     let closestHeading: Element | null = null;
     let minDistance = Infinity;
 
     headings.forEach((heading) => {
       const rect = heading.getBoundingClientRect();
-      // Look for headings in viewport or approaching center
-      if (rect.top < viewportHeight && rect.bottom > 0) {
-        const dist = Math.abs(rect.top - centerY);
+      if (rect.top < viewportHeight && rect.bottom > NAVBAR_SAFE_Y) {
+        const dist = Math.abs(rect.top - focusY);
         if (dist < minDistance) {
           minDistance = dist;
           closestHeading = heading;
@@ -73,16 +94,8 @@ export function FlyingWren() {
     });
 
     if (closestHeading) {
-      const rect = (closestHeading as HTMLElement).getBoundingClientRect();
-      const isWide = rect.width > 200;
-      // Perch on the top-right of heading, or top-left
-      const destX = isWide ? rect.left + Math.min(rect.width - 20, 360) : rect.left + rect.width + 10;
-      const destY = Math.max(50, rect.top - 32);
-
-      targetPos.current = {
-        x: Math.min(window.innerWidth - 60, Math.max(20, destX)),
-        y: destY,
-      };
+      const newPos = getHeadingPerchPos(closestHeading);
+      targetPos.current = newPos;
 
       if (closestHeading !== currentHeadingRef.current) {
         currentHeadingRef.current = closestHeading;
@@ -104,7 +117,7 @@ export function FlyingWren() {
       if (isScrollingTimeout.current) clearTimeout(isScrollingTimeout.current);
 
       isScrollingTimeout.current = setTimeout(() => {
-        // Will check if close enough to perch in loop
+        // Will settle at target in flight loop
       }, 400);
     };
 
@@ -131,36 +144,39 @@ export function FlyingWren() {
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       // Lerp ease
-      const speed = Math.min(0.09, Math.max(0.045, dist * 0.0009));
+      const speed = Math.min(0.095, Math.max(0.05, dist * 0.001));
 
       if (dist > 3) {
         current.x += dx * speed;
         current.y += dy * speed;
 
-        // Facing direction (scaleX: 1 for right, -1 for left)
-        if (Math.abs(dx) > 2) {
+        // Enforce safe navbar upper boundary
+        current.y = Math.max(NAVBAR_SAFE_Y - 10, current.y);
+
+        // Facing direction
+        if (Math.abs(dx) > 1.5) {
           current.scaleX = dx > 0 ? 1 : -1;
         }
 
         // Aerodynamic bank & tilt angle
-        const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.45;
+        const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.4;
         current.rotation += (targetAngle - current.rotation) * 0.12;
 
         setIsFlying(true);
         setPerched(false);
 
-        // Spawn gentle golden feather glints during flight
-        if (dist > 40 && Math.random() < 0.2) {
+        // Feather dust trail
+        if (dist > 35 && Math.random() < 0.22) {
           trailCount.current += 1;
           const newParticle = {
             id: trailCount.current,
-            x: current.x + (Math.random() * 10 - 5),
-            y: current.y + (Math.random() * 10 - 5),
+            x: current.x + (Math.random() * 8 - 4),
+            y: current.y + (Math.random() * 8 - 4),
           };
           setFeatherTrail((prev) => [...prev.slice(-6), newParticle]);
         }
       } else {
-        // Landed at target
+        // Landed cleanly
         current.rotation += (0 - current.rotation) * 0.15;
         if (isFlying) {
           setIsFlying(false);
@@ -168,7 +184,7 @@ export function FlyingWren() {
         }
       }
 
-      // Direct DOM transform for 60fps performance
+      // Direct DOM transform for smooth 60fps rendering
       const birdEl = document.getElementById("flying-wren-companion");
       if (birdEl) {
         birdEl.style.transform = `translate3d(${current.x}px, ${current.y}px, 0) scaleX(${current.scaleX}) rotate(${current.rotation}deg)`;
@@ -187,7 +203,7 @@ export function FlyingWren() {
   if (!mounted) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none fixed inset-0 z-[60] overflow-hidden" aria-hidden="true">
       {/* Golden Feather Breeze Particle Trail */}
       {featherTrail.map((p) => (
         <span
@@ -197,7 +213,7 @@ export function FlyingWren() {
         />
       ))}
 
-      {/* Main Flying / Perched Wren Bird Companion (Pure Bird Only with Zero Background) */}
+      {/* Main Flying / Perched Wren Bird Companion (High z-index, zero navbar clipping) */}
       <div
         id="flying-wren-companion"
         className="absolute top-0 left-0 will-change-transform pointer-events-none"
@@ -228,7 +244,7 @@ export function FlyingWren() {
             />
           </div>
 
-          {/* Perched Pose */}
+          {/* Perched Pose (Initial load & landing) */}
           <div
             className={`absolute inset-0 transition-opacity duration-150 ${
               perched ? "opacity-100 scale-100" : "opacity-0 scale-95"

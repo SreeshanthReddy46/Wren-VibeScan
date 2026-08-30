@@ -49,11 +49,15 @@ export function HeroSection() {
     "Wren statically scans your codebase and flags the vulnerabilities AI coding tools tend to leave behind — before they reach production.";
 
   return (
-    <section className="relative pt-36 pb-24 sm:pt-48 sm:pb-36 overflow-hidden">
+    <section id="hero" className="relative pt-36 pb-24 sm:pt-48 sm:pb-36 overflow-hidden">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col items-center text-center space-y-8">
           {/* Main Headline with Light Yellow Word Cover & Reveal */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-zinc-950 max-w-5xl leading-[1.15]">
+          <h1
+            id="hero-heading"
+            data-bird-target="hero-heading"
+            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-zinc-950 max-w-5xl leading-[1.15] relative"
+          >
             <RevealWords text={headlineText} baseDelay={100} stagger={60} />
           </h1>
 
