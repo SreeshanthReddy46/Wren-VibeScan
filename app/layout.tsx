@@ -40,8 +40,9 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="font-sans antialiased text-zinc-950 bg-transparent min-h-screen relative overflow-x-hidden">
         <BackgroundClouds />
-        <FlyingWren />
         {children}
+        {/* Mount FlyingWren AFTER children so it is always painted on top of all words and sections */}
+        <FlyingWren />
       </body>
     </html>
   );
