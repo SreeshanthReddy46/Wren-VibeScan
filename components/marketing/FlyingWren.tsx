@@ -23,7 +23,9 @@ export function FlyingWren() {
   const currentHeadingRef = React.useRef<Element | null>(null);
   const animFrameRef = React.useRef<number | null>(null);
   const trailCount = React.useRef(0);
-  const isScrollingTimeout = React.useRef<NodeJS.Timeout | null>(null);
+  const isActivelyScrolling = React.useRef(false);
+  const scrollStopTimer = React.useRef<NodeJS.Timeout | null>(null);
+  const lastScrollY = React.useRef(0);
 
   // Calculates exact coordinates to stand on the last word of any heading
   const getLastWordPerchPos = React.useCallback((el: Element) => {
@@ -68,7 +70,7 @@ export function FlyingWren() {
         }
       }
     } catch (e) {
-      // Fallback below
+      // Fallback
     }
 
     // 3. Fallback: Rightmost boundary of heading bounding rect
@@ -79,9 +81,42 @@ export function FlyingWren() {
     };
   }, []);
 
+  // Update target heading based on current scroll position
+  const updateTargetOnStop = React.useCallback(() => {
+    const headings = Array.from(
+      document.querySelectorAll("h1, h2, [data-bird-target]")
+    );
+
+    if (!headings.length) return;
+
+    const viewportHeight = window.innerHeight;
+    const focusY = viewportHeight * 0.35; // Upper-middle focus
+
+    let closestHeading: Element | null = null;
+    let minDistance = Infinity;
+
+    headings.forEach((heading) => {
+      const rect = heading.getBoundingClientRect();
+      if (rect.top < viewportHeight && rect.bottom > NAVBAR_SAFE_Y) {
+        const dist = Math.abs(rect.top - focusY);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestHeading = heading;
+        }
+      }
+    });
+
+    if (closestHeading) {
+      const newPos = getLastWordPerchPos(closestHeading);
+      targetPos.current = newPos;
+      currentHeadingRef.current = closestHeading;
+    }
+  }, [getLastWordPerchPos]);
+
   // Mount and set initial perch on the Hero heading's last word
   React.useEffect(() => {
     setMounted(true);
+    lastScrollY.current = window.scrollY;
 
     const placeAtHeroLastWord = () => {
       const heroHeading =
@@ -105,68 +140,48 @@ export function FlyingWren() {
     return () => clearTimeout(timer);
   }, [getLastWordPerchPos]);
 
-  // Update target heading based on current scroll position
-  const updateTarget = React.useCallback(() => {
-    const headings = Array.from(
-      document.querySelectorAll("h1, h2, [data-bird-target]")
-    );
-
-    if (!headings.length) return;
-
-    const viewportHeight = window.innerHeight;
-    const focusY = viewportHeight * 0.35; // Upper-middle reading focus
-
-    let closestHeading: Element | null = null;
-    let minDistance = Infinity;
-
-    headings.forEach((heading) => {
-      const rect = heading.getBoundingClientRect();
-      if (rect.top < viewportHeight && rect.bottom > NAVBAR_SAFE_Y) {
-        const dist = Math.abs(rect.top - focusY);
-        if (dist < minDistance) {
-          minDistance = dist;
-          closestHeading = heading;
-        }
-      }
-    });
-
-    if (closestHeading) {
-      const newPos = getLastWordPerchPos(closestHeading);
-      targetPos.current = newPos;
-
-      if (closestHeading !== currentHeadingRef.current) {
-        currentHeadingRef.current = closestHeading;
-        setIsFlying(true);
-        setPerched(false);
-      }
-    }
-  }, [getLastWordPerchPos]);
-
-  // Scroll & resize listeners
+  // Scroll listener: Flies actively while scrolling, stops flying when scroll stops
   React.useEffect(() => {
     if (!mounted) return;
 
     const onScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollDelta = currentScrollY - lastScrollY.current;
+      lastScrollY.current = currentScrollY;
+
+      isActivelyScrolling.current = true;
       setIsFlying(true);
       setPerched(false);
-      updateTarget();
 
-      if (isScrollingTimeout.current) clearTimeout(isScrollingTimeout.current);
+      // While actively scrolling, position the bird dynamically in flight
+      const viewportHeight = window.innerHeight;
+      const midY = viewportHeight * 0.38;
+      
+      // Follow the scroll travel
+      targetPos.current = {
+        x: Math.min(window.innerWidth - 65, Math.max(25, targetPos.current.x)),
+        y: Math.max(NAVBAR_SAFE_Y, midY + (scrollDelta > 0 ? 30 : -30)),
+      };
 
-      isScrollingTimeout.current = setTimeout(() => {
-        // Flight physics loop will handle touchdown
-      }, 400);
+      // Clear any pending stop timer
+      if (scrollStopTimer.current) clearTimeout(scrollStopTimer.current);
+
+      // When the user stops scrolling for 140ms, immediately land on the closest heading!
+      scrollStopTimer.current = setTimeout(() => {
+        isActivelyScrolling.current = false;
+        updateTargetOnStop();
+      }, 140);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", updateTarget);
+    window.addEventListener("resize", updateTargetOnStop);
 
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", updateTarget);
-      if (isScrollingTimeout.current) clearTimeout(isScrollingTimeout.current);
+      window.removeEventListener("resize", updateTargetOnStop);
+      if (scrollStopTimer.current) clearTimeout(scrollStopTimer.current);
     };
-  }, [mounted, updateTarget]);
+  }, [mounted, updateTargetOnStop]);
 
   // Main 60fps aerodynamic flight loop
   React.useEffect(() => {
@@ -180,30 +195,24 @@ export function FlyingWren() {
       const dy = target.y - current.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      // Adaptive speed: fast swoops for long distances, gentle deceleration near words
-      const speed = Math.min(0.098, Math.max(0.052, dist * 0.0011));
+      if (isActivelyScrolling.current) {
+        // Fast responsive flight following scroll
+        current.x += dx * 0.12;
+        current.y += dy * 0.12;
+        current.y = Math.max(NAVBAR_SAFE_Y - 6, current.y);
 
-      if (dist > 3) {
-        current.x += dx * speed;
-        current.y += dy * speed;
-
-        // Enforce safe upper navbar boundary
-        current.y = Math.max(NAVBAR_SAFE_Y - 8, current.y);
-
-        // Facing direction based on horizontal travel
         if (Math.abs(dx) > 1.2) {
           current.scaleX = dx > 0 ? 1 : -1;
         }
 
-        // Aerodynamic bank & tilt angle
-        const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.38;
-        current.rotation += (targetAngle - current.rotation) * 0.12;
+        const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.42;
+        current.rotation += (targetAngle - current.rotation) * 0.15;
 
         setIsFlying(true);
         setPerched(false);
 
-        // Golden feather dust trail during flight
-        if (dist > 30 && Math.random() < 0.22) {
+        // Feather dust trail
+        if (Math.random() < 0.25) {
           trailCount.current += 1;
           const newParticle = {
             id: trailCount.current,
@@ -213,11 +222,27 @@ export function FlyingWren() {
           setFeatherTrail((prev) => [...prev.slice(-6), newParticle]);
         }
       } else {
-        // Touchdown on the last word's letters!
-        current.rotation += (0 - current.rotation) * 0.16;
-        if (isFlying) {
-          setIsFlying(false);
-          setPerched(true);
+        // Landing deceleration towards the heading's last word
+        const speed = Math.min(0.12, Math.max(0.06, dist * 0.0014));
+
+        if (dist > 3) {
+          current.x += dx * speed;
+          current.y += dy * speed;
+          current.y = Math.max(NAVBAR_SAFE_Y - 6, current.y);
+
+          if (Math.abs(dx) > 1.2) {
+            current.scaleX = dx > 0 ? 1 : -1;
+          }
+
+          const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.35;
+          current.rotation += (targetAngle - current.rotation) * 0.14;
+        } else {
+          // Touchdown: STOP FLYING and stand peacefully on the words!
+          current.rotation += (0 - current.rotation) * 0.2;
+          if (isFlying) {
+            setIsFlying(false);
+            setPerched(true);
+          }
         }
       }
 
@@ -265,9 +290,9 @@ export function FlyingWren() {
             isFlying ? "animate-wren-flight-bob" : "animate-wren-perch-breathe"
           }`}
         >
-          {/* Flying Pose */}
+          {/* Flying Pose (Active during scrolling) */}
           <div
-            className={`absolute inset-0 transition-opacity duration-150 ${
+            className={`absolute inset-0 transition-opacity duration-100 ${
               isFlying ? "opacity-100 scale-100" : "opacity-0 scale-95"
             }`}
           >
@@ -281,9 +306,9 @@ export function FlyingWren() {
             />
           </div>
 
-          {/* Standing Pose (Feet standing directly on the letters with NO branch/stem) */}
+          {/* Standing Pose (Active when scrolling stops) */}
           <div
-            className={`absolute inset-0 transition-opacity duration-150 ${
+            className={`absolute inset-0 transition-opacity duration-100 ${
               perched ? "opacity-100 scale-100" : "opacity-0 scale-95"
             }`}
           >
