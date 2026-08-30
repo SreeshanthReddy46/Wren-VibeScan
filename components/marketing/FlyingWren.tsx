@@ -168,7 +168,7 @@ export function FlyingWren() {
         }
       }
 
-      // Re-render position via state or direct DOM transform for max smoothness
+      // Direct DOM transform for 60fps performance
       const birdEl = document.getElementById("flying-wren-companion");
       if (birdEl) {
         birdEl.style.transform = `translate3d(${current.x}px, ${current.y}px, 0) scaleX(${current.scaleX}) rotate(${current.rotation}deg)`;
@@ -197,15 +197,14 @@ export function FlyingWren() {
         />
       ))}
 
-      {/* Main Flying / Perched Wren Bird Companion */}
+      {/* Main Flying / Perched Wren Bird Companion (Pure Bird Only with Zero Background) */}
       <div
         id="flying-wren-companion"
-        className="absolute top-0 left-0 will-change-transform"
+        className="absolute top-0 left-0 will-change-transform pointer-events-none"
         style={{
-          width: "56px",
-          height: "56px",
+          width: "52px",
+          height: "52px",
           transform: `translate3d(${birdPos.current.x}px, ${birdPos.current.y}px, 0)`,
-          transition: "filter 0.3s ease",
         }}
       >
         <div
@@ -213,12 +212,9 @@ export function FlyingWren() {
             isFlying ? "animate-wren-flight-bob" : "animate-wren-perch-breathe"
           }`}
         >
-          {/* Subtle Ambient Sunlight Aura */}
-          <div className="absolute inset-0 -m-2 rounded-full bg-amber-300/20 blur-md pointer-events-none" />
-
           {/* Flying Pose */}
           <div
-            className={`absolute inset-0 transition-opacity duration-200 ${
+            className={`absolute inset-0 transition-opacity duration-150 ${
               isFlying ? "opacity-100 scale-100" : "opacity-0 scale-95"
             }`}
           >
@@ -227,14 +223,14 @@ export function FlyingWren() {
               alt="Flying Wren Bird"
               fill
               priority
-              className="object-contain mix-blend-multiply drop-shadow-[0_4px_8px_rgba(14,165,233,0.3)] animate-wren-wing-flutter"
-              sizes="56px"
+              className="object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.15)] animate-wren-wing-flutter"
+              sizes="52px"
             />
           </div>
 
-          {/* Perched Pose (Wings folded, relaxed head tilt) */}
+          {/* Perched Pose */}
           <div
-            className={`absolute inset-0 transition-opacity duration-200 ${
+            className={`absolute inset-0 transition-opacity duration-150 ${
               perched ? "opacity-100 scale-100" : "opacity-0 scale-95"
             }`}
           >
@@ -243,8 +239,8 @@ export function FlyingWren() {
               alt="Perched Wren Bird"
               fill
               priority
-              className="object-contain mix-blend-multiply drop-shadow-[0_3px_6px_rgba(0,0,0,0.18)]"
-              sizes="56px"
+              className="object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+              sizes="52px"
             />
           </div>
         </div>
