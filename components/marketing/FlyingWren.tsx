@@ -99,12 +99,12 @@ function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number
 
 // 6 Birds with individual sizes and flight speeds
 const INITIAL_BIRDS_CONFIG = [
-  { size: 52, speed: 0.14 }, // Bird 0: Heading Scout
-  { size: 48, speed: 0.11 }, // Bird 1
-  { size: 46, speed: 0.12 }, // Bird 2
+  { size: 52, speed: 0.12 }, // Bird 0: Heading Scout
+  { size: 48, speed: 0.10 }, // Bird 1
+  { size: 46, speed: 0.11 }, // Bird 2
   { size: 42, speed: 0.09 }, // Bird 3
-  { size: 44, speed: 0.13 }, // Bird 4
-  { size: 40, speed: 0.10 }, // Bird 5
+  { size: 44, speed: 0.11 }, // Bird 4
+  { size: 40, speed: 0.09 }, // Bird 5
 ];
 
 export function FlyingWren() {
@@ -233,7 +233,7 @@ export function FlyingWren() {
 
       if (scrollStopTimer.current) clearTimeout(scrollStopTimer.current);
 
-      // When scroll stops for 140ms, assign new random resting positions and land completely!
+      // Slower, gentler deceleration window (~220ms debounce)
       scrollStopTimer.current = setTimeout(() => {
         isActivelyScrolling.current = false;
         const active = findActiveHeading();
@@ -244,7 +244,7 @@ export function FlyingWren() {
           activeHeadingPosRef.current = box;
         }
         pickRandomRestPositions(box);
-      }, 140);
+      }, 220);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -263,7 +263,7 @@ export function FlyingWren() {
     };
   }, [mounted, findActiveHeading, pickRandomRestPositions]);
 
-  // Main 60fps flight loop: Only flies while scrolling, stays 100% still when resting
+  // Main 60fps flight loop: Smoothly decelerates somewhat slower when coming to a stop
   React.useEffect(() => {
     if (!mounted) return;
 
@@ -272,7 +272,7 @@ export function FlyingWren() {
       const vh = window.innerHeight;
 
       if (isActivelyScrolling.current) {
-        roamTimeRef.current += 0.03;
+        roamTimeRef.current += 0.028;
       }
       const t = roamTimeRef.current;
 
@@ -303,14 +303,14 @@ export function FlyingWren() {
             bird.scaleX = dx > 0 ? 1 : -1;
           }
 
-          const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.42;
-          bird.rotation += (targetAngle - bird.rotation) * 0.15;
+          const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.40;
+          bird.rotation += (targetAngle - bird.rotation) * 0.14;
 
           bird.isFlying = true;
           bird.perched = false;
 
           // Golden glints from roaming birds
-          if (Math.random() < 0.07) {
+          if (Math.random() < 0.06) {
             trailCount.current += 1;
             const newParticle = {
               id: trailCount.current,
@@ -320,28 +320,29 @@ export function FlyingWren() {
             setFeatherTrail((prev) => [...prev.slice(-8), newParticle]);
           }
         } else {
-          // User is NOT scrolling: Smoothly land at resting spot and stay 100% still!
+          // Slower, gentler deceleration touchdown
           const dx = bird.restX - bird.x;
           const dy = bird.restY - bird.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist > 2.5) {
-            const landingSpeed = Math.min(0.18, Math.max(0.08, dist * 0.0025));
+          if (dist > 1.8) {
+            // Gentle easing curve for slower stop
+            const landingSpeed = Math.min(0.065, Math.max(0.030, dist * 0.0009));
             bird.x += dx * landingSpeed;
             bird.y += dy * landingSpeed;
             bird.y = Math.max(NAVBAR_SAFE_Y - 4, bird.y);
 
-            if (Math.abs(dx) > 1) {
+            if (Math.abs(dx) > 0.8) {
               bird.scaleX = dx > 0 ? 1 : -1;
             }
 
-            const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.35;
-            bird.rotation += (targetAngle - bird.rotation) * 0.2;
+            const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.30;
+            bird.rotation += (targetAngle - bird.rotation) * 0.09;
           } else {
-            // Arrived at resting spot: 100% motionless!
+            // Settled at resting spot: 100% motionless!
             bird.x = bird.restX;
             bird.y = bird.restY;
-            bird.rotation = 0;
+            bird.rotation += (0 - bird.rotation) * 0.15;
 
             if (bird.isFlying) {
               bird.isFlying = false;
@@ -417,7 +418,7 @@ export function FlyingWren() {
           >
             {/* Flying Pose Layer (Active only while scrolling) */}
             <div
-              className="bird-flying-layer absolute inset-0 transition-opacity duration-100 opacity-0"
+              className="bird-flying-layer absolute inset-0 transition-opacity duration-150 opacity-0"
             >
               <Image
                 src="/assets/wren-flying.png"
@@ -432,7 +433,7 @@ export function FlyingWren() {
 
             {/* Standing Pose Layer (100% still until scroll) */}
             <div
-              className="bird-perched-layer absolute inset-0 transition-opacity duration-100 opacity-100"
+              className="bird-perched-layer absolute inset-0 transition-opacity duration-150 opacity-100"
             >
               <Image
                 src="/assets/wren-perched.png"
