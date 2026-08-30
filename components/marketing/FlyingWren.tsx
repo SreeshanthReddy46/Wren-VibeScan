@@ -10,13 +10,13 @@ interface BirdState {
   scaleX: number;
   isFlying: boolean;
   perched: boolean;
+  phase: number;
 }
 
 const NAVBAR_SAFE_Y = 82; // Safe distance below fixed navbar
 
 // Helper to extract the exact coordinate of the LAST WORD on the UPPER/FIRST LINE of any heading
-function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number; width: number; height: number; left: number; top: number; right: number } {
-  // 1. Check for child word spans
+function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number } {
   const childSpans = Array.from(
     headingEl.querySelectorAll(".word-reveal-wrapper, .demo-title-word, span")
   ).filter((el) => {
@@ -45,17 +45,12 @@ function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number
         return {
           x: Math.min(window.innerWidth - 56, Math.max(10, r.left + r.width * 0.5 - 26)),
           y: Math.max(NAVBAR_SAFE_Y, r.top - 46),
-          width: r.width,
-          height: r.height,
-          left: r.left,
-          top: r.top,
-          right: r.right,
         };
       }
     }
   }
 
-  // 2. Extract DOM Range on the first sentence / top text line
+  // DOM range fallback
   try {
     const walker = document.createTreeWalker(headingEl, NodeFilter.SHOW_TEXT);
     let node: Node | null = null;
@@ -84,11 +79,6 @@ function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number
           return {
             x: Math.min(window.innerWidth - 56, Math.max(10, r.left + r.width * 0.5 - 26)),
             y: Math.max(NAVBAR_SAFE_Y, r.top - 46),
-            width: r.width,
-            height: r.height,
-            left: r.left,
-            top: r.top,
-            right: r.right,
           };
         }
       }
@@ -101,53 +91,52 @@ function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number
   return {
     x: Math.min(window.innerWidth - 56, Math.max(10, fallback.right - 46)),
     y: Math.max(NAVBAR_SAFE_Y, fallback.top - 46),
-    width: fallback.width,
-    height: fallback.height,
-    left: fallback.left,
-    top: fallback.top,
-    right: fallback.right,
   };
 }
 
-// Flock configuration: 5 realistic Wren birds with natural formation offsets
-const FLOCK_CONFIG = [
-  // 0: Alpha Leader (stands directly on upper-line last word)
-  { size: 52, scale: 1.0, flightOffset: { x: 0, y: 0 }, perchOffset: { x: 0, y: 0 }, lag: 0.14 },
-  // 1: Left Wing Companion (perches near the first word of the heading)
-  { size: 48, scale: 0.92, flightOffset: { x: -65, y: -30 }, perchOffset: { x: -60, y: -4 }, lag: 0.11 },
-  // 2: Right Wing Companion (perches to the right of the heading)
-  { size: 46, scale: 0.88, flightOffset: { x: 70, y: 25 }, perchOffset: { x: 50, y: 0 }, lag: 0.12 },
-  // 3: High Soarer (cruises higher in sky / perches gracefully)
-  { size: 42, scale: 0.82, flightOffset: { x: -35, y: -55 }, perchOffset: { x: -30, y: -30 }, lag: 0.09 },
-  // 4: Playful Tail Flyer (follows formation)
-  { size: 44, scale: 0.85, flightOffset: { x: 40, y: 45 }, perchOffset: { x: 28, y: 20 }, lag: 0.10 },
+// 6 Unique Birds Distributed Across the Entire Screen
+const BIRDS_CONFIG = [
+  // 0: Main Heading Scout (Stands on topmost last word of active heading)
+  { id: 0, size: 52, zone: "heading", speed: 0.14, roamX: 0.5, roamY: 0.35, ampX: 60, ampY: 35 },
+  // 1: Far Left Sky Wanderer (Roams across left 10% - 30% of screen)
+  { id: 1, size: 48, zone: "left", speed: 0.10, roamX: 0.18, roamY: 0.40, ampX: 90, ampY: 70 },
+  // 2: Far Right Sky Cruiser (Roams across right 70% - 90% of screen)
+  { id: 2, size: 46, zone: "right", speed: 0.11, roamX: 0.82, roamY: 0.45, ampX: 85, ampY: 75 },
+  // 3: High Cloud Soarer (Cruises high in top sky 10% - 25% height)
+  { id: 3, size: 42, zone: "top", speed: 0.09, roamX: 0.35, roamY: 0.18, ampX: 140, ampY: 30 },
+  // 4: Lower Content Explorer (Roams lower 55% - 75% height)
+  { id: 4, size: 44, zone: "bottom", speed: 0.12, roamX: 0.65, roamY: 0.68, ampX: 110, ampY: 55 },
+  // 5: Free Center Glider (Circles center 35% - 65% in graceful arcs)
+  { id: 5, size: 40, zone: "center", speed: 0.08, roamX: 0.50, roamY: 0.52, ampX: 130, ampY: 80 },
 ];
 
 export function FlyingWren() {
   const [mounted, setMounted] = React.useState(false);
   const [featherTrail, setFeatherTrail] = React.useState<{ id: number; x: number; y: number }[]>([]);
 
-  // 5 Birds independent state refs
+  // 6 Independent Bird State Tracking
   const birdsRef = React.useRef<BirdState[]>(
-    FLOCK_CONFIG.map((_, i) => ({
-      x: 100 + i * 40,
-      y: 130 + i * 20,
+    BIRDS_CONFIG.map((cfg, i) => ({
+      x: 100 + i * 150,
+      y: 120 + i * 80,
       rotation: 0,
-      scaleX: 1,
+      scaleX: i % 2 === 0 ? 1 : -1,
       isFlying: false,
       perched: true,
+      phase: i * 1.25,
     }))
   );
 
-  const baseTargetPos = React.useRef<{ x: number; y: number }>({ x: 120, y: 140 });
+  const headingPosRef = React.useRef<{ x: number; y: number }>({ x: 200, y: 140 });
   const currentHeadingRef = React.useRef<HTMLElement | null>(null);
   const animFrameRef = React.useRef<number | null>(null);
   const trailCount = React.useRef(0);
   const isActivelyScrolling = React.useRef(false);
   const scrollStopTimer = React.useRef<NodeJS.Timeout | null>(null);
   const lastScrollY = React.useRef(0);
+  const timeRef = React.useRef(0);
 
-  // Find the primary heading visible in current viewport
+  // Find primary heading visible in viewport
   const findActiveHeading = React.useCallback((): HTMLElement | null => {
     const headings = Array.from(
       document.querySelectorAll("h1, h2, [data-bird-target]")
@@ -156,7 +145,7 @@ export function FlyingWren() {
     if (!headings.length) return null;
 
     const viewportHeight = window.innerHeight;
-    const focusCenterY = viewportHeight * 0.35; // Reading focus
+    const focusCenterY = viewportHeight * 0.35;
 
     let bestHeading: HTMLElement | null = null;
     let minDistance = Infinity;
@@ -175,12 +164,12 @@ export function FlyingWren() {
     return bestHeading;
   }, []);
 
-  // Mount and set initial perch on the Hero heading
+  // Initial placement on mount
   React.useEffect(() => {
     setMounted(true);
     lastScrollY.current = window.scrollY;
 
-    const placeAtHero = () => {
+    const placeBirds = () => {
       const heroHeading =
         (document.getElementById("hero-heading") as HTMLElement) ||
         (document.querySelector("[data-bird-target='hero-heading']") as HTMLElement) ||
@@ -188,65 +177,65 @@ export function FlyingWren() {
 
       if (heroHeading) {
         const box = getUpperLineLastWordBox(heroHeading);
-        baseTargetPos.current = { x: box.x, y: box.y };
+        headingPosRef.current = { x: box.x, y: box.y };
         currentHeadingRef.current = heroHeading;
 
-        birdsRef.current.forEach((b, i) => {
-          const cfg = FLOCK_CONFIG[i];
-          b.x = Math.min(window.innerWidth - 56, Math.max(10, box.x + cfg.perchOffset.x));
-          b.y = Math.max(NAVBAR_SAFE_Y, box.y + cfg.perchOffset.y);
-          b.rotation = 0;
-          b.scaleX = 1;
-          b.isFlying = false;
-          b.perched = true;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        birdsRef.current.forEach((bird, i) => {
+          const cfg = BIRDS_CONFIG[i];
+          if (i === 0) {
+            // Main bird on heading last word
+            bird.x = box.x;
+            bird.y = box.y;
+          } else {
+            // Other birds distributed across their wide screen sectors
+            bird.x = Math.min(vw - 60, Math.max(20, vw * cfg.roamX + Math.sin(cfg.id) * 40));
+            bird.y = Math.max(NAVBAR_SAFE_Y + 10, Math.min(vh - 80, vh * cfg.roamY + Math.cos(cfg.id) * 30));
+          }
+          bird.rotation = 0;
+          bird.isFlying = false;
+          bird.perched = true;
         });
       }
     };
 
-    placeAtHero();
-    const timer = setTimeout(placeAtHero, 150);
+    placeBirds();
+    const timer = setTimeout(placeBirds, 150);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Scroll listener: Whole flock flies while scrolling, lands when scrolling stops
+  // Scroll listener: Entire flock takes flight and roams everywhere
   React.useEffect(() => {
     if (!mounted) return;
 
     const onScroll = () => {
       const currentScrollY = window.scrollY;
-      const scrollDelta = currentScrollY - lastScrollY.current;
       lastScrollY.current = currentScrollY;
 
       isActivelyScrolling.current = true;
 
-      // In flight, guide flock through viewport
-      const viewportHeight = window.innerHeight;
-      const midY = viewportHeight * 0.36;
-      baseTargetPos.current = {
-        x: Math.min(window.innerWidth - 65, Math.max(25, baseTargetPos.current.x)),
-        y: Math.max(NAVBAR_SAFE_Y, midY + (scrollDelta > 0 ? 25 : -25)),
-      };
-
       if (scrollStopTimer.current) clearTimeout(scrollStopTimer.current);
 
-      // When scroll stops for 120ms, lock onto the upper line of the active heading
+      // When scroll stops for 140ms, birds settle into their sector resting spots
       scrollStopTimer.current = setTimeout(() => {
         isActivelyScrolling.current = false;
         const active = findActiveHeading();
         if (active) {
           currentHeadingRef.current = active;
           const box = getUpperLineLastWordBox(active);
-          baseTargetPos.current = { x: box.x, y: box.y };
+          headingPosRef.current = { x: box.x, y: box.y };
         }
-      }, 120);
+      }, 140);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", () => {
       if (currentHeadingRef.current) {
         const box = getUpperLineLastWordBox(currentHeadingRef.current);
-        baseTargetPos.current = { x: box.x, y: box.y };
+        headingPosRef.current = { x: box.x, y: box.y };
       }
     });
 
@@ -256,65 +245,96 @@ export function FlyingWren() {
     };
   }, [mounted, findActiveHeading]);
 
-  // Main 60fps aerodynamic flight & touchdown loop for all 5 birds
+  // Main 60fps aerodynamic roaming & flight physics loop
   React.useEffect(() => {
     if (!mounted) return;
 
     const updateFlockPhysics = () => {
-      // Continuously sync base target with real DOM position when scroll has settled
+      timeRef.current += 0.025;
+      const t = timeRef.current;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Sync active heading position if scroll has settled
       if (!isActivelyScrolling.current && currentHeadingRef.current) {
         const liveBox = getUpperLineLastWordBox(currentHeadingRef.current);
-        baseTargetPos.current = { x: liveBox.x, y: liveBox.y };
+        headingPosRef.current = { x: liveBox.x, y: liveBox.y };
       }
 
-      const base = baseTargetPos.current;
+      const headingPos = headingPosRef.current;
 
       birdsRef.current.forEach((bird, i) => {
-        const cfg = FLOCK_CONFIG[i];
-        
-        // Target calculation: flight formation vs perch distribution
-        const offset = isActivelyScrolling.current ? cfg.flightOffset : cfg.perchOffset;
-        const destX = Math.min(window.innerWidth - 56, Math.max(10, base.x + offset.x));
-        const destY = Math.max(NAVBAR_SAFE_Y - (isActivelyScrolling.current ? 6 : 0), base.y + offset.y);
+        const cfg = BIRDS_CONFIG[i];
+        let targetX = 0;
+        let targetY = 0;
 
-        const dx = destX - bird.x;
-        const dy = destY - bird.y;
+        if (i === 0) {
+          // Bird 0: Dedicated to active heading upper last word
+          if (isActivelyScrolling.current) {
+            targetX = headingPos.x + Math.sin(t * 1.5 + bird.phase) * 50;
+            targetY = Math.max(NAVBAR_SAFE_Y, vh * 0.35 + Math.cos(t * 1.8 + bird.phase) * 30);
+          } else {
+            targetX = headingPos.x;
+            targetY = headingPos.y;
+          }
+        } else {
+          // Birds 1-5: Roam independently across distinct screen sectors
+          const baseX = vw * cfg.roamX;
+          const baseY = Math.max(NAVBAR_SAFE_Y + 15, Math.min(vh - 90, vh * cfg.roamY));
+
+          if (isActivelyScrolling.current) {
+            // Wide sweeping roaming motion while scrolling
+            const sweepX = Math.sin(t * (0.8 + i * 0.15) + bird.phase) * cfg.ampX * 1.3;
+            const sweepY = Math.cos(t * (0.9 + i * 0.12) + bird.phase) * cfg.ampY * 1.2;
+            targetX = Math.min(vw - 60, Math.max(20, baseX + sweepX));
+            targetY = Math.max(NAVBAR_SAFE_Y + 10, Math.min(vh - 80, baseY + sweepY));
+          } else {
+            // Resting position in each bird's distinct zone
+            const restOffsetX = Math.sin(bird.phase) * (cfg.ampX * 0.4);
+            const restOffsetY = Math.cos(bird.phase) * (cfg.ampY * 0.3);
+            targetX = Math.min(vw - 60, Math.max(20, baseX + restOffsetX));
+            targetY = Math.max(NAVBAR_SAFE_Y + 10, Math.min(vh - 80, baseY + restOffsetY));
+          }
+        }
+
+        const dx = targetX - bird.x;
+        const dy = targetY - bird.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (isActivelyScrolling.current) {
-          // Dynamic soaring flight
-          bird.x += dx * cfg.lag;
-          bird.y += dy * cfg.lag;
-          bird.y = Math.max(NAVBAR_SAFE_Y - 6, bird.y);
+          // Active free flight across the website
+          bird.x += dx * cfg.speed;
+          bird.y += dy * cfg.speed;
+          bird.y = Math.max(NAVBAR_SAFE_Y - 4, bird.y);
 
           if (Math.abs(dx) > 1.2) {
             bird.scaleX = dx > 0 ? 1 : -1;
           }
 
           const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.42;
-          bird.rotation += (targetAngle - bird.rotation) * 0.15;
+          bird.rotation += (targetAngle - bird.rotation) * 0.14;
 
           bird.isFlying = true;
           bird.perched = false;
 
-          // Alpha bird spawns feather glints
-          if (i === 0 && Math.random() < 0.25) {
+          // Golden glints from roaming birds
+          if (Math.random() < 0.08) {
             trailCount.current += 1;
             const newParticle = {
               id: trailCount.current,
               x: bird.x + (Math.random() * 8 - 4),
               y: bird.y + (Math.random() * 8 - 4),
             };
-            setFeatherTrail((prev) => [...prev.slice(-6), newParticle]);
+            setFeatherTrail((prev) => [...prev.slice(-8), newParticle]);
           }
         } else {
-          // Landing approach towards words/destinations
-          const speed = Math.min(0.16, Math.max(0.08, dist * 0.002)) * (1 - i * 0.05);
+          // Touchdown & resting in each zone
+          const landingSpeed = Math.min(0.16, Math.max(0.08, dist * 0.002));
 
           if (dist > 2.5) {
-            bird.x += dx * speed;
-            bird.y += dy * speed;
-            bird.y = Math.max(NAVBAR_SAFE_Y - 6, bird.y);
+            bird.x += dx * landingSpeed;
+            bird.y += dy * landingSpeed;
+            bird.y = Math.max(NAVBAR_SAFE_Y - 4, bird.y);
 
             if (Math.abs(dx) > 1) {
               bird.scaleX = dx > 0 ? 1 : -1;
@@ -323,9 +343,9 @@ export function FlyingWren() {
             const targetAngle = Math.atan2(dy, Math.abs(dx)) * (180 / Math.PI) * 0.35;
             bird.rotation += (targetAngle - bird.rotation) * 0.18;
           } else {
-            // Touchdown: stop flying, stand peacefully
-            bird.x = destX;
-            bird.y = destY;
+            // Stopped flying: stands in place
+            bird.x = targetX;
+            bird.y = targetY;
             bird.rotation += (0 - bird.rotation) * 0.25;
 
             if (bird.isFlying) {
@@ -335,12 +355,11 @@ export function FlyingWren() {
           }
         }
 
-        // Direct DOM transform for 60fps GPU acceleration
+        // Direct DOM update for 60fps GPU acceleration
         const el = document.getElementById(`flying-wren-bird-${i}`);
         if (el) {
           el.style.transform = `translate3d(${bird.x}px, ${bird.y}px, 0) scaleX(${bird.scaleX}) rotate(${bird.rotation}deg)`;
-          
-          // Toggle flying / perched visibility classes smoothly
+
           const flyingLayer = el.querySelector(".bird-flying-layer") as HTMLElement;
           const perchedLayer = el.querySelector(".bird-perched-layer") as HTMLElement;
           if (flyingLayer && perchedLayer) {
@@ -382,10 +401,10 @@ export function FlyingWren() {
         />
       ))}
 
-      {/* 5 Realistic Wren Birds Flock */}
-      {FLOCK_CONFIG.map((cfg, i) => (
+      {/* 6 Realistic Wren Birds Roaming Freely Across Different Zones of the Website */}
+      {BIRDS_CONFIG.map((cfg, i) => (
         <div
-          key={i}
+          key={cfg.id}
           id={`flying-wren-bird-${i}`}
           className="absolute top-0 left-0 will-change-transform pointer-events-none"
           style={{
@@ -399,7 +418,7 @@ export function FlyingWren() {
             className={`relative w-full h-full ${
               i % 2 === 0 ? "animate-wren-flight-bob" : "animate-wren-perch-breathe"
             }`}
-            style={{ animationDelay: `${i * -0.6}s` }}
+            style={{ animationDelay: `${i * -0.7}s` }}
           >
             {/* Flying Pose Layer */}
             <div
@@ -407,16 +426,16 @@ export function FlyingWren() {
             >
               <Image
                 src="/assets/wren-flying.png"
-                alt={`Flying Wren Bird ${i + 1}`}
+                alt={`Roaming Wren Bird ${i + 1}`}
                 fill
                 priority
                 className="object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.22)] animate-wren-wing-flutter"
-                style={{ animationDelay: `${i * -0.08}s` }}
+                style={{ animationDelay: `${i * -0.09}s` }}
                 sizes={`${cfg.size}px`}
               />
             </div>
 
-            {/* Standing Pose Layer (100% solid opaque, stands on words) */}
+            {/* Standing Pose Layer (100% solid opaque) */}
             <div
               className="bird-perched-layer absolute inset-0 transition-opacity duration-100 opacity-100"
             >
