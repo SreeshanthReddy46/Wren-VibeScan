@@ -1,16 +1,13 @@
+// packages/cli/tsup.config.ts
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: {
-    cli: "src/cli.ts",
-    index: "src/index.ts",
-  },
-  format: ["cjs"],
+  entry: ["src/cli.ts"],
+  format: ["cjs"], // or ["esm"]
   dts: true,
   clean: true,
   banner: {
     js: "#!/usr/bin/env node",
   },
-  shims: true,
-  noExternal: ["@wren/core", "@wren/shared-types"],
+  noExternal: ["@wren/core", "@wren/shared-types"], // inlines internal workspace code
 });
