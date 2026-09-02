@@ -19,14 +19,27 @@ const packOutput = execSync("pnpm pack", {
 console.log(packOutput.trim());
 
 // 2. Find the generated tarball in root or packages/cli
-const tarballName = "wren-1.0.0.tgz";
-let tarballPath = path.join(rootDir, tarballName);
-if (!fs.existsSync(tarballPath)) {
-  tarballPath = path.join(cliPkgDir, tarballName);
+const possibleTarballs = [
+  "wren-cli-1.0.0.tgz",
+  "wren-1.0.0.tgz",
+];
+
+let tarballPath = null;
+for (const name of possibleTarballs) {
+  const p1 = path.join(rootDir, name);
+  const p2 = path.join(cliPkgDir, name);
+  if (fs.existsSync(p1)) {
+    tarballPath = p1;
+    break;
+  }
+  if (fs.existsSync(p2)) {
+    tarballPath = p2;
+    break;
+  }
 }
 
-if (!fs.existsSync(tarballPath)) {
-  throw new Error(`Tarball not found after pack: ${tarballPath}`);
+if (!tarballPath || !fs.existsSync(tarballPath)) {
+  throw new Error(`Tarball not found after pack in ${cliPkgDir}`);
 }
 console.log(`2. Successfully created release tarball: ${tarballPath}`);
 
@@ -42,10 +55,10 @@ const helpOutput = execSync(`node "${path.join(cliPkgDir, "dist", "cli.js")}" --
   encoding: "utf8",
 }).trim();
 
-if (versionOutput.includes("1.0.0") && helpOutput.includes("wren [path]")) {
+if (versionOutput.includes("1.0.0") && (helpOutput.includes("wren-cli [path]") || helpOutput.includes("wren [path]"))) {
   console.log("✔ Smoke test passed! CLI binary is verified and ready for npm publish.");
 } else {
-  throw new Error(`Unexpected smoke test output`);
+  throw new Error(`Unexpected smoke test output:\n${helpOutput}`);
 }
 
 // Clean up tarball

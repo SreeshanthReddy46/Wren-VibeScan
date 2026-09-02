@@ -18,7 +18,7 @@ export default function FAQPage() {
     },
     {
       q: "Does Wren send my private source code to external servers?",
-      a: "When running the local CLI (`npx wren scan .`), your code is evaluated locally on your computer and never uploaded or stored on any server. If you use the cloud dashboard, only high-level finding metadata (rule name, file path, line number) is synced.",
+      a: "When running the local CLI (`npx wren-cli check .`), your code is evaluated locally on your computer and never uploaded or stored on any server. If you use the cloud dashboard, only high-level finding metadata (rule name, file path, line number) is synced.",
     },
     {
       q: "Why does AI code have security vulnerabilities in the first place?",
@@ -30,7 +30,7 @@ export default function FAQPage() {
     },
     {
       q: "Is the local CLI scanner free?",
-      a: "Yes! You can run local scans on your computer with `npx wren scan .` completely free without creating an account.",
+      a: "Yes! You can run local scans on your computer with `npx wren-cli check .` completely free without creating an account.",
     },
   ];
 

@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Security scanning for AI-generated code, from your terminal.",
   "bin": {
+    "wren-cli": "./dist/cli.js",
     "wren": "./dist/cli.js"
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cli.js",
+  "types": "./dist/cli.d.ts",
   "files": [
     "dist",
     "README.md",

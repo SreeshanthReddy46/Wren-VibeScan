@@ -3,7 +3,7 @@
 > **Security scanning for AI-generated code, from your terminal to production.**  
 > Catch what Cursor, Lovable, Bolt, and v0 leave behind — before it reaches users.
 
-[![npm version](https://img.shields.io/npm/v/wren.svg?style=flat-square&color=0284c7)](https://www.npmjs.com/package/wren)
+[![npm version](https://img.shields.io/npm/v/wren-cli.svg?style=flat-square&color=0284c7)](https://www.npmjs.com/package/wren-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![CI Status](https://img.shields.io/github/actions/workflow/status/SreeshanthReddy46/Wren-VibeScan/ci.yml?branch=main&style=flat-square)](https://github.com/SreeshanthReddy46/Wren-VibeScan/actions)
 [![Turborepo](https://img.shields.io/badge/monorepo-Turborepo-ef4444.svg?style=flat-square)](https://turbo.build/repo)
@@ -33,7 +33,7 @@ wren/
 │   └── web/                    # Next.js 15 web app — marketing, dashboard, and API endpoints
 │
 ├── packages/
-│   ├── cli/                    # The npm-published "wren" package (wren check, login, init)
+│   ├── cli/                    # The npm-published "wren-cli" package (wren-cli check, login, init)
 │   ├── core/                   # Scan engine logic — shared between CLI and GitHub Action
 │   ├── shared-types/           # TypeScript types shared across web + CLI
 │   └── config/                 # Shared tsconfig bases (base, nextjs, node)
@@ -51,14 +51,14 @@ wren/
 Run directly against your current repository using `npx`:
 
 ```bash
-npx wren check .
+npx wren-cli check .
 ```
 
 Or install globally:
 
 ```bash
-npm install -g wren
-wren check
+npm install -g wren-cli
+wren-cli check
 ```
 
 ---
@@ -68,7 +68,7 @@ wren check
 - ⚡ **Lightning Fast**: Local scans run in milliseconds. No code is uploaded to the cloud.
 - 🎯 **Tailored for Vibe-Coding**: Specific rules targeting the known hallucination and oversight patterns of AI models.
 - 🚦 **CI/CD Failure Gates**: `--fail-on-critical` fails your build on critical vulnerabilities.
-- 📊 **GitHub Code Scanning**: Export findings directly to SARIF 2.1.0 format (`wren check --format sarif`).
+- 📊 **GitHub Code Scanning**: Export findings directly to SARIF 2.1.0 format (`wren-cli check --format sarif`).
 - 🛠️ **Remediation Code Diffs**: Instant code patches ready to apply.
 
 ---
@@ -77,12 +77,12 @@ wren check
 
 | Command | Description |
 |---|---|
-| `wren check [path]` | Scan directory for vulnerabilities (aliases: `wren [path]`, `wren scan`) |
-| `wren init` | Generate `.wrenignore` and `.wrenrc.json` configuration |
-| `wren login [token]` | Connect CLI to your Wren Cloud dashboard |
-| `wren logout` | Remove stored local credentials |
-| `wren --version` | Print installed CLI version |
-| `wren --help` | Show command help and options |
+| `wren-cli check [path]` | Scan directory for vulnerabilities (aliases: `wren-cli [path]`, `wren-cli scan`) |
+| `wren-cli init` | Generate `.wrenignore` and `.wrenrc.json` configuration |
+| `wren-cli login [token]` | Connect CLI to your Wren Cloud dashboard |
+| `wren-cli logout` | Remove stored local credentials |
+| `wren-cli --version` | Print installed CLI version |
+| `wren-cli --help` | Show command help and options |
 
 ---
 
@@ -112,7 +112,7 @@ pnpm build
 pnpm typecheck
 
 # Run CLI pre-publish smoke test
-pnpm --filter wren run test:smoke
+pnpm --filter wren-cli run test:smoke
 ```
 
 ---
