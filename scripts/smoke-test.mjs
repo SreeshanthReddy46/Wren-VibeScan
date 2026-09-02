@@ -20,6 +20,7 @@ console.log(packOutput.trim());
 
 // 2. Find the generated tarball in root or packages/cli
 const possibleTarballs = [
+  "wren-security-1.0.0.tgz",
   "wren-cli-1.0.0.tgz",
   "wren-1.0.0.tgz",
 ];
@@ -55,7 +56,7 @@ const helpOutput = execSync(`node "${path.join(cliPkgDir, "dist", "cli.js")}" --
   encoding: "utf8",
 }).trim();
 
-if (versionOutput.includes("1.0.0") && (helpOutput.includes("wren-cli [path]") || helpOutput.includes("wren [path]"))) {
+if (versionOutput.includes("1.0.0") && (helpOutput.includes("wren-security [path]") || helpOutput.includes("wren-cli [path]") || helpOutput.includes("wren [path]"))) {
   console.log("✔ Smoke test passed! CLI binary is verified and ready for npm publish.");
 } else {
   throw new Error(`Unexpected smoke test output:\n${helpOutput}`);

@@ -6,9 +6,9 @@ import { runLogoutCommand } from "./commands/logout";
 import { reportCrash } from "./telemetry/crash-reporter";
 import { ExitCode } from "./utils/exit-codes";
 
-const cli = cac("wren-cli");
+const cli = cac("wren-security");
 
-// 1. wren-cli check [path] (or wren-cli scan)
+// 1. wren-security check [path] (or wren-security scan)
 cli
   .command("[path]", "Scan codebase for AI-generated security vulnerabilities")
   .alias("check")

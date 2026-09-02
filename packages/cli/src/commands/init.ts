@@ -50,6 +50,6 @@ export function runInitCommand(): void {
   }
 
   if (createdCount > 0) {
-    console.log(pc.green("\n🦅 Wren initialized successfully! Run 'wren-cli check' to start scanning."));
+    console.log(pc.green("\n🦅 Wren initialized successfully! Run 'wren-security check' to start scanning."));
   }
 }

@@ -27,7 +27,7 @@ export default function InstallationPage() {
         <p className="text-sm text-zinc-700 leading-relaxed">
           If you have <strong>Node.js</strong> installed on your computer, you can run Wren immediately using <code className="bg-sky-50 text-sky-900 px-1 py-0.5 rounded font-mono text-xs">npx</code> without downloading any global software:
         </p>
-        <CodeBlock code="npx wren-cli check ." title="Terminal" />
+        <CodeBlock code="npx wren-security check ." title="Terminal" />
         <p className="text-xs text-zinc-500">
           💡 The dot (<code className="font-mono">.</code>) tells Wren to scan all files in your current folder.
         </p>
@@ -37,13 +37,13 @@ export default function InstallationPage() {
       <div className="p-6 sm:p-8 rounded-3xl border border-sky-200/80 bg-white/80 backdrop-blur-md space-y-4 shadow-xs">
         <h2 className="text-xl font-bold text-zinc-950">Method 2: Install Globally</h2>
         <p className="text-sm text-zinc-700 leading-relaxed">
-          If you want to use the shorter <code className="bg-zinc-100 px-1.5 py-0.5 rounded font-mono text-xs">wren-cli</code> command anywhere in your terminal:
+          If you want to use the shorter <code className="bg-zinc-100 px-1.5 py-0.5 rounded font-mono text-xs">wren-security</code> command anywhere in your terminal:
         </p>
-        <CodeBlock code="npm install -g wren-cli" title="Terminal" />
+        <CodeBlock code="npm install -g wren-security" title="Terminal" />
         <p className="text-xs text-zinc-600">
           Once installed, you can simply type:
         </p>
-        <CodeBlock code="wren-cli check" title="Terminal" />
+        <CodeBlock code="wren-security check" title="Terminal" />
       </div>
 
       {/* Beginner FAQ: Do I have Node.js? */}
@@ -70,11 +70,11 @@ export default function InstallationPage() {
             </thead>
             <tbody className="divide-y divide-sky-100 text-xs text-zinc-700">
               <tr>
-                <td className="p-4 font-mono font-bold text-zinc-950">npx wren-cli check .</td>
+                <td className="p-4 font-mono font-bold text-zinc-950">npx wren-security check .</td>
                 <td className="p-4 leading-relaxed">Scans the entire current folder and prints findings.</td>
               </tr>
               <tr>
-                <td className="p-4 font-mono font-bold text-zinc-950">npx wren-cli check ./src</td>
+                <td className="p-4 font-mono font-bold text-zinc-950">npx wren-security check ./src</td>
                 <td className="p-4 leading-relaxed">Scans only the <code className="font-mono text-zinc-800">src</code> subfolder.</td>
               </tr>
               <tr>

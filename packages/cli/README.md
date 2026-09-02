@@ -1,12 +1,11 @@
-# wren-cli 🦅
+# wren-security 🦅
 
 > **Security scanning for AI-generated code, directly from your terminal.**  
 > Catch what Cursor, Lovable, Bolt, and v0 leave behind — before it reaches production.
 
-[![npm version](https://img.shields.io/npm/v/wren-cli.svg?style=flat-square&color=0284c7)](https://www.npmjs.com/package/wren-cli)
+[![npm version](https://img.shields.io/npm/v/wren-security.svg?style=flat-square&color=0284c7)](https://www.npmjs.com/package/wren-security)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Node Version](https://img.shields.io/node/v/wren-cli.svg?style=flat-square)](https://nodejs.org)
-[![Provenance](https://img.shields.io/badge/npm-provenance-brightgreen.svg?style=flat-square)](https://docs.npmjs.com/generating-provenance-statements)
+[![Node Version](https://img.shields.io/node/v/wren-security.svg?style=flat-square)](https://nodejs.org)
 
 ---
 
@@ -15,14 +14,14 @@
 Run instantly against any directory with `npx`:
 
 ```bash
-npx wren-cli check .
+npx wren-security check .
 ```
 
 Or install globally:
 
 ```bash
-npm install -g wren-cli
-wren-cli check
+npm install -g wren-security
+wren-security check
 ```
 
 ---
@@ -53,31 +52,31 @@ AI code generators prioritize **speed** and **making the UI work immediately**. 
 
 ## Commands & Usage
 
-### 1. `wren-cli check [path]` (or `wren-cli scan`)
+### 1. `wren-security check [path]` (or `wren-security scan`)
 
 Scans your files for security vulnerabilities.
 
 ```bash
 # Scan current directory
-wren-cli check
+wren-security check
 
 # Scan a specific folder
-wren-cli check ./src
+wren-security check ./src
 
 # Exit with code 1 if critical vulnerabilities exist (perfect for CI/CD)
-wren-cli check --fail-on-critical
+wren-security check --fail-on-critical
 
 # Fail on high or critical issues
-wren-cli check --fail-on high
+wren-security check --fail-on high
 
 # Output as SARIF for GitHub Security Tab
-wren-cli check --format sarif -o results.sarif
+wren-security check --format sarif -o results.sarif
 
 # Output as machine-readable JSON
-wren-cli check --format json -o wren-report.json
+wren-security check --format json -o wren-report.json
 
 # Enable LLM-assisted reasoning
-wren-cli check --llm
+wren-security check --llm
 ```
 
 #### CLI Options:
@@ -96,12 +95,12 @@ wren-cli check --llm
 
 ---
 
-### 2. `wren-cli init`
+### 2. `wren-security init`
 
 Initializes Wren configuration in your repository:
 
 ```bash
-wren-cli init
+wren-security init
 ```
 
 Creates:
@@ -110,19 +109,19 @@ Creates:
 
 ---
 
-### 3. `wren-cli login [token]` & `wren-cli logout`
+### 3. `wren-security login [token]` & `wren-security logout`
 
 Connect your CLI to your Wren Cloud dashboard:
 
 ```bash
 # Interactive token prompt
-wren-cli login
+wren-security login
 
 # Or pass token directly
-wren-cli login <your-api-token>
+wren-security login <your-api-token>
 
 # Remove stored credentials
-wren-cli logout
+wren-security logout
 ```
 
 Stored securely in `~/.wren/config.json` (respects `XDG_CONFIG_HOME`).
@@ -177,7 +176,7 @@ jobs:
           node-version: 20
 
       - name: Run Wren Security Check
-        run: npx wren-cli check . --format sarif -o results.sarif --fail-on-critical
+        run: npx wren-security check . --format sarif -o results.sarif --fail-on-critical
 
       - name: Upload SARIF to GitHub Security Tab
         if: always()
@@ -193,7 +192,7 @@ jobs:
 You can also use Wren programmatically inside Node.js or build scripts:
 
 ```typescript
-import { runScan } from "wren-cli";
+import { runScan } from "wren-security";
 
 async function audit() {
   const result = await runScan({
@@ -239,7 +238,6 @@ audit();
 
 - **100% Local Execution**: Source code is parsed and analyzed locally on your machine.
 - **Zero Telemetry Leaks**: Code snippets are never transmitted to external analytics.
-- **Audited Builds**: Published with **npm provenance** cryptographically linking each package to its GitHub Actions commit and workflow.
 
 ---
 

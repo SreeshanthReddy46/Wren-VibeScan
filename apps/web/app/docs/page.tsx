@@ -110,7 +110,7 @@ export default function DocsOverviewPage() {
             </p>
             <CodeBlock
               title="Terminal"
-              code="npx wren-cli check ."
+              code="npx wren-security check ."
             />
           </div>
 
