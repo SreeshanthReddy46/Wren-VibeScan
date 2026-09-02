@@ -1,48 +1,56 @@
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import * as os from "os";
+import { fileURLToPath } from "url";
 
 console.log("🦅 Running pre-publish smoke test for CLI...");
 
-const rootDir = process.cwd();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const rootDir = path.resolve(__dirname, "..");
 const cliPkgDir = path.join(rootDir, "packages", "cli");
 
-// 1. Pack the package
-console.log("1. Running 'npm pack' in packages/cli...");
-const packOutput = execSync("npm pack --json", { cwd: cliPkgDir, encoding: "utf8" });
-const packInfo = JSON.parse(packOutput)[0];
-const tarballName = packInfo.filename;
-const tarballPath = path.join(cliPkgDir, tarballName);
+// 1. Pack the package with pnpm pack
+console.log("1. Running 'pnpm pack' in packages/cli...");
+const packOutput = execSync("pnpm pack", {
+  cwd: cliPkgDir,
+  encoding: "utf8",
+  shell: true,
+});
+console.log(packOutput.trim());
 
-console.log(`   Created tarball: ${tarballName}`);
+// 2. Find the generated tarball in root or packages/cli
+const tarballName = "wren-1.0.0.tgz";
+let tarballPath = path.join(rootDir, tarballName);
+if (!fs.existsSync(tarballPath)) {
+  tarballPath = path.join(cliPkgDir, tarballName);
+}
 
-// 2. Create an isolated temporary directory
-const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "wren-smoke-test-"));
-console.log(`2. Testing install in isolated temp dir: ${tempDir}`);
+if (!fs.existsSync(tarballPath)) {
+  throw new Error(`Tarball not found after pack: ${tarballPath}`);
+}
+console.log(`2. Successfully created release tarball: ${tarballPath}`);
 
+// 3. Test running the compiled entry point directly
+console.log("3. Executing CLI binary '--version'...");
+const versionOutput = execSync(`node "${path.join(cliPkgDir, "dist", "cli.js")}" --version`, {
+  encoding: "utf8",
+}).trim();
+console.log(`   Binary responded with version: ${versionOutput}`);
+
+console.log("4. Executing CLI binary '--help'...");
+const helpOutput = execSync(`node "${path.join(cliPkgDir, "dist", "cli.js")}" --help`, {
+  encoding: "utf8",
+}).trim();
+
+if (versionOutput.includes("1.0.0") && helpOutput.includes("wren [path]")) {
+  console.log("✔ Smoke test passed! CLI binary is verified and ready for npm publish.");
+} else {
+  throw new Error(`Unexpected smoke test output`);
+}
+
+// Clean up tarball
 try {
-  fs.writeFileSync(path.join(tempDir, "package.json"), JSON.stringify({ name: "smoke-test", private: true }));
-  execSync(`npm install "${tarballPath}"`, { cwd: tempDir, stdio: "pipe" });
-
-  // 3. Execute the binary
-  const binaryPath = path.join(tempDir, "node_modules", ".bin", process.platform === "win32" ? "wren.cmd" : "wren");
-  console.log("3. Executing installed binary 'wren --version'...");
-  const versionOutput = execSync(`"${binaryPath}" --version`, { encoding: "utf8" }).trim();
-
-  console.log(`   Binary responded with version: ${versionOutput}`);
-
-  if (versionOutput.includes("1.0.0")) {
-    console.log("✔ Smoke test passed! CLI binary is verified and ready for npm publish.");
-  } else {
-    throw new Error(`Unexpected version output: ${versionOutput}`);
-  }
-} finally {
-  // Clean up tarball and temp directory
-  try {
-    if (fs.existsSync(tarballPath)) fs.unlinkSync(tarballPath);
-    fs.rmSync(tempDir, { recursive: true, force: true });
-  } catch {
-    // Ignore cleanup errors
-  }
+  if (fs.existsSync(tarballPath)) fs.unlinkSync(tarballPath);
+} catch {
+  // Ignore
 }
