@@ -1,23 +1,48 @@
-import { createClient } from "@supabase/supabase-js";
-
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl!, supabaseAnonKey!, {
+// Client-side cache for Supabase instance
+let cachedClient: unknown = null;
+
+export async function getSupabaseClient() {
+  if (typeof window === "undefined") {
+    // Never instantiate or import @supabase/supabase-js during server-side rendering (SSR)
+    return null;
+  }
+  if (!isSupabaseConfigured) {
+    return null;
+  }
+  if (cachedClient) {
+    return cachedClient;
+  }
+
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    cachedClient = createClient(supabaseUrl!, supabaseAnonKey!, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
       },
-    })
-  : null;
+    });
+    return cachedClient;
+  } catch (err) {
+    console.warn("Failed to load Supabase client:", err);
+    return null;
+  }
+}
 
 export async function signInWithGoogleOAuth(): Promise<{ error: Error | null }> {
-  if (supabase) {
-    const { error } = await supabase.auth.signInWithOAuth({
+  const client = (await getSupabaseClient()) as {
+    auth: {
+      signInWithOAuth: (options: unknown) => Promise<{ error: { message: string } | null }>;
+    };
+  } | null;
+
+  if (client) {
+    const { error } = await client.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/dashboard`,
@@ -30,7 +55,7 @@ export async function signInWithGoogleOAuth(): Promise<{ error: Error | null }> 
     return { error: error ? new Error(error.message) : null };
   }
 
-  // Secure Mock Fallback for local development
+  // Secure Mock Fallback for local development / demo mode
   return new Promise((resolve) => {
     setTimeout(() => {
       if (typeof window !== "undefined") {
@@ -50,8 +75,14 @@ export async function signInWithGoogleOAuth(): Promise<{ error: Error | null }> 
 }
 
 export async function signInWithGitHubOAuth(): Promise<{ error: Error | null }> {
-  if (supabase) {
-    const { error } = await supabase.auth.signInWithOAuth({
+  const client = (await getSupabaseClient()) as {
+    auth: {
+      signInWithOAuth: (options: unknown) => Promise<{ error: { message: string } | null }>;
+    };
+  } | null;
+
+  if (client) {
+    const { error } = await client.auth.signInWithOAuth({
       provider: "github",
       options: {
         redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/dashboard`,
@@ -60,7 +91,7 @@ export async function signInWithGitHubOAuth(): Promise<{ error: Error | null }> 
     return { error: error ? new Error(error.message) : null };
   }
 
-  // Secure Mock Fallback for local development
+  // Secure Mock Fallback for local development / demo mode
   return new Promise((resolve) => {
     setTimeout(() => {
       if (typeof window !== "undefined") {
