@@ -33,8 +33,10 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-40 flex justify-center px-4 pt-4 sm:pt-6 transition-all duration-200">
       <nav
         className={cn(
-          "w-full max-w-6xl rounded-full border border-zinc-200/80 bg-white/85 backdrop-blur-md px-4 sm:px-6 py-2.5 shadow-pill transition-all flex items-center justify-between",
-          scrolled ? "bg-white/95 shadow-md border-zinc-300/80" : ""
+          "w-full max-w-6xl rounded-full px-4 sm:px-6 py-2.5 transition-all duration-300 flex items-center justify-between bg-transparent",
+          scrolled
+            ? "border border-white/40 bg-white/15 backdrop-blur-md shadow-xs"
+            : "border border-white/30 shadow-none"
         )}
         aria-label="Main Navigation"
       >
@@ -43,7 +45,7 @@ export function Navbar() {
           href="/"
           className="flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-zinc-800 rounded-lg p-0.5 group"
         >
-          <div className="relative h-8 w-8 rounded-full overflow-hidden border border-zinc-200/90 bg-white shadow-xs shrink-0 transition-transform duration-300 group-hover:scale-105">
+          <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/40 bg-white/40 shadow-xs shrink-0 transition-transform duration-300 group-hover:scale-105">
             <Image
               src="/assets/bird-logo.png"
               alt="Wren Logo"
@@ -53,7 +55,7 @@ export function Navbar() {
               sizes="32px"
             />
           </div>
-          <span className="font-semibold text-lg tracking-tight text-zinc-900">Wren</span>
+          <span className="font-semibold text-lg tracking-tight text-zinc-950">Wren</span>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -66,7 +68,7 @@ export function Navbar() {
                 href={link.href}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-800 rounded-md px-1 py-0.5",
-                  isActive ? "text-zinc-950 font-semibold" : "text-zinc-600"
+                  isActive ? "text-zinc-950 font-bold" : "text-zinc-800 hover:text-zinc-950"
                 )}
               >
                 {link.label}
@@ -78,12 +80,12 @@ export function Navbar() {
         {/* CTA Button */}
         <div className="hidden md:flex items-center gap-3">
           <Link href="/login">
-            <Button size="small" variant="ghost" className="rounded-full px-4 text-xs font-semibold text-zinc-700 hover:text-zinc-950">
+            <Button size="small" variant="ghost" className="rounded-full px-4 text-xs font-semibold text-zinc-800 hover:text-zinc-950 hover:bg-white/25">
               Sign in
             </Button>
           </Link>
           <Link href="/#waitlist">
-            <Button size="small" variant="primary" className="rounded-full px-5 text-xs font-semibold">
+            <Button size="small" variant="primary" className="rounded-full px-5 text-xs font-semibold shadow-xs">
               Join the waitlist
             </Button>
           </Link>
@@ -93,7 +95,7 @@ export function Navbar() {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-zinc-700 hover:text-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-800 rounded-full"
+          className="md:hidden p-2 text-zinc-800 hover:text-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-800 rounded-full"
           aria-expanded={mobileMenuOpen}
           aria-label="Toggle navigation menu"
         >
@@ -103,21 +105,21 @@ export function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed top-20 left-4 right-4 z-50 rounded-2xl border border-zinc-200/90 bg-white/98 p-6 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-200">
+        <div className="md:hidden fixed top-20 left-4 right-4 z-50 rounded-2xl border border-white/40 bg-white/80 p-6 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-200">
           <div className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-base font-medium text-zinc-700 hover:text-zinc-950 py-1"
+                className="text-base font-medium text-zinc-800 hover:text-zinc-950 py-1"
               >
                 {link.label}
               </Link>
             ))}
-            <div className="pt-3 border-t border-zinc-100 flex flex-col gap-2.5">
+            <div className="pt-3 border-t border-white/40 flex flex-col gap-2.5">
               <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" className="w-full justify-center rounded-xl py-2.5 text-zinc-800 font-semibold">
+                <Button variant="outline" className="w-full justify-center rounded-xl py-2.5 text-zinc-800 font-semibold bg-white/60 border-white/50">
                   Sign in
                 </Button>
               </Link>
