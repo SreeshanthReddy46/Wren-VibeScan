@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Github, Loader2, Eye, EyeOff, ShieldAlert, AlertTriangle, CheckCircle2, Lock, User, Mail } from "lucide-react";
-import { signInWithGoogleOAuth, signInWithGitHubOAuth } from "@/lib/supabase-client";
+import { Loader2, Eye, EyeOff, ShieldAlert, AlertTriangle, CheckCircle2, Lock, User, Mail } from "lucide-react";
+import { signInWithGoogleOAuth } from "@/lib/supabase-client";
 
 // Official Google G multi-color SVG icon
 function GoogleIcon({ className = "h-4 w-4" }: { className?: string }) {
@@ -44,7 +44,7 @@ export default function LoginPage() {
 
   // Status states
   const [loading, setLoading] = React.useState(false);
-  const [authProviderLoading, setAuthProviderLoading] = React.useState<"google" | "github" | null>(null);
+  const [googleLoading, setGoogleLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
 
@@ -102,7 +102,7 @@ export default function LoginPage() {
   const handleGoogleAuth = async () => {
     if (lockoutRemaining > 0) return;
     setError(null);
-    setAuthProviderLoading("google");
+    setGoogleLoading(true);
     try {
       const { error } = await signInWithGoogleOAuth();
       if (error) {
@@ -114,27 +114,7 @@ export default function LoginPage() {
     } catch {
       setError("An unexpected error occurred during Google sign in.");
     } finally {
-      setAuthProviderLoading(null);
-    }
-  };
-
-  // GitHub OAuth Handler
-  const handleGitHubAuth = async () => {
-    if (lockoutRemaining > 0) return;
-    setError(null);
-    setAuthProviderLoading("github");
-    try {
-      const { error } = await signInWithGitHubOAuth();
-      if (error) {
-        setError("Failed to authenticate with GitHub. Please try again.");
-      } else {
-        setSuccess(true);
-        setTimeout(() => router.push("/dashboard"), 400);
-      }
-    } catch {
-      setError("An unexpected error occurred during GitHub sign in.");
-    } finally {
-      setAuthProviderLoading(null);
+      setGoogleLoading(false);
     }
   };
 
@@ -211,7 +191,7 @@ export default function LoginPage() {
   };
 
   const isFormLocked = lockoutRemaining > 0;
-  const isAnyLoading = loading || authProviderLoading !== null;
+  const isAnyLoading = loading || googleLoading;
 
   return (
     <div className="space-y-6">
@@ -257,9 +237,8 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* OAuth Actions */}
-      <div className="space-y-2.5">
-        {/* Google OAuth */}
+      {/* Google OAuth Action */}
+      <div>
         <Button
           type="button"
           variant="outline"
@@ -267,28 +246,12 @@ export default function LoginPage() {
           disabled={isAnyLoading || isFormLocked}
           className="w-full h-11 rounded-xl flex items-center justify-center gap-3 font-medium border-sky-200/90 bg-white/95 hover:bg-sky-50/70 text-zinc-800 shadow-xs transition-all duration-150 active:scale-[0.99]"
         >
-          {authProviderLoading === "google" ? (
+          {googleLoading ? (
             <Loader2 className="h-4 w-4 animate-spin text-zinc-600" />
           ) : (
             <GoogleIcon className="h-4 w-4" />
           )}
           <span>Continue with Google</span>
-        </Button>
-
-        {/* GitHub OAuth */}
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleGitHubAuth}
-          disabled={isAnyLoading || isFormLocked}
-          className="w-full h-11 rounded-xl flex items-center justify-center gap-3 font-medium border-sky-200/90 bg-white/95 hover:bg-sky-50/70 text-zinc-800 shadow-xs transition-all duration-150 active:scale-[0.99]"
-        >
-          {authProviderLoading === "github" ? (
-            <Loader2 className="h-4 w-4 animate-spin text-zinc-600" />
-          ) : (
-            <Github className="h-4 w-4 text-zinc-900" />
-          )}
-          <span>Continue with GitHub</span>
         </Button>
       </div>
 
