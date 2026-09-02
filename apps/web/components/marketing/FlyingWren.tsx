@@ -373,20 +373,20 @@ export function FlyingWren() {
                   alt={`Wren Bird ${i + 1}`}
                   fill
                   priority={i === 0}
-                  className="object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.20)] animate-wren-wing-flutter"
+                  className="object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.20)] animate-wren-wing-flutter pointer-events-none"
                   style={{ animationDelay: `${i * -0.09}s` }}
                   sizes={`${actualSize}px`}
                 />
               </div>
 
               {/* Standing Pose Layer */}
-              <div className="bird-perched-layer absolute inset-0 transition-opacity duration-150 opacity-100">
+              <div className="bird-perched-layer absolute inset-0 transition-opacity duration-150 opacity-100 pointer-events-none">
                 <Image
                   src="/assets/wren-perched.png"
                   alt={`Standing Wren Bird ${i + 1}`}
                   fill
                   priority={i === 0}
-                  className="object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.22)]"
+                  className="object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.22)] pointer-events-none"
                   sizes={`${actualSize}px`}
                 />
               </div>
