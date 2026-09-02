@@ -1,0 +1,55 @@
+{
+  "name": "wren",
+  "version": "1.0.0",
+  "description": "Security scanning for AI-generated code, from your terminal.",
+  "bin": {
+    "wren": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SreeshanthReddy46/Wren-VibeScan"
+  },
+  "keywords": [
+    "security",
+    "cli",
+    "vibe-coding",
+    "code-scanning",
+    "ai"
+  ],
+  "license": "MIT",
+  "author": "Wren Security",
+  "homepage": "https://wren.dev",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch --onSuccess \"node dist/cli.js\"",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build && node ../../scripts/smoke-test.mjs",
+    "test:smoke": "node ../../scripts/smoke-test.mjs"
+  },
+  "dependencies": {
+    "cac": "^6.7.14",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@wren/config": "workspace:*",
+    "@wren/core": "workspace:*",
+    "@wren/shared-types": "workspace:*",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3"
+  }
+}

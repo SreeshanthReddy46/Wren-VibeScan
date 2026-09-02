@@ -1,0 +1,24 @@
+{
+  "name": "@wren/core",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@wren/shared-types": "workspace:*",
+    "ignore": "^7.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@wren/config": "workspace:*",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3"
+  }
+}
