@@ -109,7 +109,7 @@ export default function LoginPage() {
         setError("Failed to authenticate with Google. Please try again.");
       } else {
         setSuccess(true);
-        setTimeout(() => router.push("/dashboard"), 400);
+        setTimeout(() => router.push("/"), 400);
       }
     } catch {
       setError("An unexpected error occurred during Google sign in.");
@@ -182,7 +182,7 @@ export default function LoginPage() {
           })
         );
       }
-      setTimeout(() => router.push("/dashboard"), 400);
+      setTimeout(() => router.push("/"), 400);
     } catch {
       setError("Network error. Could not connect to authentication server.");
     } finally {
@@ -199,7 +199,7 @@ export default function LoginPage() {
       <div className="text-center space-y-1.5">
         <h1 className="text-2xl font-extrabold tracking-tight text-zinc-950">Welcome back</h1>
         <p className="text-xs text-zinc-600">
-          Sign in to your Wren Security account to access your workspace.
+          Sign in to your Wren Security account.
         </p>
       </div>
 

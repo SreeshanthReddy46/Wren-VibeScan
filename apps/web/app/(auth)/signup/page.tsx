@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Github, Loader2, Eye, EyeOff, AlertTriangle, CheckCircle2, Lock, User, Mail } from "lucide-react";
-import { signInWithGoogleOAuth, signInWithGitHubOAuth } from "@/lib/supabase-client";
+import { Loader2, Eye, EyeOff, AlertTriangle, CheckCircle2, Lock, User, Mail } from "lucide-react";
+import { signInWithGoogleOAuth } from "@/lib/supabase-client";
 
 function GoogleIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -40,45 +40,26 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const [loading, setLoading] = React.useState(false);
-  const [authProviderLoading, setAuthProviderLoading] = React.useState<"google" | "github" | null>(null);
+  const [googleLoading, setGoogleLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
 
-  // Handle Google OAuth
+  // Handle Google OAuth (directs directly to Google Accounts / Gmail)
   const handleGoogleAuth = async () => {
     setError(null);
-    setAuthProviderLoading("google");
+    setGoogleLoading(true);
     try {
       const { error } = await signInWithGoogleOAuth();
       if (error) {
         setError("Failed to authenticate with Google.");
       } else {
         setSuccess(true);
-        setTimeout(() => router.push("/dashboard"), 400);
+        setTimeout(() => router.push("/"), 400);
       }
     } catch {
       setError("An error occurred during Google authentication.");
     } finally {
-      setAuthProviderLoading(null);
-    }
-  };
-
-  // Handle GitHub OAuth
-  const handleGitHubAuth = async () => {
-    setError(null);
-    setAuthProviderLoading("github");
-    try {
-      const { error } = await signInWithGitHubOAuth();
-      if (error) {
-        setError("Failed to authenticate with GitHub.");
-      } else {
-        setSuccess(true);
-        setTimeout(() => router.push("/dashboard"), 400);
-      }
-    } catch {
-      setError("An error occurred during GitHub authentication.");
-    } finally {
-      setAuthProviderLoading(null);
+      setGoogleLoading(false);
     }
   };
 
@@ -113,7 +94,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // In local dev/demo, simulate account creation and redirect
+      // In local dev/demo, simulate account creation and redirect to home
       setTimeout(() => {
         setSuccess(true);
         if (typeof window !== "undefined") {
@@ -126,7 +107,7 @@ export default function SignupPage() {
             })
           );
         }
-        setTimeout(() => router.push("/dashboard"), 400);
+        setTimeout(() => router.push("/"), 400);
       }, 500);
     } catch {
       setError("An unexpected error occurred during signup.");
@@ -134,7 +115,7 @@ export default function SignupPage() {
     }
   };
 
-  const isAnyLoading = loading || authProviderLoading !== null;
+  const isAnyLoading = loading || googleLoading;
 
   return (
     <div className="space-y-6">
@@ -142,7 +123,7 @@ export default function SignupPage() {
       <div className="text-center space-y-1.5">
         <h1 className="text-2xl font-extrabold tracking-tight text-zinc-950">Create your account</h1>
         <p className="text-xs text-zinc-600">
-          Start catching vulnerabilities in your vibe-coded apps in minutes.
+          Get started with Wren Security to scan and secure your vibe-coded apps.
         </p>
       </div>
 
@@ -162,12 +143,12 @@ export default function SignupPage() {
       {success && (
         <div className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-          <span>Account created! Redirecting to dashboard...</span>
+          <span>Account created! Redirecting...</span>
         </div>
       )}
 
-      {/* OAuth Buttons */}
-      <div className="space-y-2.5">
+      {/* Google OAuth Action */}
+      <div>
         <Button
           type="button"
           variant="outline"
@@ -175,27 +156,12 @@ export default function SignupPage() {
           disabled={isAnyLoading}
           className="w-full h-11 rounded-xl flex items-center justify-center gap-3 font-medium border-sky-200/90 bg-white/95 hover:bg-sky-50/70 text-zinc-800 shadow-xs transition-all duration-150 active:scale-[0.99]"
         >
-          {authProviderLoading === "google" ? (
+          {googleLoading ? (
             <Loader2 className="h-4 w-4 animate-spin text-zinc-600" />
           ) : (
             <GoogleIcon className="h-4 w-4" />
           )}
           <span>Sign up with Google</span>
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleGitHubAuth}
-          disabled={isAnyLoading}
-          className="w-full h-11 rounded-xl flex items-center justify-center gap-3 font-medium border-sky-200/90 bg-white/95 hover:bg-sky-50/70 text-zinc-800 shadow-xs transition-all duration-150 active:scale-[0.99]"
-        >
-          {authProviderLoading === "github" ? (
-            <Loader2 className="h-4 w-4 animate-spin text-zinc-600" />
-          ) : (
-            <Github className="h-4 w-4 text-zinc-900" />
-          )}
-          <span>Sign up with GitHub</span>
         </Button>
       </div>
 
@@ -238,7 +204,7 @@ export default function SignupPage() {
         {/* Email or Gmail */}
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
-            <span>Email or Gmail Address</span>
+            <span>Email or Gmail</span>
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -319,9 +285,6 @@ export default function SignupPage() {
           <Link href="/login" className="text-sky-900 font-bold hover:underline">
             Sign in
           </Link>
-        </div>
-        <div className="text-[11px] text-zinc-400">
-          By signing up, you agree to our Terms of Service & Privacy Policy.
         </div>
       </div>
     </div>

@@ -531,3 +531,38 @@
     transform: translate(-50%, 0) rotate(360deg);
   }
 }
+
+/* =========================================================================
+   MOBILE RESPONSIVENESS & ZERO-LAG 60FPS COMPOSITING
+   ========================================================================= */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  position: relative;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (max-width: 768px) {
+  /* Prevent horizontal layout shifts on phones */
+  * {
+    max-width: 100%;
+  }
+
+  /* Optimize touch responsiveness */
+  button, a, input {
+    touch-action: manipulation;
+  }
+
+  /* Reduce GPU filter strain on mobile phones */
+  .realistic-sun-glow {
+    animation-duration: 12s !important;
+  }
+
+  /* Hardware acceleration for phone scrolling */
+  .will-change-transform {
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+

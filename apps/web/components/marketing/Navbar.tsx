@@ -77,6 +77,11 @@ export function Navbar() {
 
         {/* CTA Button */}
         <div className="hidden md:flex items-center gap-3">
+          <Link href="/login">
+            <Button size="small" variant="ghost" className="rounded-full px-4 text-xs font-semibold text-zinc-700 hover:text-zinc-950">
+              Sign in
+            </Button>
+          </Link>
           <Link href="/#waitlist">
             <Button size="small" variant="primary" className="rounded-full px-5 text-xs font-semibold">
               Join the waitlist
@@ -111,14 +116,14 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-3 border-t border-zinc-100 flex flex-col gap-2.5">
-              <Link href="/#waitlist" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="primary" className="w-full justify-center rounded-xl py-2.5">
-                  Join the waitlist
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" className="w-full justify-center rounded-xl py-2.5 text-zinc-800 font-semibold">
+                  Sign in
                 </Button>
               </Link>
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" className="w-full justify-center rounded-xl py-2.5">
-                  Dashboard
+              <Link href="/#waitlist" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="primary" className="w-full justify-center rounded-xl py-2.5 font-semibold">
+                  Join the waitlist
                 </Button>
               </Link>
             </div>
