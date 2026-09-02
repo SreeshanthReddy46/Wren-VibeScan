@@ -1,90 +1,133 @@
-# Wren
+# Wren 🦅
 
-**A security scanner built for the AI-coding era.**
+> **Security scanning for AI-generated code, from your terminal to production.**  
+> Catch what Cursor, Lovable, Bolt, and v0 leave behind — before it reaches users.
 
-Wren catches the vulnerabilities that slip into apps built with AI coding
-tools — Cursor, Bolt, Lovable, v0, and similar — before they ever reach
-production.
-
----
-
-## Why Wren Exists
-
-AI coding tools have made it possible to ship a working app in minutes.
-What they haven't solved is security review. Code that looks complete in
-a demo often ships with the same quiet, dangerous mistakes: exposed API
-keys, missing authentication checks, unprotected database rules, and
-edge cases nobody tested because the happy path worked fine.
-
-These issues don't show up until someone finds them — and by then, it's
-usually too late. Wren exists to find them first.
+[![npm version](https://img.shields.io/npm/v/wren.svg?style=flat-square&color=0284c7)](https://www.npmjs.com/package/wren)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/SreeshanthReddy46/Wren-VibeScan/ci.yml?branch=main&style=flat-square)](https://github.com/SreeshanthReddy46/Wren-VibeScan/actions)
+[![Turborepo](https://img.shields.io/badge/monorepo-Turborepo-ef4444.svg?style=flat-square)](https://turbo.build/repo)
+[![pnpm](https://img.shields.io/badge/pnpm-workspace-orange.svg?style=flat-square)](https://pnpm.io)
 
 ---
 
-## What Wren Checks For
+## What is Wren?
 
-- **Exposed secrets** — hardcoded API keys, committed `.env` files,
-  credentials left in client-side code
-- **Missing authentication** — routes and endpoints with no auth check,
-  or auth logic that isn't actually reachable in every code path
-- **Unprotected data access** — database rules and permissions that
-  leave records readable or writable by anyone
-- **Unhandled edge cases** — the failure states AI-generated code
-  systematically skips because only the happy path was ever tested
+Wren statically analyzes modern web and full-stack codebases to flag the subtle, dangerous security vulnerabilities AI coding assistants leave behind:
+- **Exposed API keys & secrets** (`sk-...`, `sk_live_...`, database credentials)
+- **Unauthenticated route handlers** (`POST`/`DELETE` endpoints lacking session checks)
+- **Client-side leaked admin keys** (`NEXT_PUBLIC_` prefixes on private tokens)
+- **Overly permissive database security rules** (`allow read, write: if true;`)
 
----
-
-## How It Works
-
-Wren combines three layers of review:
-
-1. **Fast pattern-based scanning** catches the well-known, deterministic
-   issues — the ones with a clear signature.
-2. **Structural code analysis** goes deeper, tracing logic that pattern
-   matching alone can't reach — like whether a permission check actually
-   applies where it's supposed to.
-3. **Targeted reasoning on flagged issues** evaluates the small set of
-   candidates the first two layers surface, reducing false positives and
-   catching problems that require understanding intent, not just syntax.
-
-The result is a report ranked by severity, written in plain language,
-pointing to the exact file and line — built to read like a clean audit
-log, not a wall of warnings.
+Wren combines sub-second static analysis with AST parsing to pinpoint the exact line, explain the threat in plain English, and provide a copy-paste code diff fix.
 
 ---
 
-## Getting Started
+## Monorepo Architecture
 
-```bash
-npx wren check
+This repository is organized as a **Turborepo** + **pnpm workspace** monorepo:
+
+```
+wren/
+├── apps/
+│   └── web/                    # Next.js 15 web app — marketing, dashboard, and API endpoints
+│
+├── packages/
+│   ├── cli/                    # The npm-published "wren" package (wren check, login, init)
+│   ├── core/                   # Scan engine logic — shared between CLI and GitHub Action
+│   ├── shared-types/           # TypeScript types shared across web + CLI
+│   └── config/                 # Shared tsconfig bases (base, nextjs, node)
+│
+├── .changeset/                 # Changesets release config & automated changelog
+├── .github/workflows/          # CI/CD pipelines (CI testing + npm provenance publishing)
+├── turbo.json                  # Turborepo task pipelines
+└── pnpm-workspace.yaml         # pnpm workspace definition
 ```
 
-That's it. Wren scans your project from the terminal and prints a
-report. No account required to run a local scan.
+---
 
-For continuous checks on every pull request, Wren also runs as a GitHub
-Action.
+## Quick Start (Zero Install)
+
+Run directly against your current repository using `npx`:
+
+```bash
+npx wren check .
+```
+
+Or install globally:
+
+```bash
+npm install -g wren
+wren check
+```
 
 ---
 
-## A Note on Privacy
+## Core Features
 
-Wren scans locally by default. Your source code is not uploaded to run
-a scan — only summary results sync to your dashboard if you choose to
-create an account. A security tool asking for your entire codebase
-should be a hard sell, and we built Wren so it doesn't have to be one.
-
----
-
-## The Name
-
-A wren is a small, easily overlooked bird — but its call is precise and
-impossible to miss. Wren stays quiet until it finds something real, then
-tells you exactly what, and where.
+- ⚡ **Lightning Fast**: Local scans run in milliseconds. No code is uploaded to the cloud.
+- 🎯 **Tailored for Vibe-Coding**: Specific rules targeting the known hallucination and oversight patterns of AI models.
+- 🚦 **CI/CD Failure Gates**: `--fail-on-critical` fails your build on critical vulnerabilities.
+- 📊 **GitHub Code Scanning**: Export findings directly to SARIF 2.1.0 format (`wren check --format sarif`).
+- 🛠️ **Remediation Code Diffs**: Instant code patches ready to apply.
 
 ---
 
-## Status
+## CLI Commands
 
-Wren is under active development. Feedback, issues, and early testers
-are welcome.
+| Command | Description |
+|---|---|
+| `wren check [path]` | Scan directory for vulnerabilities (aliases: `wren [path]`, `wren scan`) |
+| `wren init` | Generate `.wrenignore` and `.wrenrc.json` configuration |
+| `wren login [token]` | Connect CLI to your Wren Cloud dashboard |
+| `wren logout` | Remove stored local credentials |
+| `wren --version` | Print installed CLI version |
+| `wren --help` | Show command help and options |
+
+---
+
+## Development & Monorepo Workflows
+
+### Prerequisites
+- Node.js >= 18.0.0
+- pnpm >= 11.0.0
+
+### Getting Started
+
+```bash
+# Clone the repository
+git clone https://github.com/SreeshanthReddy46/Wren-VibeScan.git
+cd Wren-VibeScan
+
+# Install dependencies across all workspace packages
+pnpm install
+
+# Start development servers (Web app on port 3000 + watch mode for packages)
+pnpm dev
+
+# Build all packages with Turborepo caching
+pnpm build
+
+# Run typecheck across all workspace projects
+pnpm typecheck
+
+# Run CLI pre-publish smoke test
+pnpm --filter wren run test:smoke
+```
+
+---
+
+## Automated Releases & Changesets
+
+Wren follows automated semantic versioning powered by [Changesets](https://github.com/changesets/changesets):
+
+1. Make a change in a package.
+2. Run `pnpm changeset` and describe the change (patch, minor, or major).
+3. Open a PR and merge to `main`.
+4. GitHub Actions automatically generates a "Version Packages" PR and publishes to npm with cryptographic provenance (`id-token: write`).
+
+---
+
+## License
+
+[MIT](LICENSE) © Wren Security
