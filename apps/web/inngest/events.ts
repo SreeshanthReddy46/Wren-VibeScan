@@ -42,6 +42,26 @@ export type ScanFailedData = {
   error: string;
 };
 
+export type RemediationRequestedData = {
+  remediationId: string;
+  scanId: string;
+  findingId: string;
+  repoName: string;
+  targetPath?: string;
+};
+
+export type RemediationCompletedData = {
+  remediationId: string;
+  prUrl: string;
+  prNumber: number;
+  branchName: string;
+};
+
+export type RemediationFailedData = {
+  remediationId: string;
+  error: string;
+};
+
 export type Events = {
   "scan.requested": { data: ScanRequestedData };
   "scan.progress": { data: ScanProgressData };
@@ -49,4 +69,8 @@ export type Events = {
   "finding.verified": { data: FindingVerifiedData };
   "scan.completed": { data: ScanCompletedData };
   "scan.failed": { data: ScanFailedData };
+  "remediation.requested": { data: RemediationRequestedData };
+  "remediation.completed": { data: RemediationCompletedData };
+  "remediation.failed": { data: RemediationFailedData };
 };
+
