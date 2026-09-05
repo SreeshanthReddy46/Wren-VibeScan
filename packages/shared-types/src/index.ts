@@ -222,3 +222,62 @@ export interface AgentTraceRecord {
   timestamp: string;
 }
 
+export interface CustomerAgentEvent {
+  id: string;
+  agentId: string;
+  sessionId?: string;
+  environment?: string;
+  action: string;
+  declaredIntent?: string;
+  arguments: Record<string, unknown>;
+  result?: {
+    status: "success" | "error";
+    outputSnippet?: string;
+  };
+  metadata?: Record<string, unknown>;
+  timestamp: string;
+}
+
+export interface RuntimeRuleViolation {
+  ruleId: string;
+  ruleName: string;
+  severity: Severity;
+  category:
+    | "destructive_action"
+    | "privilege_escalation"
+    | "credential_leak"
+    | "pii_exposure"
+    | "scope_violation";
+  description: string;
+  evidence: string;
+  suggestedAction: string;
+}
+
+export interface RuntimeAlert {
+  id: string;
+  eventId: string;
+  agentId: string;
+  ruleId: string;
+  ruleName: string;
+  severity: Severity;
+  category: RuntimeRuleViolation["category"];
+  description: string;
+  evidence: string;
+  suggestedAction: string;
+  status: "active" | "acknowledged" | "resolved";
+  webhookSent: boolean;
+  webhookStatus?: "delivered" | "failed" | "pending";
+  createdAt: string;
+}
+
+export interface RuntimeWebhookConfig {
+  id: string;
+  projectId: string;
+  url: string;
+  secret: string;
+  enabled: boolean;
+  minSeverity: "all" | "high" | "critical";
+  createdAt: string;
+}
+
+
