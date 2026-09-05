@@ -33,12 +33,40 @@ export async function runAgentLoop(
       return { findings, llmApplied: false };
     }
 
-    // 2. Setup sandboxed codebase tools
+    // 2. Setup sandboxed codebase tools and memory store
     const tools = createCodebaseTools(config.targetPath || ".");
     const verifications = new Map<string, VerificationResult>();
+    const memoryStore = config.memoryStore;
 
     // 3. Investigator & Verifier loop per finding
     for (const finding of investigationQueue) {
+      // Memory check: Tier 1 (Hash) & Tier 2 (pgvector)
+      if (memoryStore) {
+        try {
+          const memoryLookup = await memoryStore.lookup(finding, config.projectId);
+          if (
+            memoryLookup.hit &&
+            (memoryLookup.hitType === "EXACT_HASH" ||
+              memoryLookup.hitType === "VECTOR_HIGH_CONFIDENCE") &&
+            memoryLookup.match
+          ) {
+            // High-confidence cache hit! Bypass LLM investigator & verifier completely
+            const cached = memoryLookup.match.entry;
+            verifications.set(finding.id, {
+              findingId: finding.id,
+              verdict: cached.verdict,
+              rationale: `[Memory Hit: ${memoryLookup.hitType}] ${cached.rationale}`,
+              confidence: cached.confidence,
+              adjustedSeverity: cached.adjustedSeverity,
+              suggestedFix: cached.suggestedFix,
+            });
+            continue;
+          }
+        } catch {
+          // On memory lookup error, proceed with standard agent loop
+        }
+      }
+
       // Phase 2: Investigator (native tool-use loop)
       const investigation = await investigateFinding(
         finding,
@@ -56,6 +84,15 @@ export async function runAgentLoop(
       );
 
       verifications.set(finding.id, verification);
+
+      // Save fresh verdict to memory store
+      if (memoryStore) {
+        try {
+          await memoryStore.save(finding, verification, config.projectId, true);
+        } catch {
+          // On memory save error, ignore
+        }
+      }
     }
 
     // 4. Reporter: synthesize findings, eliminate false positives, enrich confirmed findings

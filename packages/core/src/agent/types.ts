@@ -8,15 +8,17 @@ export interface AgentProgressEvent {
 
 export interface AgentScanConfig {
   targetPath: string;
+  projectId?: string;
   apiKey?: string;
   apiUrl?: string;
   model?: string;
   maxToolTurns?: number;
   timeoutMs?: number;
+  memoryStore?: any;
   onProgress?: (event: AgentProgressEvent) => void;
 }
 
-export const DEFAULT_AGENT_CONFIG: Required<Omit<AgentScanConfig, "apiKey" | "apiUrl" | "onProgress">> = {
+export const DEFAULT_AGENT_CONFIG: Required<Omit<AgentScanConfig, "apiKey" | "apiUrl" | "onProgress" | "memoryStore" | "projectId">> = {
   targetPath: ".",
   model: "claude-3-5-sonnet-latest",
   maxToolTurns: 4,
