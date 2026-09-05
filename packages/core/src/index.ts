@@ -16,6 +16,7 @@ export * from "./agent/planner";
 export * from "./agent/investigator";
 export * from "./agent/verifier";
 export * from "./agent/reporter";
+export * from "./memory/types";
 
 export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
