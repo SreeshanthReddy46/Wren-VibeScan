@@ -10,6 +10,7 @@ import type {
 test("ScanLifecycleStatus encompasses all progression states", () => {
   const statuses: ScanLifecycleStatus[] = [
     "queued",
+    "running",
     "discovering",
     "static_analysis",
     "agent_investigating",
@@ -17,7 +18,7 @@ test("ScanLifecycleStatus encompasses all progression states", () => {
     "completed",
     "failed",
   ];
-  assert.equal(statuses.length, 7);
+  assert.equal(statuses.length, 8);
 });
 
 test("ScanJobResponse provides queued status and dashboardUrl", () => {

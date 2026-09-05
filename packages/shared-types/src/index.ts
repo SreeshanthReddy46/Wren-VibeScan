@@ -111,6 +111,7 @@ export interface ApiScanResponse {
 
 export type ScanLifecycleStatus =
   | "queued"
+  | "running"
   | "discovering"
   | "static_analysis"
   | "agent_investigating"
