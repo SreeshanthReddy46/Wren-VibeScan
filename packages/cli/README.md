@@ -75,6 +75,9 @@ wren-security check --format sarif -o results.sarif
 # Output as machine-readable JSON
 wren-security check --format json -o wren-report.json
 
+# Asynchronous background scan with real-time status
+wren-security check --async
+
 # Enable LLM-assisted reasoning
 wren-security check --llm
 ```
@@ -84,10 +87,11 @@ wren-security check --llm
 | Flag | Type | Description | Default |
 |---|---|---|---|
 | `[path]` | `string` | Target directory to scan | `.` (current directory) |
+| `--async` | `boolean` | Dispatch scan to background queue and stream progress | `false` |
 | `--fail-on-critical` | `boolean` | Exit code `1` if critical findings are found | `false` |
 | `--fail-on <severity>` | `string` | Exit code `1` if findings at or above threshold exist (`critical`, `high`, `medium`) | — |
 | `--format <format>` | `string` | Output format: `terminal`, `json`, or `sarif` | `terminal` |
-| `--llm` | `boolean` | Enrich findings with contextual LLM reasoning | `false` |
+| `--llm` | `boolean` | Enrich findings with contextual LLM reasoning & agent loop | `false` |
 | `-o, --output <file>` | `string` | Write report output directly to a file | stdout |
 | `--api-key <key>` | `string` | Wren Cloud or Anthropic API key | — |
 | `-v, --version` | `boolean` | Display version number | — |
@@ -95,7 +99,38 @@ wren-security check --llm
 
 ---
 
-### 2. `wren-security init`
+### 2. `wren-security fix [findingId]`
+
+Generates an AST syntax-verified remediation patch and applies it or dispatches a GitHub Pull Request:
+
+```bash
+# Preview proposed unified diff patch without touching disk
+wren-security fix --dry-run
+
+# Apply verified patch directly to local disk
+wren-security fix --apply-locally
+
+# Remediate a specific finding by ID
+wren-security fix hardcoded-secret-abc123 --apply-locally
+
+# Dispatch an isolated branch and Pull Request via GitHub App
+wren-security fix --open-pr --repo owner/repo
+```
+
+#### Fix Options:
+
+| Flag | Type | Description | Default |
+|---|---|---|---|
+| `[findingId]` | `string` | ID of the finding to remediate | First finding |
+| `--dry-run` | `boolean` | Preview unified diff patch without writing to disk | `false` |
+| `--apply-locally` | `boolean` | Apply verified patch directly to the target file on disk | `false` |
+| `--open-pr` | `boolean` | Create a branch and open a GitHub Pull Request | `false` |
+| `--repo <owner/repo>`| `string` | Target GitHub repository (auto-detected from git remote) | Local remote |
+| `--api-url <url>` | `string` | Custom Wren Cloud API endpoint | `http://localhost:3000` |
+
+---
+
+### 3. `wren-security init`
 
 Initializes Wren configuration in your repository:
 
@@ -109,7 +144,7 @@ Creates:
 
 ---
 
-### 3. `wren-security login [token]` & `wren-security logout`
+### 4. `wren-security login [token]` & `wren-security logout`
 
 Connect your CLI to your Wren Cloud dashboard:
 
