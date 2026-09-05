@@ -20,6 +20,7 @@ export * from "./memory/types";
 export * from "./memory/hash";
 export * from "./memory/anonymizer";
 export * from "./memory/embeddings";
+export * from "./memory/store";
 
 export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
