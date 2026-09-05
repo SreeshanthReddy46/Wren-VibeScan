@@ -17,6 +17,7 @@ export * from "./agent/investigator";
 export * from "./agent/verifier";
 export * from "./agent/critic";
 export * from "./agent/reporter";
+export * from "./agent/tracer";
 export * from "./memory/types";
 export * from "./memory/hash";
 export * from "./memory/anonymizer";
