@@ -94,7 +94,7 @@ test("End-to-End: Agent Loop investigates middleware.ts and eliminates false pos
   );
 
   assert.equal(agentResult.llmApplied, true);
-  // The false positive was successfully eliminated by the verifier & reporter!
+  // The false positive was successfully eliminated by the verifier, critic, & reporter!
   assert.equal(agentResult.findings.length, 0);
-  assert.equal(agentCalls, 3);
+  assert.equal(agentCalls, 4); // Planner, Investigator, Verifier, Critic
 });

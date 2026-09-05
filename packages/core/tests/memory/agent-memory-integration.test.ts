@@ -103,7 +103,7 @@ test("runAgentLoop populates memory on new finding verification", async () => {
 
   assert.equal(result.llmApplied, true);
   assert.equal(result.findings.length, 1);
-  assert.equal(calls, 2);
+  assert.equal(calls, 3); // Investigator, Verifier, Critic
 
   // Now verify that the finding was stored in the memory store
   const cachedLookup = await store.lookup(finding);
