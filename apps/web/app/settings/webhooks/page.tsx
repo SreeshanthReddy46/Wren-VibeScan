@@ -43,7 +43,7 @@ export default function WebhookSettingsPage() {
           }
         }
       } catch {
-        // Fallback
+
       } finally {
         setLoading(false);
       }
@@ -87,7 +87,7 @@ export default function WebhookSettingsPage() {
     setTesting(true);
     setStatusMessage(null);
     try {
-      // Ingest a benign test event or send test payload
+
       const res = await fetch("/api/v1/agent-events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -122,11 +122,11 @@ export default function WebhookSettingsPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white selection:bg-amber-500/30">
-      {/* Background radial gradient */}
+
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.12),rgba(255,255,255,0))] pointer-events-none" />
 
       <main className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Navigation Breadcrumb */}
+
         <div className="flex items-center justify-between gap-4 mb-8">
           <Link
             href="/audit"
@@ -137,7 +137,6 @@ export default function WebhookSettingsPage() {
           </Link>
         </div>
 
-        {/* Page Header */}
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-3">
             <BellRing className="w-3.5 h-3.5" />
@@ -153,10 +152,9 @@ export default function WebhookSettingsPage() {
           </p>
         </div>
 
-        {/* Webhook Configuration Form */}
         <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 space-y-6">
           <form onSubmit={handleSave} className="space-y-6">
-            {/* Enabled Toggle */}
+
             <div className="flex items-center justify-between pb-4 border-b border-zinc-800/60">
               <div>
                 <h3 className="text-sm font-bold text-white">
@@ -178,7 +176,6 @@ export default function WebhookSettingsPage() {
               </label>
             </div>
 
-            {/* Destination URL */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
                 Webhook Destination URL
@@ -199,7 +196,6 @@ export default function WebhookSettingsPage() {
               </p>
             </div>
 
-            {/* HMAC Signing Secret */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
@@ -241,7 +237,6 @@ export default function WebhookSettingsPage() {
               </p>
             </div>
 
-            {/* Minimum Severity Selector */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
                 Minimum Severity Threshold
@@ -270,7 +265,6 @@ export default function WebhookSettingsPage() {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
               <Button
                 type="button"

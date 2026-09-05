@@ -9,7 +9,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-transparent">
-      {/* Brand Header */}
+
       <div className="mb-8">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="relative h-9 w-9 rounded-full overflow-hidden border border-zinc-200/90 bg-white shadow-xs shrink-0 transition-transform duration-300 group-hover:scale-105">

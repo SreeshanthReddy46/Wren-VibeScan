@@ -5,9 +5,6 @@ export interface SyntaxValidationResult {
   error?: string;
 }
 
-/**
- * Validates syntax of TypeScript/JavaScript/JSX/TSX code using the TypeScript parser.
- */
 export function validateCodeSyntax(
   code: string,
   filePath: string = "file.tsx"
@@ -23,7 +20,7 @@ export function validateCodeSyntax(
       filePath,
       code,
       ts.ScriptTarget.Latest,
-      /* setParentNodes */ true,
+       true,
       scriptKind
     );
 

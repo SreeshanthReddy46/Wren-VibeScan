@@ -19,7 +19,7 @@ export const metadata = {
 export default function DocsOverviewPage() {
   return (
     <div className="space-y-12">
-      {/* Page Title & Intro */}
+
       <div className="space-y-4 pb-6 border-b border-sky-200/60">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
           Getting Started with Wren
@@ -29,7 +29,6 @@ export default function DocsOverviewPage() {
         </p>
       </div>
 
-      {/* Concept 1: What is Wren in Simple Words? */}
       <div className="sky-glow-card sky-glow-cyan p-6 sm:p-8 rounded-3xl border border-sky-200/80 bg-white/85 shadow-xs space-y-4 backdrop-blur-md">
         <CornerSparks color="cyan" />
         <div className="flex items-center gap-3">
@@ -43,7 +42,6 @@ export default function DocsOverviewPage() {
         </p>
       </div>
 
-      {/* Concept 2: Why AI tools make security mistakes */}
       <div className="space-y-4">
         <h2 className="text-2xl font-bold tracking-tight text-zinc-950">
           Why Do AI-Built Apps Have Security Holes?
@@ -79,7 +77,6 @@ export default function DocsOverviewPage() {
         </div>
       </div>
 
-      {/* Step by step: How to run your first scan */}
       <div className="space-y-6 pt-4">
         <h2 className="text-2xl font-bold tracking-tight text-zinc-950">
           How to Run Your First Scan (3 Easy Steps)
@@ -128,7 +125,6 @@ export default function DocsOverviewPage() {
         </div>
       </div>
 
-      {/* Visual Before & After Example */}
       <div className="space-y-4 pt-4">
         <h2 className="text-2xl font-bold tracking-tight text-zinc-950">
           Example: Vulnerability vs. The Fix
@@ -162,7 +158,6 @@ export default function DocsOverviewPage() {
         </div>
       </div>
 
-      {/* Next steps navigation cards */}
       <div className="pt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Link href="/docs/installation" className="group">
           <Card sparkColor="cyan" className="p-5 space-y-2 border-sky-200/80 hover:border-sky-300 h-full">

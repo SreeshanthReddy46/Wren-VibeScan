@@ -9,7 +9,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const cliPkgDir = path.join(rootDir, "packages", "cli");
 
-// 1. Pack the package with pnpm pack
 console.log("1. Running 'pnpm pack' in packages/cli...");
 const packOutput = execSync("pnpm pack", {
   cwd: cliPkgDir,
@@ -18,7 +17,6 @@ const packOutput = execSync("pnpm pack", {
 });
 console.log(packOutput.trim());
 
-// 2. Find the generated tarball in root or packages/cli
 const possibleTarballs = [
   "wren-security-1.0.0.tgz",
   "wren-cli-1.0.0.tgz",
@@ -44,7 +42,6 @@ if (!tarballPath || !fs.existsSync(tarballPath)) {
 }
 console.log(`2. Successfully created release tarball: ${tarballPath}`);
 
-// 3. Test running the compiled entry point directly
 console.log("3. Executing CLI binary '--version'...");
 const versionOutput = execSync(`node "${path.join(cliPkgDir, "dist", "cli.js")}" --version`, {
   encoding: "utf8",
@@ -62,9 +59,8 @@ if (versionOutput.includes("1.0.0") && (helpOutput.includes("wren-security [path
   throw new Error(`Unexpected smoke test output:\n${helpOutput}`);
 }
 
-// Clean up tarball
 try {
   if (fs.existsSync(tarballPath)) fs.unlinkSync(tarballPath);
 } catch {
-  // Ignore
+
 }

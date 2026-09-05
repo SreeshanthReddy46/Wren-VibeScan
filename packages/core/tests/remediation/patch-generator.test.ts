@@ -33,7 +33,7 @@ test("generateRemediationPatch replaces raw secret with process.env and sanitize
 
   assert.equal(patch.isValid, true);
   assert.ok(patch.diff.includes("process.env.OPENAI_API_KEY"));
-  // Zero secret leakage guarantee: raw secret must NOT appear in diff or patched content
+
   assert.equal(patch.diff.includes(rawSecret), false);
   assert.equal(patch.patchedContent.includes(rawSecret), false);
   assert.ok(patch.branchName.startsWith("wren/fix-"));

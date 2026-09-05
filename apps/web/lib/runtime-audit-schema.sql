@@ -1,6 +1,3 @@
--- Runtime Agent Auditing & Threat Detection Schema
--- Dedicated schema for ingesting customer production agent actions, evaluating threat rules, and firing webhook alerts
-
 CREATE TABLE IF NOT EXISTS runtime_agent_events (
   id TEXT PRIMARY KEY,
   agent_id TEXT NOT NULL,
@@ -21,14 +18,14 @@ CREATE TABLE IF NOT EXISTS runtime_alerts (
   agent_id TEXT NOT NULL,
   rule_id TEXT NOT NULL,
   rule_name TEXT NOT NULL,
-  severity TEXT NOT NULL, -- 'critical' | 'high' | 'medium' | 'low'
+  severity TEXT NOT NULL,
   category TEXT NOT NULL,
   description TEXT NOT NULL,
   evidence TEXT NOT NULL,
   suggested_action TEXT NOT NULL,
-  status TEXT DEFAULT 'active', -- 'active' | 'acknowledged' | 'resolved'
+  status TEXT DEFAULT 'active',
   webhook_sent BOOLEAN DEFAULT FALSE,
-  webhook_status TEXT, -- 'delivered' | 'failed' | 'pending'
+  webhook_status TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -48,5 +45,4 @@ CREATE INDEX IF NOT EXISTS idx_runtime_alerts_agent_id ON runtime_alerts(agent_i
 CREATE INDEX IF NOT EXISTS idx_runtime_alerts_status ON runtime_alerts(status);
 CREATE INDEX IF NOT EXISTS idx_runtime_alerts_created_at ON runtime_alerts(created_at DESC);
 
--- Enable Supabase Realtime publishing for live dashboard streaming
 ALTER PUBLICATION supabase_realtime ADD TABLE runtime_agent_events, runtime_alerts;

@@ -74,7 +74,7 @@ Instructions:
     });
 
     const text = response.content?.[0]?.text || "";
-    // Clean potential markdown blocks
+
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);

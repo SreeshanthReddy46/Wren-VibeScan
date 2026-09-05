@@ -32,7 +32,6 @@ export function ScrollImageEffect({
       const rect = ref.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
 
-      // Calculate scroll progress through viewport (0: below screen, 1: center of viewport)
       const elementCenter = rect.top + rect.height / 2;
       const viewportProgress = Math.max(
         0,

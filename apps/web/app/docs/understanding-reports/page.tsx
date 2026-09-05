@@ -11,7 +11,7 @@ export const metadata = {
 export default function UnderstandingReportsPage() {
   return (
     <div className="space-y-10">
-      {/* Header */}
+
       <div className="space-y-3 pb-6 border-b border-sky-200/60">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
           How to Read Your Scan Report
@@ -21,12 +21,11 @@ export default function UnderstandingReportsPage() {
         </p>
       </div>
 
-      {/* Severity Tiers in Plain English */}
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-zinc-950">What Do the Severity Levels Mean?</h2>
-        
+
         <div className="space-y-4">
-          {/* Critical */}
+
           <div className="sky-glow-card sky-glow-rose p-6 rounded-3xl border border-red-200 bg-red-50/70 space-y-2 backdrop-blur-md shadow-xs">
             <CornerSparks color="rose" />
             <div className="flex items-center gap-2.5">
@@ -40,7 +39,6 @@ export default function UnderstandingReportsPage() {
             </p>
           </div>
 
-          {/* High */}
           <div className="sky-glow-card sky-glow-amber p-6 rounded-3xl border border-orange-200 bg-orange-50/70 space-y-2 backdrop-blur-md shadow-xs">
             <CornerSparks color="amber" />
             <div className="flex items-center gap-2.5">
@@ -54,7 +52,6 @@ export default function UnderstandingReportsPage() {
             </p>
           </div>
 
-          {/* Medium */}
           <div className="sky-glow-card sky-glow-purple p-6 rounded-3xl border border-amber-200 bg-amber-50/70 space-y-2 backdrop-blur-md shadow-xs">
             <CornerSparks color="purple" />
             <div className="flex items-center gap-2.5">
@@ -70,7 +67,6 @@ export default function UnderstandingReportsPage() {
         </div>
       </div>
 
-      {/* Breakdown of a Finding Card */}
       <div className="space-y-4 pt-4">
         <h2 className="text-2xl font-bold text-zinc-950">Anatomy of a Finding (How to Fix It)</h2>
         <p className="text-sm text-zinc-600">
@@ -96,7 +92,6 @@ export default function UnderstandingReportsPage() {
             </p>
           </div>
 
-          {/* Fix Diff */}
           <div className="space-y-1.5">
             <div className="text-xs font-bold text-zinc-950">4. Suggested Code Replacement:</div>
             <div className="rounded-xl overflow-hidden font-mono text-xs border border-zinc-800 bg-zinc-950 text-zinc-300">
@@ -111,7 +106,6 @@ export default function UnderstandingReportsPage() {
         </div>
       </div>
 
-      {/* Next Step */}
       <div className="pt-4 flex items-center justify-between p-6 rounded-2xl border border-sky-200/80 bg-white/80 backdrop-blur-md">
         <div>
           <div className="font-bold text-zinc-950 text-sm">Automate scans on GitHub?</div>

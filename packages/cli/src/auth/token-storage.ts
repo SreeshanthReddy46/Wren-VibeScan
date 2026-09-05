@@ -45,7 +45,7 @@ export function clearUserConfig(): void {
     try {
       fs.unlinkSync(filePath);
     } catch {
-      // Ignore
+
     }
   }
 }

@@ -99,7 +99,7 @@ function getAllFiles(dir: string, baseDir: string = dir): string[] {
       }
     }
   } catch {
-    // Ignore unreadable dirs
+
   }
   return results;
 }
@@ -198,7 +198,7 @@ export function createCodebaseTools(targetPath: string): CodebaseTools {
           }
         }
       } catch {
-        // Skip unreadable files
+
       }
       if (matches.length >= MAX_SEARCH_RESULTS) break;
     }
@@ -233,7 +233,7 @@ export function createCodebaseTools(targetPath: string): CodebaseTools {
           }
         }
       } catch {
-        // Skip
+
       }
       if (callSites.length >= MAX_CALL_SITES) break;
     }

@@ -139,14 +139,13 @@ export function runStaticScan(files: DiscoveredFile[]): Finding[] {
     for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
       const line = lines[lineIndex];
 
-      // Skip comment-only lines
       const trimmed = line.trim();
       if (trimmed.startsWith("//") || trimmed.startsWith("#") || trimmed.startsWith("*")) {
         continue;
       }
 
       for (const rule of STATIC_RULES) {
-        // Reset regex state
+
         rule.pattern.lastIndex = 0;
         const match = rule.pattern.exec(line);
 

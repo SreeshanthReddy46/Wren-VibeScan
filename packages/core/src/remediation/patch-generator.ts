@@ -21,9 +21,6 @@ export interface RemediationPatchResult {
   filePath: string;
 }
 
-/**
- * Creates a unified diff from original and patched content.
- */
 export function createUnifiedDiff(
   filePath: string,
   original: string,
@@ -40,7 +37,6 @@ export function createUnifiedDiff(
     `+++ b/${filePath}`,
   ];
 
-  // Find line difference
   let start = 0;
   while (
     start < origLines.length &&
@@ -86,9 +82,6 @@ export function createUnifiedDiff(
   return diffChunks.join("\n");
 }
 
-/**
- * Autonomous patch generator with zero-leakage secret abstraction and syntax validation.
- */
 export async function generateRemediationPatch(
   finding: Finding,
   options: GeneratePatchOptions = {}
@@ -109,9 +102,8 @@ export async function generateRemediationPatch(
 
   let patched = originalContent;
 
-  // 1. Secret abstraction: replace raw keys with process.env.XXX
   if (finding.category === "secret") {
-    // Determine appropriate env var name
+
     let envVarName = "API_SECRET";
     if (/openai/i.test(finding.title) || /sk-[a-zA-Z0-9]/i.test(originalContent)) {
       envVarName = "OPENAI_API_KEY";
@@ -123,22 +115,20 @@ export async function generateRemediationPatch(
       envVarName = "STRIPE_SECRET_KEY";
     }
 
-    // Match raw secret string literals
     const secretRegex = /"(sk-[a-zA-Z0-9_-]{20,}|eyJ[a-zA-Z0-9_-]{20,}|[0-9a-f]{32,64})"/g;
     patched = patched.replace(secretRegex, `process.env.${envVarName}`);
 
-    // If replacementCode from finding fix is available, apply it
     if (finding.fix && finding.fix.replacementCode) {
       if (finding.location.snippet && patched.includes(finding.location.snippet)) {
         patched = patched.replace(finding.location.snippet, finding.fix.replacementCode);
       }
     }
   } else if (finding.fix && finding.fix.replacementCode) {
-    // Auth / Config / DB fix
+
     if (finding.location.snippet && patched.includes(finding.location.snippet)) {
       patched = patched.replace(finding.location.snippet, finding.fix.replacementCode);
     } else {
-      // Line replacement fallback
+
       const lines = patched.split("\n");
       const start = Math.max(0, finding.location.startLine - 1);
       const end = Math.min(lines.length, finding.location.endLine);
@@ -147,16 +137,13 @@ export async function generateRemediationPatch(
     }
   }
 
-  // 2. Zero-Leakage Guarantee: sanitize diff and patched content
   let diff = createUnifiedDiff(filePath, originalContent, patched);
 
-  // Remove any remaining raw secrets or tokens
   const sanitized = sanitizePatternForGlobalMemory(diff);
   if (sanitized.sanitizedSnippet !== diff) {
     diff = sanitized.sanitizedSnippet;
   }
 
-  // Ensure raw secrets from finding snippet don't exist in diff
   const rawSnippetSecretMatch = (finding.location.snippet || "").match(
     /(sk-[a-zA-Z0-9_-]{20,}|eyJ[a-zA-Z0-9_-]{20,})/
   );
@@ -166,7 +153,6 @@ export async function generateRemediationPatch(
     patched = patched.split(rawVal).join("process.env.API_SECRET");
   }
 
-  // 3. AST Syntax Validation
   const syntaxCheck = validateCodeSyntax(patched, filePath);
 
   const slug = finding.ruleId.toLowerCase().replace(/[^a-z0-9]/g, "-");

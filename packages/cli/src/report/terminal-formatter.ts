@@ -12,7 +12,6 @@ const SEVERITY_BADGE: Record<Severity, string> = {
 export function formatTerminalReport(result: ScanResult): string {
   const lines: string[] = [];
 
-  // Header Banner
   lines.push("");
   lines.push(pc.bold(pc.cyan("🦅 Wren Security Scanner")) + pc.dim(` v${result.engineVersion}`));
   lines.push(pc.dim(`Target: ${result.targetPath}`));
@@ -36,7 +35,6 @@ export function formatTerminalReport(result: ScanResult): string {
   lines.push(pc.dim("─".repeat(70)));
   lines.push("");
 
-  // Detailed findings list
   result.findings.forEach((finding, idx) => {
     const badge = SEVERITY_BADGE[finding.severity] || finding.severity.toUpperCase();
     lines.push(`${badge} ${pc.bold(finding.title)}`);

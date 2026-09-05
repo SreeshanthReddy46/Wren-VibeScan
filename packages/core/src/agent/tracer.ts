@@ -10,9 +10,6 @@ export interface AgentSpan {
   startTime: number;
 }
 
-/**
- * AgentTracer captures fine-grained execution spans and rubrics across all agent lifecycle stages.
- */
 export class AgentTracer {
   private traces: AgentTraceRecord[] = [];
   public readonly scanId: string;

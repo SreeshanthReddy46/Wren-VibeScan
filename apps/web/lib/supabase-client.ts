@@ -3,12 +3,11 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-// Client-side cache for Supabase instance
 let cachedClient: unknown = null;
 
 export async function getSupabaseClient() {
   if (typeof window === "undefined") {
-    // Never instantiate or import @supabase/supabase-js during server-side rendering (SSR)
+
     return null;
   }
   if (!isSupabaseConfigured) {
@@ -34,9 +33,6 @@ export async function getSupabaseClient() {
   }
 }
 
-/**
- * Initiates Google OAuth authentication, navigating directly to Google Accounts / Gmail sign in
- */
 export async function signInWithGoogleOAuth(): Promise<{ error: Error | null }> {
   if (typeof window === "undefined") {
     return { error: null };
@@ -74,7 +70,6 @@ export async function signInWithGoogleOAuth(): Promise<{ error: Error | null }> 
     }
   }
 
-  // Direct browser navigation to Google Accounts / Gmail Authentication
   try {
     localStorage.setItem(
       "wren_auth_user",
@@ -86,13 +81,12 @@ export async function signInWithGoogleOAuth(): Promise<{ error: Error | null }> 
       })
     );
   } catch {
-    // Ignore localStorage errors
+
   }
 
   const returnUrl = encodeURIComponent(`${window.location.origin}/?auth=google_success`);
   const googleAccountsUrl = `https://accounts.google.com/AccountChooser?service=mail&continue=${returnUrl}`;
 
-  // Redirect directly to Gmail / Google account chooser
   window.location.href = googleAccountsUrl;
   return { error: null };
 }

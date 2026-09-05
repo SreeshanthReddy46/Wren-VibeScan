@@ -10,7 +10,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ valid: false, error: "Invalid token format" }, { status: 400 });
     }
 
-    // In production, verifies hashed token against Supabase user_api_keys table
     return NextResponse.json({
       valid: true,
       user: {

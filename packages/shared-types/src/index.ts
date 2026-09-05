@@ -1,7 +1,4 @@
-/**
- * Wren Shared Types
- * Common domain models shared across CLI, Scan Engine (packages/core), and Next.js Web App.
- */
+
 
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 
@@ -279,5 +276,4 @@ export interface RuntimeWebhookConfig {
   minSeverity: "all" | "high" | "critical";
   createdAt: string;
 }
-
 

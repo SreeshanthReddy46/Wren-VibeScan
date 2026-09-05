@@ -18,7 +18,6 @@ interface BirdState {
 
 const NAVBAR_SAFE_Y = 75;
 
-// Helper to extract coordinate of the last word on the first line of any heading
 function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number } {
   const childSpans = Array.from(
     headingEl.querySelectorAll(".word-reveal-wrapper, .demo-title-word, span")
@@ -63,12 +62,12 @@ function getUpperLineLastWordBox(headingEl: HTMLElement): { x: number; y: number
 }
 
 const INITIAL_BIRDS_CONFIG = [
-  { size: 50, speed: 0.12 }, // Bird 0: Heading Scout
-  { size: 44, speed: 0.10 }, // Bird 1
-  { size: 42, speed: 0.11 }, // Bird 2
-  { size: 38, speed: 0.09 }, // Bird 3
-  { size: 40, speed: 0.11 }, // Bird 4
-  { size: 36, speed: 0.09 }, // Bird 5
+  { size: 50, speed: 0.12 },
+  { size: 44, speed: 0.10 },
+  { size: 42, speed: 0.11 },
+  { size: 38, speed: 0.09 },
+  { size: 40, speed: 0.11 },
+  { size: 36, speed: 0.09 },
 ];
 
 export function FlyingWren() {
@@ -192,7 +191,6 @@ export function FlyingWren() {
     };
   }, [pickRandomRestPositions]);
 
-  // Scroll listener
   React.useEffect(() => {
     if (!mounted) return;
 
@@ -227,7 +225,6 @@ export function FlyingWren() {
     };
   }, [mounted, findActiveHeading, pickRandomRestPositions]);
 
-  // 60fps GPU-accelerated Animation Loop (Zero React state updates inside RAF)
   React.useEffect(() => {
     if (!mounted) return;
 
@@ -241,7 +238,6 @@ export function FlyingWren() {
       }
       const t = roamTimeRef.current;
 
-      // On mobile screens, only run physics for Bird 0 (scout); birds 1-5 are hidden
       const birdsToAnimate = mobileMode ? [birdsRef.current[0]] : birdsRef.current;
 
       birdsToAnimate.forEach((bird, i) => {
@@ -304,7 +300,6 @@ export function FlyingWren() {
           }
         }
 
-        // Direct DOM update (no React re-render overhead)
         const el = document.getElementById(`flying-wren-bird-${i}`);
         if (el) {
           el.style.transform = `translate3d(${bird.x}px, ${bird.y}px, 0) scaleX(${bird.scaleX}) rotate(${bird.rotation}deg)`;
@@ -342,7 +337,7 @@ export function FlyingWren() {
       aria-hidden="true"
     >
       {birdsRef.current.map((bird, i) => {
-        // On mobile/phone, only render Bird 0 to avoid clutter and ensure 60fps performance
+
         const isHiddenOnMobile = isMobile && i > 0;
         const actualSize = isMobile ? Math.min(bird.size, 38) : bird.size;
 
@@ -366,7 +361,7 @@ export function FlyingWren() {
               }`}
               style={{ animationDelay: `${i * -0.7}s` }}
             >
-              {/* Flying Pose Layer */}
+
               <div className="bird-flying-layer absolute inset-0 transition-opacity duration-150 opacity-0">
                 <Image
                   src="/assets/wren-flying.png"
@@ -379,7 +374,6 @@ export function FlyingWren() {
                 />
               </div>
 
-              {/* Standing Pose Layer */}
               <div className="bird-perched-layer absolute inset-0 transition-opacity duration-150 opacity-100 pointer-events-none">
                 <Image
                   src="/assets/wren-perched.png"

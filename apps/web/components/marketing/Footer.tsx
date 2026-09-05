@@ -17,7 +17,7 @@ export function Footer() {
     <footer className="border-t border-sky-200/70 bg-transparent py-14 sm:py-16 text-zinc-700">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 space-y-12">
         <div className="flex flex-col md:flex-row justify-between gap-10">
-          {/* Logo & Brand */}
+
           <div className="space-y-3 max-w-xs">
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="relative h-8 w-8 rounded-full overflow-hidden border border-zinc-200/90 bg-white shadow-xs shrink-0 transition-transform duration-300 group-hover:scale-105">
@@ -36,7 +36,6 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Product Menu Column */}
           <div className="space-y-3">
             <div className="text-xs font-semibold uppercase tracking-wider text-sky-900">
               Product
@@ -56,7 +55,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="pt-8 border-t border-sky-200/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-600">
           <div>© 2026 Wren. All rights reserved.</div>
           <div className="flex items-center gap-6">

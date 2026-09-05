@@ -26,7 +26,6 @@ export async function runCheckCommand(
   const userConfig = loadUserConfig();
   const format: OutputFormat = options.format || "terminal";
 
-  // Fast asynchronous execution mode: queues scan job and returns immediately
   if (options.async) {
     const scanId = `scan-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
     const baseDashboardUrl = userConfig.apiUrl
@@ -66,7 +65,6 @@ export async function runCheckCommand(
   try {
     const result = await runScan(config);
 
-    // Format output
     let outputText = "";
     if (format === "json") {
       outputText = formatJsonReport(result);
@@ -85,7 +83,6 @@ export async function runCheckCommand(
       console.log(outputText);
     }
 
-    // Determine exit code
     const failSeverity = config.failOnSeverity;
     if (failSeverity) {
       const severityRank: Record<Severity, number> = {

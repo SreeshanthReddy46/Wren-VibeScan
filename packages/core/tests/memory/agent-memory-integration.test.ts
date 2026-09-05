@@ -18,7 +18,6 @@ test("runAgentLoop bypasses LLM on pre-existing memory hit", async () => {
     fix: { description: "Add auth", replacementCode: "" },
   };
 
-  // Pre-seed memory with settled verdict (FALSE_POSITIVE)
   await store.save(finding, {
     findingId: "f-mem-1",
     verdict: "FALSE_POSITIVE",
@@ -26,7 +25,6 @@ test("runAgentLoop bypasses LLM on pre-existing memory hit", async () => {
     confidence: 1.0,
   });
 
-  // Track if Anthropic client is called
   let llmCalls = 0;
   const mockAnthropic = {
     messages: {
@@ -44,9 +42,9 @@ test("runAgentLoop bypasses LLM on pre-existing memory hit", async () => {
   );
 
   assert.equal(result.llmApplied, true);
-  // False positive resolved via memory hit -> filtered out -> 0 findings returned
+
   assert.equal(result.findings.length, 0);
-  // LLM was completely bypassed (0 calls)!
+
   assert.equal(llmCalls, 0);
 });
 
@@ -65,7 +63,6 @@ test("runAgentLoop populates memory on new finding verification", async () => {
     fix: { description: "fix", replacementCode: "" },
   };
 
-  // Mock Anthropic client for fresh investigation & verification
   let calls = 0;
   const mockAnthropic = {
     messages: {
@@ -103,9 +100,8 @@ test("runAgentLoop populates memory on new finding verification", async () => {
 
   assert.equal(result.llmApplied, true);
   assert.equal(result.findings.length, 1);
-  assert.equal(calls, 3); // Investigator, Verifier, Critic
+  assert.equal(calls, 3);
 
-  // Now verify that the finding was stored in the memory store
   const cachedLookup = await store.lookup(finding);
   assert.equal(cachedLookup.hit, true);
   assert.equal(cachedLookup.match?.entry.verdict, "CONFIRMED");

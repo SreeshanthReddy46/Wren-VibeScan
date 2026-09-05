@@ -50,7 +50,6 @@ export function RemediationModal({
       const branch = `wren/fix-${slug.toLowerCase().replace(/[^a-z0-9]/g, "-")}-${finding.id.slice(0, 8)}`;
       setBranchName(branch);
 
-      // Construct preview diff
       const original = finding.location.snippet || 'const apiKey = "sk-proj-****************";';
       const fixed =
         finding.fix?.replacementCode ||
@@ -111,7 +110,6 @@ export function RemediationModal({
       <div className="p-6 sm:p-8 flex flex-col max-h-[85vh] overflow-y-auto">
         <DialogClose onClose={() => onOpenChange(false)} />
 
-        {/* Header */}
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
             <GitPullRequest className="w-6 h-6 text-amber-400" />
@@ -134,7 +132,6 @@ export function RemediationModal({
           </div>
         </div>
 
-        {/* Security & Verification Badges */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
             <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -154,7 +151,6 @@ export function RemediationModal({
           </div>
         </div>
 
-        {/* Target Details */}
         <div className="bg-zinc-900/40 rounded-xl border border-zinc-800 p-4 mb-6 space-y-2 text-xs font-mono">
           <div className="flex justify-between items-center text-zinc-400">
             <span className="flex items-center gap-1.5">
@@ -172,7 +168,6 @@ export function RemediationModal({
           </div>
         </div>
 
-        {/* Patch Unified Diff Preview */}
         <div className="mb-6">
           <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2 block">
             Proposed Unified Diff Patch
@@ -198,7 +193,6 @@ export function RemediationModal({
           </div>
         </div>
 
-        {/* Result Callout */}
         {status === "pr_opened" && prUrl && (
           <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 mb-6 flex items-start gap-3 animate-in fade-in">
             <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
@@ -231,7 +225,6 @@ export function RemediationModal({
           </div>
         )}
 
-        {/* Actions */}
         <div className="flex items-center justify-end gap-3 mt-auto pt-4 border-t border-zinc-800">
           <Button
             variant="ghost"

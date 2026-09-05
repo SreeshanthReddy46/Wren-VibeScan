@@ -6,10 +6,6 @@ export interface WebhookSignatureResult {
   timestamp: number;
 }
 
-/**
- * Generate a timestamped HMAC-SHA256 signature for a webhook payload
- * Header format: t={timestamp},v1={hexSignature}
- */
 export function generateWebhookSignature(
   payload: unknown,
   secret: string,
@@ -31,10 +27,6 @@ export function generateWebhookSignature(
   };
 }
 
-/**
- * Verify a timestamped HMAC-SHA256 webhook signature header
- * Enforces tolerance to mitigate replay attacks and uses timingSafeEqual
- */
 export function verifyWebhookSignature(
   payload: unknown,
   signatureHeader: string,
@@ -45,7 +37,6 @@ export function verifyWebhookSignature(
     return false;
   }
 
-  // Parse header: t=1234567,v1=abc...
   const parts = signatureHeader.split(",");
   let timestampStr: string | undefined;
   let signatureHex: string | undefined;
@@ -65,7 +56,6 @@ export function verifyWebhookSignature(
     return false;
   }
 
-  // Replay attack tolerance check
   const now = Math.floor(Date.now() / 1000);
   if (Math.abs(now - timestamp) > toleranceSeconds) {
     return false;

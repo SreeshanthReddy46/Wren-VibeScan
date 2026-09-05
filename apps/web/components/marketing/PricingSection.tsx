@@ -52,7 +52,7 @@ export function PricingSection() {
   return (
     <section id="pricing" className="py-20 sm:py-28 bg-transparent">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
-        {/* Section Header */}
+
         <div className="flex flex-col items-center text-center space-y-4">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
             Simple plans with concrete limits
@@ -61,7 +61,6 @@ export function PricingSection() {
             Pick the plan that fits your team and scan volume. No surprises.
           </p>
 
-          {/* Billing Toggle */}
           <div className="pt-2 flex items-center justify-center gap-3">
             <button
               type="button"
@@ -102,7 +101,6 @@ export function PricingSection() {
           </div>
         </div>
 
-        {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {MOCK_PRICING_PLANS.map((plan) => {
             const Icon = icons[plan.id as keyof typeof icons] || CheckCircle2;
@@ -122,7 +120,7 @@ export function PricingSection() {
                 )}
               >
                 <div className="space-y-6">
-                  {/* Top Icon & Title */}
+
                   <div className="space-y-4">
                     <div
                       className={cn(
@@ -145,7 +143,6 @@ export function PricingSection() {
                     </div>
                   </div>
 
-                  {/* Price */}
                   <div className="space-y-1 pt-2">
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl sm:text-5xl font-extrabold tracking-tight">
@@ -179,7 +176,6 @@ export function PricingSection() {
                     )}
                   />
 
-                  {/* Feature List */}
                   <div className="space-y-3">
                     <ul className="space-y-3">
                       {plan.features.map((feature) => (
@@ -203,7 +199,6 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                {/* CTA Button */}
                 <div className="pt-8">
                   <Link href={plan.ctaHref} className="block w-full">
                     <Button
@@ -222,7 +217,6 @@ export function PricingSection() {
           })}
         </div>
 
-        {/* Feature Comparison Matrix */}
         <div className="pt-6 space-y-6">
           <div className="space-y-1.5 text-left">
             <h3 className="text-xl font-bold tracking-tight text-zinc-950">Compare plans</h3>

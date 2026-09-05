@@ -54,10 +54,9 @@ export function TraceDrawer({
           }
         }
       } catch {
-        // Fallback to synthetic preview trace if offline
+
       }
 
-      // Generate synthetic demonstration traces if database/api has not populated yet
       const sampleCritic: CriticRubric = {
         evidenceQuality: finding?.severity === "critical" ? 0.94 : 0.88,
         falsePositiveRisk: 0.15,
@@ -150,7 +149,7 @@ export function TraceDrawer({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogClose onClose={() => onOpenChange(false)} />
       <div className="flex flex-col h-full max-h-[85vh]">
-        {/* Header */}
+
         <div className="p-6 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur sticky top-0 z-10">
           <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 mb-1.5">
             <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 font-semibold uppercase tracking-wider text-[10px]">
@@ -169,10 +168,9 @@ export function TraceDrawer({
               : "Complete chronological chain-of-thought and critic rubric metrics for all agent steps."}
           </p>
 
-          {/* Critic Evaluation Rubric Cards */}
           {rubric && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-              {/* Evidence Quality */}
+
               <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800/80">
                 <div className="flex items-center justify-between text-xs mb-1">
                   <span className="text-zinc-400 font-medium">Evidence Quality</span>
@@ -197,7 +195,6 @@ export function TraceDrawer({
                 </p>
               </div>
 
-              {/* False Positive Risk */}
               <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800/80">
                 <div className="flex items-center justify-between text-xs mb-1">
                   <span className="text-zinc-400 font-medium">False-Positive Risk</span>
@@ -222,7 +219,6 @@ export function TraceDrawer({
                 </p>
               </div>
 
-              {/* Mathematical Confidence */}
               <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800/80">
                 <div className="flex items-center justify-between text-xs mb-1">
                   <span className="text-zinc-400 font-medium">Judge Confidence</span>
@@ -251,7 +247,6 @@ export function TraceDrawer({
           )}
         </div>
 
-        {/* Content: Step-by-Step Spans */}
         <div className="p-6 overflow-y-auto space-y-3">
           {loading ? (
             <div className="py-12 flex flex-col items-center justify-center text-zinc-400">
@@ -311,12 +306,10 @@ export function TraceDrawer({
                     </div>
                   </div>
 
-                  {/* Plain-English Reasoning Trace */}
                   <div className="mt-2.5 text-xs text-zinc-300 font-sans leading-relaxed pl-9">
                     {step.reasoning}
                   </div>
 
-                  {/* Expandable Technical Payloads */}
                   {isExpanded && (
                     <div className="mt-3 pt-3 border-t border-zinc-800/60 pl-9 space-y-2">
                       <div>
@@ -348,7 +341,6 @@ export function TraceDrawer({
           )}
         </div>
 
-        {/* Footer */}
         <div className="p-4 border-t border-zinc-800 bg-zinc-950/80 flex items-center justify-between text-xs text-zinc-500">
           <span className="font-mono">Total Trace Spans: {traces.length}</span>
           <Button

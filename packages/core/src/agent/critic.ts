@@ -22,10 +22,6 @@ You must output valid JSON ONLY with the following shape:
   "critique": "Brief plain-English explanation of your evaluation"
 }`;
 
-/**
- * Independent Critic / Judge pass that scores agent findings against a rigorous rubric
- * and overrules verdicts when evidence is weak or false-positive risk is high.
- */
 export async function evaluateVerdictWithCritic(
   finding: Finding,
   verification: VerificationResult,
@@ -79,7 +75,7 @@ Evaluate the evidence quality, false-positive risk, and confidence. Output JSON 
           critique: String(parsed.critique ?? "Critic evaluated finding."),
         };
       } catch {
-        // Fallback on model error
+
         rubric = generateFallbackRubric(verification);
       }
     } else {
@@ -87,7 +83,6 @@ Evaluate the evidence quality, false-positive risk, and confidence. Output JSON 
     }
   }
 
-  // Overrule Policy: Evidence quality must be >= 0.70 and false-positive risk <= 0.50
   const isOverruled =
     (verification.verdict === "CONFIRMED" || verification.verdict === "SEVERITY_ADJUSTED") &&
     (rubric.evidenceQuality < 0.7 || rubric.falsePositiveRisk > 0.5);

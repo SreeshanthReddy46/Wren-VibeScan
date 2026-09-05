@@ -14,12 +14,10 @@ export const executeRuntimeAuditFunction = inngest.createFunction(
   async ({ event, step }: { event: any; step: any }) => {
     const agentEvent = event.data;
 
-    // Step 1: Run threat rules engine
     const evalResult = await step.run("evaluate-threat-rules", async () => {
       return evaluateRuntimeAgentEvent(agentEvent);
     });
 
-    // Step 2: If threat rules tripped, trigger webhook dispatch
     if (evalResult.tripped) {
       await step.run("dispatch-security-webhook", async () => {
         const config = await getRuntimeWebhookConfig();

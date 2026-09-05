@@ -1,10 +1,6 @@
 import type { CustomerAgentEvent, RuntimeRuleViolation } from "@wren/shared-types";
 import type { RuntimeRule } from "./types";
 
-/**
- * WREN-RUN-001: Unsanctioned Destructive Operation
- * Catches unprompted destructive calls (delete, drop, truncate, purge) unaligned with declared intent.
- */
 export const ruleUnsanctionedDestructiveAction: RuntimeRule = {
   id: "WREN-RUN-001",
   name: "Unsanctioned Destructive Operation",
@@ -23,7 +19,6 @@ export const ruleUnsanctionedDestructiveAction: RuntimeRule = {
       return null;
     }
 
-    // Check if the agent declared an explicit authorization/intent to delete
     const intent = (event.declaredIntent || "").toLowerCase();
     const intentAuthorizes =
       /\b(delete|drop|truncate|purge|destroy|clean\s*up|decommission)\b/i.test(
@@ -49,10 +44,6 @@ export const ruleUnsanctionedDestructiveAction: RuntimeRule = {
   },
 };
 
-/**
- * WREN-RUN-002: Privilege Escalation / Admin Role Grant
- * Flags operations granting administrative or superuser privileges.
- */
 export const rulePrivilegeEscalation: RuntimeRule = {
   id: "WREN-RUN-002",
   name: "Privilege Escalation / Admin Role Grant",
@@ -91,10 +82,6 @@ export const rulePrivilegeEscalation: RuntimeRule = {
   },
 };
 
-/**
- * WREN-RUN-003: Active Credential / Secret in Action Arguments
- * Catches active API keys, secret tokens, or AWS credentials in tool calls.
- */
 export const ruleCredentialLeak: RuntimeRule = {
   id: "WREN-RUN-003",
   name: "Active Credential / Secret in Action Arguments",
@@ -114,7 +101,7 @@ export const ruleCredentialLeak: RuntimeRule = {
     for (const pattern of SECRET_PATTERNS) {
       const match = pattern.regex.exec(argsString);
       if (match) {
-        // Redact match for evidence
+
         const raw = match[0];
         const redacted =
           raw.slice(0, 7) + "..." + raw.slice(Math.max(7, raw.length - 4));
@@ -136,10 +123,6 @@ export const ruleCredentialLeak: RuntimeRule = {
   },
 };
 
-/**
- * WREN-RUN-004: Unmasked Financial / PII Exposure
- * Detects private keys, Social Security Numbers, or credit card numbers in action inputs.
- */
 export const rulePiiExposure: RuntimeRule = {
   id: "WREN-RUN-004",
   name: "Unmasked Financial / PII Exposure",
@@ -161,7 +144,6 @@ export const rulePiiExposure: RuntimeRule = {
       };
     }
 
-    // US SSN pattern
     if (/\b\d{3}-\d{2}-\d{4}\b/.test(argsString)) {
       return {
         ruleId: "WREN-RUN-004",

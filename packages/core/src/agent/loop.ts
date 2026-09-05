@@ -18,13 +18,12 @@ export async function runAgentLoop(
   const scanId = config.scanId || `scan-${Date.now().toString(36)}`;
   const tracer = new AgentTracer(scanId);
 
-  // Circuit breaker: offline or unauthenticated fallback
   if (!apiKey || findings.length === 0) {
     return { findings, traces: [], llmApplied: false };
   }
 
   try {
-    // 1. Planner: triage findings requiring deep contextual investigation
+
     config.onProgress?.({
       stage: "planner",
       message: `Triaging ${findings.length} findings for deep contextual investigation`,
@@ -43,14 +42,12 @@ export async function runAgentLoop(
       return { findings, traces: tracer.getTraces(), llmApplied: false };
     }
 
-    // 2. Setup sandboxed codebase tools and memory store
     const tools = createCodebaseTools(config.targetPath || ".");
     const verifications = new Map<string, VerificationResult>();
     const memoryStore = config.memoryStore;
 
-    // 3. Investigator & Verifier loop per finding
     for (const finding of investigationQueue) {
-      // Memory check: Tier 1 (Hash) & Tier 2 (pgvector)
+
       if (memoryStore) {
         try {
           const memoryLookup = await memoryStore.lookup(finding, config.projectId);
@@ -60,7 +57,7 @@ export async function runAgentLoop(
               memoryLookup.hitType === "VECTOR_HIGH_CONFIDENCE") &&
             memoryLookup.match
           ) {
-            // High-confidence cache hit! Bypass LLM investigator & verifier completely
+
             const cached = memoryLookup.match.entry;
             const verifiedHit: VerificationResult = {
               findingId: finding.id,
@@ -77,11 +74,10 @@ export async function runAgentLoop(
             continue;
           }
         } catch {
-          // On memory lookup error, proceed with standard agent loop
+
         }
       }
 
-      // Phase 2: Investigator (native tool-use loop)
       const invSpan = tracer.startSpan("investigator", finding.id, {
         ruleId: finding.ruleId,
         filePath: finding.location.filePath,
@@ -100,7 +96,6 @@ export async function runAgentLoop(
         `Investigator gathered ${investigation.gatheredContext.length} contextual slices across ${investigation.steps.length} turns`
       );
 
-      // Phase 3: Verifier (hypothesis testing against accumulated evidence)
       const verSpan = tracer.startSpan("verifier", finding.id, {
         findingId: finding.id,
       });
@@ -119,7 +114,6 @@ export async function runAgentLoop(
         verification.confidence
       );
 
-      // Phase 4: Critic / Judge pass (adversarial rubric evaluation & overrule)
       config.onProgress?.({
         stage: "critic",
         findingId: finding.id,
@@ -156,17 +150,15 @@ export async function runAgentLoop(
 
       verifications.set(finding.id, verification);
 
-      // Save fresh verdict to memory store
       if (memoryStore) {
         try {
           await memoryStore.save(finding, verification, config.projectId, true);
         } catch {
-          // On memory save error, ignore
+
         }
       }
     }
 
-    // 5. Reporter: synthesize findings, eliminate false positives, enrich confirmed findings
     config.onProgress?.({
       stage: "reporter",
       message: "Synthesizing and finalizing enriched findings report",
@@ -188,7 +180,7 @@ export async function runAgentLoop(
       try {
         tracer.flushToDisk(config.targetPath);
       } catch {
-        // Ignore trace flush error on read-only targets
+
       }
     }
 
@@ -198,7 +190,7 @@ export async function runAgentLoop(
       llmApplied: true,
     };
   } catch {
-    // Circuit breaker: catch any unhandled network or execution error and return static findings
+
     return {
       findings,
       traces: tracer.getTraces(),

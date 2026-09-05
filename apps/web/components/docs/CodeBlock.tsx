@@ -31,7 +31,7 @@ export function CodeBlock({ code, language = "bash", title, className }: CodeBlo
         className
       )}
     >
-      {/* Header bar */}
+
       <div className="flex items-center justify-between px-4 py-2 bg-zinc-900/90 border-b border-zinc-800/80 text-xs text-zinc-400">
         <div className="flex items-center gap-2">
           <Terminal className="h-3.5 w-3.5 text-zinc-500" />
@@ -57,7 +57,6 @@ export function CodeBlock({ code, language = "bash", title, className }: CodeBlo
         </button>
       </div>
 
-      {/* Code contents */}
       <div className="p-4 overflow-x-auto text-zinc-200 leading-relaxed text-[13px]">
         <pre>
           <code>{code}</code>

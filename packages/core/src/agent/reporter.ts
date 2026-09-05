@@ -10,18 +10,15 @@ export function synthesizeFindings(
   for (const finding of originalFindings) {
     const verification = verifications.get(finding.id);
 
-    // If not verified or no verification record, keep original finding
     if (!verification) {
       result.push(finding);
       continue;
     }
 
-    // Filter out false positives confirmed by evidence
     if (verification.verdict === "FALSE_POSITIVE") {
       continue;
     }
 
-    // Apply adjustments
     const updatedFinding: Finding = {
       ...finding,
       severity: verification.adjustedSeverity || finding.severity,

@@ -15,11 +15,6 @@ export interface EmbeddingOptions {
 const DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small";
 const DEFAULT_TIMEOUT_MS = 2500;
 
-/**
- * Generates vector embeddings for a code snippet using OpenAI text-embedding-3-small (1536 dims).
- * Implements a strict circuit breaker: if no API key is set, or if the request times out
- * or fails, it returns null without throwing or interrupting the scan.
- */
 export async function generateCodeEmbedding(
   text: string,
   options: EmbeddingOptions = {}
@@ -28,7 +23,6 @@ export async function generateCodeEmbedding(
     return null;
   }
 
-  // 1. If mock/injected client provided (e.g. for unit testing or custom wrappers)
   if (options.client) {
     try {
       const response = await options.client.embeddings.create({
@@ -43,7 +37,7 @@ export async function generateCodeEmbedding(
 
   const apiKey = options.apiKey || process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    // Circuit breaker: unconfigured embedding API
+
     return null;
   }
 

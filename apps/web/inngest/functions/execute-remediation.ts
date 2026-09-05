@@ -16,13 +16,11 @@ export const executeRemediationFunction = inngest.createFunction(
   async ({ event, step }: { event: any; step: any }) => {
     const { remediationId, scanId, findingId, repoName, targetPath } = event.data;
 
-    // Step 1: Verify repository opt-in settings
     await step.run("verify-opt-in", async () => {
       const settings = await getRepoSettings(repoName);
       return { optIn: settings.autoRemediateEnabled };
     });
 
-    // Step 2: Generate patch with AST syntax validation & secret sanitization
     const patchResult = await step.run("generate-patch", async () => {
       await updateRemediationStatus(remediationId, "generating_patch");
       const findings = await getScanFindings(scanId);
@@ -53,7 +51,6 @@ export const executeRemediationFunction = inngest.createFunction(
       return patch;
     });
 
-    // Step 3: Open Pull Request via GitHub App
     const prResult = await step.run("create-github-pr", async () => {
       await updateRemediationStatus(remediationId, "syntax_verifying", {
         patchDiff: patchResult.diff,

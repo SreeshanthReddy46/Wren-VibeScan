@@ -47,7 +47,6 @@ export default function RepoSettingsPage() {
           </Link>
         </div>
 
-        {/* Page Header */}
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-3">
             <GitPullRequest className="w-3.5 h-3.5" />
@@ -62,7 +61,6 @@ export default function RepoSettingsPage() {
           </p>
         </div>
 
-        {/* App Trust & Security Info */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800">
             <Lock className="w-5 h-5 text-emerald-400 mb-2" />
@@ -87,7 +85,6 @@ export default function RepoSettingsPage() {
           </div>
         </div>
 
-        {/* Repositories List */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-white">

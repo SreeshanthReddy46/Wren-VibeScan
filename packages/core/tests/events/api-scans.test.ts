@@ -20,7 +20,7 @@ test("POST /api/scans returns 202 Accepted with queued scanId and dashboardUrl",
 });
 
 test("GET /api/scans/[id] returns scan status and findings", async () => {
-  // First create a scan
+
   const createReq = new Request("http://localhost:3000/api/scans", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -29,7 +29,6 @@ test("GET /api/scans/[id] returns scan status and findings", async () => {
   const createRes = await POST(createReq);
   const { scanId } = await createRes.json();
 
-  // Fetch scan by ID
   const getReq = new Request(`http://localhost:3000/api/scans/${scanId}`);
   const getRes = await getScanById(getReq, {
     params: Promise.resolve({ id: scanId }),

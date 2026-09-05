@@ -9,12 +9,10 @@ import {
 } from "@wren/core";
 import { isSupabaseConfigured, getSupabaseClient } from "./supabase-client.ts";
 
-// In-memory stores for runtime auditing and local development fallback
 const runtimeEventsStore = new Map<string, CustomerAgentEvent>();
 const runtimeAlertsStore = new Map<string, RuntimeAlert>();
 const webhookConfigsStore = new Map<string, RuntimeWebhookConfig>();
 
-// Initialize default test webhook config
 webhookConfigsStore.set("default", {
   id: "wh_default",
   projectId: "default",
@@ -25,10 +23,6 @@ webhookConfigsStore.set("default", {
   createdAt: new Date().toISOString(),
 });
 
-/**
- * Ingests a live customer agent event, evaluates runtime security rules in background,
- * and triggers alerts + webhook delivery if tripped.
- */
 export async function ingestCustomerAgentEvent(
   rawEvent: Partial<CustomerAgentEvent> & { agentId: string; action: string }
 ): Promise<{ eventId: string; status: "queued"; tripped: boolean; alertCount: number }> {
@@ -49,14 +43,11 @@ export async function ingestCustomerAgentEvent(
     timestamp: rawEvent.timestamp || new Date().toISOString(),
   };
 
-  // Evaluate rules immediately in memory (<1ms)
   const evalResult = evaluateRuntimeAgentEvent(event);
   const tripped = evalResult.tripped;
 
-  // 1. Store the event
   runtimeEventsStore.set(eventId, event);
 
-  // 2. Persist to Supabase if configured
   if (isSupabaseConfigured) {
     try {
       const client = (await getSupabaseClient()) as {
@@ -83,11 +74,10 @@ export async function ingestCustomerAgentEvent(
         ]);
       }
     } catch {
-      // Fallback intact
+
     }
   }
 
-  // 3. If rules tripped, create alerts and trigger webhook delivery
   let alertCount = 0;
   if (tripped) {
     alertCount = evalResult.violations.length;
@@ -115,9 +105,8 @@ export async function ingestCustomerAgentEvent(
 
       runtimeAlertsStore.set(alertId, alert);
 
-      // Async webhook delivery attempt
       dispatchAlertWebhook(alert, event).catch(() => {
-        // Safe background catch
+
       });
     }
   }
@@ -130,9 +119,6 @@ export async function ingestCustomerAgentEvent(
   };
 }
 
-/**
- * Dispatch signed HTTP webhook for a tripped security alert
- */
 async function dispatchAlertWebhook(
   alert: RuntimeAlert,
   event: CustomerAgentEvent
@@ -142,7 +128,6 @@ async function dispatchAlertWebhook(
     return;
   }
 
-  // Check minimum severity filter
   if (config.minSeverity === "critical" && alert.severity !== "critical") {
     return;
   }
@@ -189,9 +174,6 @@ async function dispatchAlertWebhook(
   }
 }
 
-/**
- * Retrieve ingested events with optional filtering
- */
 export async function getRuntimeAgentEvents(
   limit = 50,
   agentId?: string
@@ -206,9 +188,6 @@ export async function getRuntimeAgentEvents(
   return events.slice(0, limit);
 }
 
-/**
- * Retrieve security alerts with optional filtering
- */
 export async function getRuntimeAlerts(
   limit = 50,
   agentId?: string,
@@ -227,9 +206,6 @@ export async function getRuntimeAlerts(
   return alerts.slice(0, limit);
 }
 
-/**
- * Update alert status (e.g. acknowledge or resolve)
- */
 export async function updateRuntimeAlertStatus(
   alertId: string,
   status: "active" | "acknowledged" | "resolved"
@@ -240,9 +216,6 @@ export async function updateRuntimeAlertStatus(
   return alert;
 }
 
-/**
- * Get customer webhook settings
- */
 export async function getRuntimeWebhookConfig(
   projectId = "default"
 ): Promise<RuntimeWebhookConfig> {
@@ -262,9 +235,6 @@ export async function getRuntimeWebhookConfig(
   return created;
 }
 
-/**
- * Save customer webhook settings
- */
 export async function saveRuntimeWebhookConfig(
   updates: Partial<RuntimeWebhookConfig> & { url: string },
   projectId = "default"
@@ -279,9 +249,6 @@ export async function saveRuntimeWebhookConfig(
   return updated;
 }
 
-/**
- * Reset in-memory data for testing
- */
 export function clearRuntimeStoreForTesting(): void {
   runtimeEventsStore.clear();
   runtimeAlertsStore.clear();

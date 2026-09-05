@@ -25,7 +25,6 @@ export interface ScanRecord {
   completedAt?: string;
 }
 
-// In-memory store fallback for development, testing, and offline environments
 const scansStore = new Map<string, ScanRecord>();
 const findingsStore = new Map<string, Finding[]>();
 const eventsStore = new Map<string, ScanStepEvent[]>();
@@ -78,7 +77,6 @@ export async function recordScanEvent(event: ScanStepEvent): Promise<void> {
   existing.push(event);
   eventsStore.set(event.scanId, existing);
 
-  // Notify any active local subscribers (for real-time CLI or SSE/WebSocket fallback)
   const subs = eventSubscribers.get(event.scanId);
   if (subs) {
     for (const callback of subs) {
@@ -109,10 +107,6 @@ export function subscribeToScanEvents(
   };
 }
 
-/**
- * Execute scan in local in-process background worker.
- * Used for tests, offline development, and when running without an external Inngest daemon.
- */
 async function runLocalBackgroundScan(
   scanId: string,
   request: ScanJobRequest
@@ -138,7 +132,6 @@ async function runLocalBackgroundScan(
       ...config,
     });
 
-    // Record discovered & verified findings
     for (let i = 0; i < result.findings.length; i++) {
       const f = result.findings[i];
       await recordScanEvent({
@@ -188,15 +181,11 @@ async function runLocalBackgroundScan(
   }
 }
 
-/**
- * Dispatch scan job: returns immediately with 202 Accepted status and queued scanId.
- */
 export async function dispatchScanJob(request: ScanJobRequest): Promise<ScanJobResponse> {
   const scanId =
     request.scanId ||
     `scan-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
-  // Record initial queued status
   await updateScanStatus(scanId, "queued", {
     repoName: request.repoName,
     branch: request.branch,
@@ -204,7 +193,6 @@ export async function dispatchScanJob(request: ScanJobRequest): Promise<ScanJobR
     progressStage: "queued",
   });
 
-  // Check if Inngest cloud is configured or if we are in local/test fallback mode
   const inngestKey = process.env.INNGEST_EVENT_KEY || process.env.INNGEST_SIGNING_KEY;
   const isDevOrTest =
     process.env.NODE_ENV === "test" || !inngestKey || process.env.WREN_LOCAL_WORKER === "1";
@@ -230,7 +218,7 @@ export async function dispatchScanJob(request: ScanJobRequest): Promise<ScanJobR
       }, 0);
     }
   } else {
-    // Local in-process background execution
+
     setTimeout(() => {
       void runLocalBackgroundScan(scanId, request);
     }, 0);

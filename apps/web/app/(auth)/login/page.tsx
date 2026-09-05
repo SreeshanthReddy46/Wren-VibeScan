@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Eye, EyeOff, ShieldAlert, AlertTriangle, CheckCircle2, Lock, User, Mail } from "lucide-react";
 import { signInWithGoogleOAuth } from "@/lib/supabase-client";
 
-// Official Google G multi-color SVG icon
 function GoogleIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
@@ -35,24 +34,20 @@ function GoogleIcon({ className = "h-4 w-4" }: { className?: string }) {
 export default function LoginPage() {
   const router = useRouter();
 
-  // Form states
   const [identifier, setIdentifier] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [rememberMe, setRememberMe] = React.useState(true);
   const [showPassword, setShowPassword] = React.useState(false);
   const [capsLockActive, setCapsLockActive] = React.useState(false);
 
-  // Status states
   const [loading, setLoading] = React.useState(false);
   const [googleLoading, setGoogleLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
 
-  // Anti-Brute-Force Lockout (Security Guardrail)
   const [failedAttempts, setFailedAttempts] = React.useState(0);
   const [lockoutRemaining, setLockoutRemaining] = React.useState(0);
 
-  // Restore lockout state from sessionStorage on mount
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const storedLock = sessionStorage.getItem("wren_lockout_until");
@@ -67,7 +62,6 @@ export default function LoginPage() {
     }
   }, []);
 
-  // Lockout countdown timer
   React.useEffect(() => {
     if (lockoutRemaining <= 0) return;
     const interval = setInterval(() => {
@@ -84,7 +78,6 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, [lockoutRemaining]);
 
-  // Detect input type: Gmail, standard email, or username
   const detectedType = React.useMemo(() => {
     const trimmed = identifier.trim().toLowerCase();
     if (!trimmed) return null;
@@ -93,12 +86,10 @@ export default function LoginPage() {
     return "username";
   }, [identifier]);
 
-  // Caps Lock keyboard listener for security UX
   const handleKeyModifier = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setCapsLockActive(e.getModifierState("CapsLock"));
   };
 
-  // Google OAuth Handler
   const handleGoogleAuth = async () => {
     if (lockoutRemaining > 0) return;
     setError(null);
@@ -118,7 +109,6 @@ export default function LoginPage() {
     }
   };
 
-  // Email/Username + Password Form Submit
   const handleCredentialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (lockoutRemaining > 0) return;
@@ -171,7 +161,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Success
       setSuccess(true);
       if (typeof window !== "undefined") {
         localStorage.setItem(
@@ -195,7 +184,7 @@ export default function LoginPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+
       <div className="text-center space-y-1.5">
         <h1 className="text-2xl font-extrabold tracking-tight text-zinc-950">Welcome back</h1>
         <p className="text-xs text-zinc-600">
@@ -203,7 +192,6 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Lockout Banner */}
       {isFormLocked && (
         <div
           role="alert"
@@ -217,7 +205,6 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Error Alert */}
       {error && !isFormLocked && (
         <div
           role="alert"
@@ -229,7 +216,6 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Success Notice */}
       {success && (
         <div className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
@@ -237,7 +223,6 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Google OAuth Action */}
       <div>
         <Button
           type="button"
@@ -255,7 +240,6 @@ export default function LoginPage() {
         </Button>
       </div>
 
-      {/* Divider */}
       <div className="relative flex items-center justify-center my-2">
         <div className="border-t border-sky-200/80 w-full" />
         <span className="bg-white/90 px-3 text-[11px] uppercase tracking-wider text-sky-900/80 font-bold absolute rounded-full">
@@ -263,9 +247,8 @@ export default function LoginPage() {
         </span>
       </div>
 
-      {/* Credential Form */}
       <form onSubmit={handleCredentialSubmit} className="space-y-4" noValidate>
-        {/* Identifier: Email, Gmail, or Username */}
+
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label htmlFor="identifier-input" className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
@@ -303,7 +286,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Password */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label htmlFor="password-input" className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
@@ -348,7 +330,6 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* CapsLock Warning Indicator */}
           {capsLockActive && (
             <div className="flex items-center gap-1.5 text-[11px] text-amber-700 font-medium pt-0.5">
               <AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
@@ -357,7 +338,6 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Remember Me */}
         <div className="flex items-center justify-between pt-0.5">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
@@ -371,7 +351,6 @@ export default function LoginPage() {
           </label>
         </div>
 
-        {/* Submit Button */}
         <Button
           type="submit"
           disabled={isAnyLoading || isFormLocked}
@@ -390,7 +369,6 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      {/* Footer Navigation */}
       <div className="text-center text-xs text-zinc-600 pt-1 space-y-2 border-t border-sky-100">
         <div>
           <span>New to Wren? </span>

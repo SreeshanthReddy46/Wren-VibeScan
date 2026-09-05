@@ -26,7 +26,6 @@ export interface RemediationRecord {
   completedAt?: string;
 }
 
-// In-memory store fallback for repository settings & remediation jobs
 const repoSettingsStore = new Map<string, RepoRemediationSettings>();
 const remediationStore = new Map<string, RemediationRecord>();
 
@@ -86,9 +85,6 @@ export async function updateRemediationStatus(
   remediationStore.set(remediationId, updated);
 }
 
-/**
- * Local in-process execution for tests, offline mode, or fallback without Inngest server.
- */
 async function runLocalRemediation(
   remediationId: string,
   request: RemediationRequest
@@ -96,12 +92,11 @@ async function runLocalRemediation(
   try {
     await updateRemediationStatus(remediationId, "generating_patch");
 
-    // 1. Locate finding
     const findings = await getScanFindings(request.scanId);
     let finding = findings.find((f) => f.id === request.findingId);
 
     if (!finding) {
-      // Fallback synthetic finding for direct unit testing
+
       finding = {
         id: request.findingId,
         ruleId: "WREN-SEC-001",
@@ -123,7 +118,6 @@ async function runLocalRemediation(
       };
     }
 
-    // 2. Generate patch with AST validation & zero-leakage secret abstraction
     const patchResult = await generateRemediationPatch(finding, {
       targetPath: request.targetPath,
     });
@@ -141,7 +135,6 @@ async function runLocalRemediation(
       explanation: patchResult.explanation,
     });
 
-    // 3. Open PR via GitHub App client (or dry-run)
     const prResult = await createRemediationPullRequest({
       repoName: request.repoName || "org/repo",
       branchName: patchResult.branchName,
@@ -158,7 +151,6 @@ async function runLocalRemediation(
       return;
     }
 
-    // 4. Mark complete
     await updateRemediationStatus(remediationId, "pr_opened", {
       prUrl: prResult.prUrl,
       prNumber: prResult.prNumber,
@@ -171,15 +163,11 @@ async function runLocalRemediation(
   }
 }
 
-/**
- * Dispatches remediation job: returns immediately with 202 Accepted status.
- */
 export async function dispatchRemediationJob(
   request: RemediationRequest
 ): Promise<RemediationResponse> {
   const remediationId = `rem-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
-  // Record queued status
   const record: RemediationRecord = {
     id: remediationId,
     scanId: request.scanId,

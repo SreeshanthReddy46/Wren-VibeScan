@@ -72,25 +72,23 @@ export function discoverFiles(
   const root = path.resolve(targetDir);
   const ig = ignore();
 
-  // Load .gitignore if present
   const gitignorePath = path.join(root, ".gitignore");
   if (fs.existsSync(gitignorePath)) {
     try {
       const gitignoreContent = fs.readFileSync(gitignorePath, "utf8");
       ig.add(gitignoreContent);
     } catch {
-      // Ignore read errors
+
     }
   }
 
-  // Load .wrenignore if present
   const wrenignorePath = path.join(root, ".wrenignore");
   if (fs.existsSync(wrenignorePath)) {
     try {
       const wrenignoreContent = fs.readFileSync(wrenignorePath, "utf8");
       ig.add(wrenignoreContent);
     } catch {
-      // Ignore read errors
+
     }
   }
 
@@ -126,7 +124,6 @@ export function discoverFiles(
         const ext = path.extname(entry.name).toLowerCase();
         const baseName = entry.name.toLowerCase();
 
-        // Check if ignored or binary
         if (BINARY_EXTENSIONS.has(ext)) {
           continue;
         }
@@ -135,7 +132,6 @@ export function discoverFiles(
           continue;
         }
 
-        // Only scan code / config / env files or check .env prefixes
         const isEnvFile = baseName.startsWith(".env");
         if (!isEnvFile && !SCANNABLE_EXTENSIONS.has(ext) && ext !== "") {
           continue;
@@ -143,7 +139,7 @@ export function discoverFiles(
 
         try {
           const stats = fs.statSync(fullPath);
-          // Limit individual file size to 2MB to avoid memory leaks
+
           if (stats.size <= 2 * 1024 * 1024) {
             results.push({
               absolutePath: fullPath,
@@ -153,7 +149,7 @@ export function discoverFiles(
             });
           }
         } catch {
-          // Skip inaccessible files
+
         }
       }
     }

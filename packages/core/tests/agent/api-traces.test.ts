@@ -102,7 +102,6 @@ test("POST and GET /api/scans/[id]/traces handles batch ingestion and retrieval"
   assert.equal(postData.success, true);
   assert.equal(postData.count, 2);
 
-  // Query traces via GET
   const getReq = new Request(`http://localhost:3000/api/scans/${scanId}/traces`);
   const getRes = await getTracesRoute(getReq, {
     params: Promise.resolve({ id: scanId }),

@@ -111,8 +111,7 @@ export function WaitlistSection() {
     <section id="waitlist" className="py-20 sm:py-28 bg-transparent overflow-hidden">
       <div className="container max-w-5xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col items-center text-center space-y-12">
-          
-          {/* Top Section Header & Early Access Form */}
+
           <div className="space-y-6 max-w-2xl">
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-950 leading-[1.15]">
               Secure your AI apps before your users do.
@@ -122,7 +121,6 @@ export function WaitlistSection() {
               Wren is in private beta for indie hackers, founders, and engineering teams. Enter your email to claim your priority CLI token.
             </p>
 
-            {/* Email Form Card */}
             <div className="sky-glow-card sky-glow-emerald mx-auto relative w-full max-w-md p-6 sm:p-7 rounded-3xl border border-sky-200/90 bg-white/90 shadow-xl backdrop-blur-md">
               <CornerSparks color="emerald" />
               {status === "success" ? (
@@ -163,7 +161,7 @@ export function WaitlistSection() {
                   {status === "error" && (
                     <p className="text-xs text-red-600 font-medium text-left px-1">{errorMessage}</p>
                   )}
-                  
+
                   <div className="pt-2 text-left space-y-1.5">
                     <div className="flex items-center justify-between text-xs text-zinc-600 font-medium">
                       <span>Beta Seats Reserved</span>
@@ -180,9 +178,6 @@ export function WaitlistSection() {
         </div>
       </div>
 
-      {/* =========================================================================
-          OPEN-AIR ROLLER COASTER COMPANY LOGO STREAM (No bounding div, full-bleed sine wave)
-          ========================================================================= */}
       <div className="w-full pt-16 pb-6 overflow-hidden select-none">
         <div className="text-center space-y-1 mb-8">
           <div className="text-xs font-bold uppercase tracking-wider text-sky-900 flex items-center justify-center gap-2">
@@ -191,7 +186,6 @@ export function WaitlistSection() {
           </div>
         </div>
 
-        {/* Roller Coaster Floating Train of Logos */}
         <div className="relative w-full py-8">
           <div className="coaster-track flex items-center gap-14 sm:gap-20">
             {[...companies, ...companies, ...companies].map((company, idx) => (

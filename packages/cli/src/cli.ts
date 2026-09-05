@@ -9,7 +9,6 @@ import { ExitCode } from "./utils/exit-codes";
 
 const cli = cac("wren-security");
 
-// 1. wren-security check [path] (or wren-security scan)
 cli
   .command("[path]", "Scan codebase for AI-generated security vulnerabilities")
   .alias("check")
@@ -39,7 +38,6 @@ cli
     }
   });
 
-// 2. wren init
 cli
   .command("init", "Initialize Wren configuration (.wrenignore and .wrenrc.json)")
   .action(() => {
@@ -51,7 +49,6 @@ cli
     }
   });
 
-// 3. wren login [token]
 cli
   .command("login [token]", "Authenticate local CLI with Wren Cloud")
   .action(async (token) => {
@@ -63,7 +60,6 @@ cli
     }
   });
 
-// 4. wren logout
 cli
   .command("logout", "Log out and remove stored Wren credentials")
   .action(() => {
@@ -75,7 +71,6 @@ cli
     }
   });
 
-// 5. wren fix [findingId]
 cli
   .command("fix [findingId]", "Generate and apply remediation patches or open GitHub PRs")
   .option("--dry-run", "Preview the patch without modifying any files")

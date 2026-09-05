@@ -9,17 +9,11 @@ export function BackgroundClouds() {
       className="pointer-events-none fixed inset-0 overflow-hidden -z-10 select-none"
       aria-hidden="true"
     >
-      {/* Sunny Azure Sky Gradient */}
+
       <div className="absolute inset-0 bg-gradient-to-b from-[#60a5fa]/90 via-[#7dd3fc] via-[#bae6fd] to-[#e0f2fe]" />
 
-      {/* =========================================================================
-          REALISTIC PHOTOREALISTIC SUN WITH OPTICAL SOLAR FLARE & RADIANT SUNBEAMS
-          ========================================================================= */}
-      
-      {/* Layer 1: Ambient Warm Solar Heat Aura */}
       <div className="absolute -top-32 right-0 sm:right-20 w-[600px] sm:w-[900px] h-[600px] sm:h-[900px] rounded-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-300/40 via-yellow-200/20 to-transparent blur-3xl pointer-events-none" />
 
-      {/* Layer 2: Photographic Cinematic Sun Flare with Sunbeams & Optical Corona */}
       <div className="realistic-sun-glow absolute -top-24 sm:-top-32 right-0 sm:right-16 w-[450px] sm:w-[720px] aspect-square mix-blend-screen pointer-events-none">
         <Image
           src="/assets/sun-flare.png"
@@ -30,13 +24,10 @@ export function BackgroundClouds() {
         />
       </div>
 
-      {/* Layer 3: Blinding White-Hot Sun Core */}
       <div className="absolute top-10 sm:top-14 right-28 sm:right-64 w-16 sm:w-24 h-16 sm:h-24 rounded-full bg-white shadow-[0_0_90px_35px_rgba(255,255,255,0.95)] blur-[1.5px] pointer-events-none" />
 
-      {/* Layer 4: Diagonal Sunbeams Across Upper Atmosphere */}
       <div className="absolute -top-40 right-10 sm:right-40 w-[700px] sm:w-[1100px] h-[700px] sm:h-[1100px] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/30 via-yellow-100/15 to-transparent blur-2xl pointer-events-none" />
 
-      {/* SVG Definitions for Volumetric Cloud Shading & Transparency */}
       <svg className="absolute w-0 h-0" aria-hidden="true">
         <defs>
           <filter id="cloud-puff-filter" x="-30%" y="-30%" width="160%" height="160%">
@@ -67,11 +58,6 @@ export function BackgroundClouds() {
         </defs>
       </svg>
 
-      {/* =========================================================================
-          CONTINUOUS STREAM OF ROAMING CLOUDS (True Edge-to-Edge Transit on All Devices)
-          ========================================================================= */}
-
-      {/* Cloud 1 (LTR): Top Upper Sky Cumulus */}
       <div className="cloud-stream-ltr-1 absolute top-[2%] left-0 w-[420px] sm:w-[680px] h-[200px] sm:h-[300px]">
         <svg viewBox="0 0 520 240" className="w-full h-full filter drop-shadow-[0_16px_32px_rgba(255,255,255,0.95)]">
           <g filter="url(#cloud-puff-filter)">
@@ -84,7 +70,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 2 (RTL): Upper Wispy Cirrus Passing In Front of Sunbeams */}
       <div className="cloud-stream-rtl-1 absolute top-[8%] left-0 w-[480px] sm:w-[740px] h-[200px] sm:h-[280px]">
         <svg viewBox="0 0 560 220" className="w-full h-full filter drop-shadow-[0_14px_28px_rgba(255,255,255,0.9)]">
           <g filter="url(#cloud-wisp-filter)">
@@ -97,7 +82,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 3 (LTR): Mid-Upper Sky Fluffy Cloud */}
       <div className="cloud-stream-ltr-2 absolute top-[18%] left-0 w-[440px] sm:w-[700px] h-[210px] sm:h-[290px]">
         <svg viewBox="0 0 500 230" className="w-full h-full filter drop-shadow-[0_16px_30px_rgba(255,255,255,0.9)]">
           <g filter="url(#cloud-puff-filter)">
@@ -110,7 +94,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 4 (RTL): Mid-Upper Counter Stream */}
       <div className="cloud-stream-rtl-2 absolute top-[28%] left-0 w-[400px] sm:w-[620px] h-[190px] sm:h-[260px]">
         <svg viewBox="0 0 480 210" className="w-full h-full filter drop-shadow-[0_12px_24px_rgba(255,255,255,0.85)]">
           <g filter="url(#cloud-wisp-filter)">
@@ -123,7 +106,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 5 (LTR): Center Sky Dense Cumulus */}
       <div className="cloud-stream-ltr-3 absolute top-[40%] left-0 w-[460px] sm:w-[740px] h-[220px] sm:h-[310px]">
         <svg viewBox="0 0 530 250" className="w-full h-full filter drop-shadow-[0_16px_32px_rgba(255,255,255,0.92)]">
           <g filter="url(#cloud-puff-filter)">
@@ -136,7 +118,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 6 (RTL): Center Counter Stream */}
       <div className="cloud-stream-rtl-3 absolute top-[52%] left-0 w-[440px] sm:w-[680px] h-[200px] sm:h-[280px]">
         <svg viewBox="0 0 510 220" className="w-full h-full filter drop-shadow-[0_14px_28px_rgba(255,255,255,0.88)]">
           <g filter="url(#cloud-wisp-filter)">
@@ -149,7 +130,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 7 (LTR): Lower-Mid Sky Cloud */}
       <div className="cloud-stream-ltr-4 absolute top-[64%] left-0 w-[420px] sm:w-[660px] h-[200px] sm:h-[280px]">
         <svg viewBox="0 0 490 220" className="w-full h-full filter drop-shadow-[0_14px_28px_rgba(255,255,255,0.85)]">
           <g filter="url(#cloud-puff-filter)">
@@ -162,7 +142,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 8 (RTL): Lower-Mid Counter Stream */}
       <div className="cloud-stream-rtl-4 absolute top-[74%] left-0 w-[460px] sm:w-[720px] h-[210px] sm:h-[290px]">
         <svg viewBox="0 0 520 230" className="w-full h-full filter drop-shadow-[0_14px_28px_rgba(255,255,255,0.88)]">
           <g filter="url(#cloud-wisp-filter)">
@@ -175,7 +154,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 9 (LTR): Bottom Horizon Cloud */}
       <div className="cloud-stream-ltr-5 absolute top-[84%] left-0 w-[450px] sm:w-[700px] h-[210px] sm:h-[290px]">
         <svg viewBox="0 0 500 230" className="w-full h-full filter drop-shadow-[0_16px_30px_rgba(255,255,255,0.9)]">
           <g filter="url(#cloud-puff-filter)">
@@ -188,7 +166,6 @@ export function BackgroundClouds() {
         </svg>
       </div>
 
-      {/* Cloud 10 (RTL): Deep Bottom Horizon Cloud */}
       <div className="cloud-stream-rtl-5 absolute top-[92%] left-0 w-[480px] sm:w-[750px] h-[220px] sm:h-[300px]">
         <svg viewBox="0 0 540 240" className="w-full h-full filter drop-shadow-[0_14px_28px_rgba(255,255,255,0.85)]">
           <g filter="url(#cloud-wisp-filter)">

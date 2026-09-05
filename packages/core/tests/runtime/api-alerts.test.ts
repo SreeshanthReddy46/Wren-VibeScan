@@ -16,7 +16,6 @@ import {
 test("GET and PATCH /api/v1/runtime-alerts manages tripped threat alerts", async () => {
   clearRuntimeStoreForTesting();
 
-  // Ingest an event that trips WREN-RUN-002 (privilege escalation)
   await ingestCustomerAgentEvent({
     agentId: "support-bot-test",
     action: "grant_admin",
@@ -24,7 +23,6 @@ test("GET and PATCH /api/v1/runtime-alerts manages tripped threat alerts", async
     arguments: { userId: "usr_attacker", role: "admin" },
   });
 
-  // Query alerts via GET
   const getReq = new Request("http://localhost:3000/api/v1/runtime-alerts");
   const getRes = await getAlertsRoute(getReq);
   assert.equal(getRes.status, 200);
@@ -35,7 +33,6 @@ test("GET and PATCH /api/v1/runtime-alerts manages tripped threat alerts", async
 
   const alertId = data.alerts[0].id;
 
-  // Acknowledge alert via PATCH
   const patchReq = new Request("http://localhost:3000/api/v1/runtime-alerts", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -52,14 +49,13 @@ test("GET and PATCH /api/v1/runtime-alerts manages tripped threat alerts", async
 });
 
 test("GET and POST /api/v1/webhooks/config updates webhook destination and signing secret", async () => {
-  // Get initial config
+
   const getReq = new Request("http://localhost:3000/api/v1/webhooks/config?projectId=test-proj");
   const getRes = await getWebhookConfigRoute(getReq);
   assert.equal(getRes.status, 200);
   const { config } = await getRes.json();
   assert.ok(config.secret);
 
-  // Update webhook destination
   const postReq = new Request("http://localhost:3000/api/v1/webhooks/config", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

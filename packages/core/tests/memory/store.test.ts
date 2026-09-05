@@ -18,7 +18,6 @@ test("MemoryStore resolves exact Tier 1 hash hit without network", async () => {
     fix: { description: "Add auth", replacementCode: "" },
   };
 
-  // Save finding verdict
   await store.save(finding, {
     findingId: "f-1",
     verdict: "FALSE_POSITIVE",
@@ -26,7 +25,6 @@ test("MemoryStore resolves exact Tier 1 hash hit without network", async () => {
     confidence: 0.99,
   });
 
-  // Query memory for identical finding
   const lookup = await store.lookup(finding);
   assert.equal(lookup.hit, true);
   assert.equal(lookup.hitType, "EXACT_HASH");

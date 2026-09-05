@@ -46,21 +46,20 @@ test("runAgentLoop coordinates Planner -> Investigator -> Verifier -> Reporter w
     },
   ];
 
-  // Mock Anthropic client
   let step = 0;
   const mockClient = {
     messages: {
       create: async () => {
         step++;
         if (step === 1) {
-          // Investigator turn 1: finishes
+
           return {
             role: "assistant",
             stop_reason: "end_turn",
             content: [{ type: "text", text: "Checked route and middleware" }],
           };
         }
-        // Verifier
+
         return {
           role: "assistant",
           content: [

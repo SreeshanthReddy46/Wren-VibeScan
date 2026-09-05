@@ -18,9 +18,6 @@ export interface FixCommandOptions {
   finding?: Finding;
 }
 
-/**
- * Detects GitHub repository name (owner/repo) from local git remote.
- */
 function detectGitRepository(cwd: string = process.cwd()): string {
   try {
     const remoteUrl = execSync("git config --get remote.origin.url", {
@@ -29,20 +26,16 @@ function detectGitRepository(cwd: string = process.cwd()): string {
       stdio: ["ignore", "pipe", "ignore"],
     }).trim();
 
-    // Match git@github.com:owner/repo.git or https://github.com/owner/repo(.git)
     const match = remoteUrl.match(/github\.com[:/]([^/]+)\/([^.]+)(?:\.git)?$/);
     if (match) {
       return `${match[1]}/${match[2]}`;
     }
   } catch {
-    // Ignore git error
+
   }
   return "wren-security/demo-repo";
 }
 
-/**
- * Formats unified diff lines with terminal colors.
- */
 function formatColoredDiff(diff: string): string {
   return diff
     .split("\n")
@@ -64,9 +57,6 @@ function formatColoredDiff(diff: string): string {
     .join("\n");
 }
 
-/**
- * Locates finding by ID from options, scan files, or creates a stub.
- */
 function resolveFinding(
   findingId?: string,
   options: FixCommandOptions = {}
@@ -91,12 +81,11 @@ function resolveFinding(
         const match = findings.find((f) => f.id === findingId);
         if (match) return match;
       } catch {
-        // Ignore parse error
+
       }
     }
   }
 
-  // Fallback: If findingId or file is given, synthesize a finding if file exists
   if (options.file || findingId) {
     const filePath = options.file || "src/index.ts";
     return {
@@ -122,9 +111,6 @@ function resolveFinding(
   return null;
 }
 
-/**
- * CLI command handler for `wren fix [findingId]`.
- */
 export async function runFixCommand(
   findingId?: string,
   options: FixCommandOptions = {}
@@ -151,13 +137,11 @@ export async function runFixCommand(
     return ExitCode.FATAL_ERROR;
   }
 
-  // Display diff preview
   console.log(pc.bold(pc.cyan(`\n🔧 Autonomous Remediation: ${patch.title}`)));
   console.log(pc.dim(`Target file: ${patch.filePath}`));
   console.log(pc.dim(`Branch: ${patch.branchName}`));
   console.log("\n" + formatColoredDiff(patch.diff) + "\n");
 
-  // 1. Dispatch Pull Request via GitHub App / API
   if (options.openPr) {
     const repo = options.repo || detectGitRepository(targetDir);
     const baseUrl = options.apiUrl || userConfig.apiUrl || "http://localhost:3000";
@@ -186,7 +170,7 @@ export async function runFixCommand(
         }
       }
     } catch {
-      // In offline/test mode without live server, rely on resilient fallback
+
     }
 
     console.log(pc.green(`✔ Pull request opened successfully: ${prUrl}`));
@@ -194,7 +178,6 @@ export async function runFixCommand(
     return ExitCode.SUCCESS;
   }
 
-  // 2. Apply Locally to disk
   if (options.applyLocally) {
     const fullPath = path.isAbsolute(patch.filePath)
       ? patch.filePath
@@ -207,7 +190,6 @@ export async function runFixCommand(
     return ExitCode.SUCCESS;
   }
 
-  // 3. Dry-run preview mode
   console.log(pc.yellow("ℹ Dry-run preview: No files were changed on disk."));
   console.log(
     pc.dim("  • Run with --apply-locally to apply this fix to your working tree.")

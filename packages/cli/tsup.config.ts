@@ -1,4 +1,4 @@
-// packages/cli/tsup.config.ts
+
 import { defineConfig } from "tsup";
 
 export default defineConfig({

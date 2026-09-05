@@ -13,7 +13,6 @@ import {
 test("POST /api/v1/agent-events validates required payload fields", async () => {
   clearRuntimeStoreForTesting();
 
-  // Missing agentId
   const badReq = new Request("http://localhost:3000/api/v1/agent-events", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -47,12 +46,10 @@ test("POST /api/v1/agent-events ingests valid event with 202 Accepted and evalua
   assert.equal(data.status, "queued");
   assert.ok(data.eventId);
 
-  // Verify event was logged
   const events = await getRuntimeAgentEvents();
   assert.equal(events.length, 1);
   assert.equal(events[0].agentId, "support-agent-prod");
 
-  // Verify threat rule WREN-RUN-001 tripped and created an alert
   const alerts = await getRuntimeAlerts();
   assert.equal(alerts.length, 1);
   assert.equal(alerts[0].ruleId, "WREN-RUN-001");

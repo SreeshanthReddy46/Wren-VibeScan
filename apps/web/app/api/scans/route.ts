@@ -4,7 +4,7 @@ import type { ApiScanRequest, ScanConfig } from "@wren/shared-types";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  // Return placeholder or recent scan
+
   const sampleScan = await getScanRecord("scan-prod-001");
   return Response.json({
     scans: sampleScan ? [sampleScan] : [
@@ -35,7 +35,6 @@ export async function POST(request: Request) {
       externalReport?: ApiScanRequest;
     };
 
-    // Dispatch scan job to Inngest / background worker immediately
     const jobResponse = await dispatchScanJob({
       scanId: body.scanId,
       targetPath: body.path || process.cwd(),

@@ -54,7 +54,7 @@ export default function RuntimeAuditDashboardPage() {
         }
       }
     } catch {
-      // Offline fallback
+
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -82,7 +82,7 @@ export default function RuntimeAuditDashboardPage() {
         );
       }
     } catch {
-      // Ignored
+
     }
   }
 
@@ -99,11 +99,11 @@ export default function RuntimeAuditDashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white selection:bg-amber-500/30">
-      {/* Background radial glow */}
+
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.12),rgba(255,255,255,0))] pointer-events-none" />
 
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Navigation Breadcrumbs */}
+
         <div className="flex items-center justify-between gap-4 mb-8">
           <Link
             href="/"
@@ -128,7 +128,6 @@ export default function RuntimeAuditDashboardPage() {
           </div>
         </div>
 
-        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-3">
@@ -161,7 +160,6 @@ export default function RuntimeAuditDashboardPage() {
           </Button>
         </div>
 
-        {/* Metric Summary Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
             <p className="text-xs text-zinc-400">Total Ingested Actions</p>
@@ -191,7 +189,6 @@ export default function RuntimeAuditDashboardPage() {
           </div>
         </div>
 
-        {/* Active Security Threat Alerts Banner */}
         {activeAlerts.length > 0 && (
           <div className="mb-10 space-y-3">
             <div className="flex items-center justify-between">
@@ -262,7 +259,6 @@ export default function RuntimeAuditDashboardPage() {
           </div>
         )}
 
-        {/* Live Ingested Agent Events Feed */}
         <div className="space-y-4 mb-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -341,7 +337,6 @@ export default function RuntimeAuditDashboardPage() {
         </div>
       </main>
 
-      {/* Event Payload Inspector Modal */}
       <Dialog
         open={Boolean(selectedEvent)}
         onOpenChange={(open) => {

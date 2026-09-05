@@ -26,9 +26,6 @@ export function isGitHubAppConfigured(): boolean {
   );
 }
 
-/**
- * Generate GitHub App JWT token for app authentication.
- */
 function generateAppJwt(appId: string, privateKey: string): string {
   const now = Math.floor(Date.now() / 1000);
   const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url");
@@ -47,10 +44,6 @@ function generateAppJwt(appId: string, privateKey: string): string {
   return `${header}.${payload}.${signature}`;
 }
 
-/**
- * Creates a remediation branch, commits the verified patched code, and opens a GitHub Pull Request.
- * Features a safe, zero-dependency dry-run fallback for local development and test environments.
- */
 export async function createRemediationPullRequest(
   options: CreatePrOptions
 ): Promise<GitHubPrResult> {
@@ -84,7 +77,7 @@ export async function createRemediationPullRequest(
   }
 
   try {
-    // 1. Get Installation Token
+
     const jwt = generateAppJwt(appId, privateKey);
     const tokenRes = await fetch(
       `https://api.github.com/app/installations/${installationId}/access_tokens`,
@@ -112,7 +105,6 @@ export async function createRemediationPullRequest(
 
     const baseBranch = options.baseBranch || "main";
 
-    // 2. Get base branch commit SHA
     const refRes = await fetch(
       `https://api.github.com/repos/${options.repoName}/git/ref/heads/${baseBranch}`,
       { headers: authHeaders }
@@ -125,7 +117,6 @@ export async function createRemediationPullRequest(
     const refData = (await refRes.json()) as { object: { sha: string } };
     const baseSha = refData.object.sha;
 
-    // 3. Create remediation branch
     await fetch(`https://api.github.com/repos/${options.repoName}/git/refs`, {
       method: "POST",
       headers: authHeaders,
@@ -135,8 +126,6 @@ export async function createRemediationPullRequest(
       }),
     });
 
-    // 4. Commit patched file
-    // Check if file exists to obtain its blob sha
     let fileSha: string | undefined;
     const fileRes = await fetch(
       `https://api.github.com/repos/${options.repoName}/contents/${options.filePath}?ref=${options.branchName}`,
@@ -166,7 +155,6 @@ export async function createRemediationPullRequest(
       throw new Error(`Failed to commit patched file: ${commitRes.statusText}`);
     }
 
-    // 5. Open Pull Request
     const prRes = await fetch(`https://api.github.com/repos/${options.repoName}/pulls`, {
       method: "POST",
       headers: authHeaders,

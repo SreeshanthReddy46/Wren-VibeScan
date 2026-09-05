@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className="font-sans antialiased text-zinc-950 bg-transparent min-h-screen relative overflow-x-clip">
         <BackgroundClouds />
         {children}
-        {/* Mount FlyingWren AFTER children so it is always painted on top of all words and sections */}
+
         <FlyingWren />
       </body>
     </html>

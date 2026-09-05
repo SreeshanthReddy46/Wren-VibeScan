@@ -50,7 +50,7 @@ export default function ChangelogPage() {
   return (
     <div className="pt-32 pb-24 sm:pt-40 sm:pb-32 bg-transparent">
       <div className="container max-w-4xl mx-auto px-4 sm:px-6 space-y-16">
-        {/* Header */}
+
         <div className="space-y-4 text-left">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sky-800">
             <Sparkles className="h-4 w-4" />
@@ -64,11 +64,10 @@ export default function ChangelogPage() {
           </p>
         </div>
 
-        {/* Timeline */}
         <div className="relative border-l border-sky-200/80 ml-4 sm:ml-6 pl-6 sm:pl-10 space-y-12">
           {releases.map((release) => (
             <div key={release.version} className="relative group">
-              {/* Dot */}
+
               <div className="absolute -left-[31px] sm:-left-[47px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-sky-400 bg-white group-hover:scale-125 transition-transform" />
 
               <div className="p-8 rounded-2xl border border-sky-200/80 bg-white/80 backdrop-blur-md hover:border-sky-300 transition-all shadow-sm space-y-4">
@@ -110,7 +109,6 @@ export default function ChangelogPage() {
           ))}
         </div>
 
-        {/* CTA */}
         <div className="p-8 rounded-3xl bg-white/80 border border-sky-200/80 text-zinc-950 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md backdrop-blur-md">
           <div className="space-y-1 text-center sm:text-left">
             <h3 className="text-xl font-bold tracking-tight">Want to suggest a security rule?</h3>

@@ -18,9 +18,6 @@ export interface RealtimeEventPayload {
   message?: string;
 }
 
-/**
- * Pure state transition reducer for realtime events.
- */
 export function handleRealtimePayload(
   state: RealtimeState,
   event: RealtimeEventPayload
@@ -59,10 +56,6 @@ export function handleRealtimePayload(
   return next;
 }
 
-/**
- * React hook to stream live scan progress, findings, and events via Supabase Realtime
- * with automatic HTTP polling fallback for local/offline execution.
- */
 export function useScanRealtime(scanId: string) {
   const [scan, setScan] = useState<ScanRecord | null>(null);
   const [findings, setFindings] = useState<Finding[]>([]);
@@ -98,10 +91,8 @@ export function useScanRealtime(scanId: string) {
     let channel: any = null;
     let pollInterval: NodeJS.Timeout | null = null;
 
-    // 1. Initial data fetch
     void fetchScanData();
 
-    // 2. Setup Realtime subscription or fallback polling
     async function setupSubscription() {
       const supabase: any = await getSupabaseClient();
 
@@ -171,7 +162,7 @@ export function useScanRealtime(scanId: string) {
             }
           });
       } else {
-        // Fallback polling for offline/local environment
+
         isPollingRef.current = true;
         pollInterval = setInterval(async () => {
           if (!mounted) return;

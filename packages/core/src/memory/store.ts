@@ -31,7 +31,6 @@ export function createMemoryStore(config: ExtendedMemoryStoreConfig = {}): Memor
     config.mediumConfidenceThreshold ?? DEFAULT_MEMORY_CONFIG.mediumConfidenceThreshold;
   const defaultProjectId = config.projectId;
 
-  // Tier 1: In-memory hash map for instant <1ms resolution
   const localHashMap = new Map<string, MemoryEntry>();
 
   function getLocalKey(projectId: string | undefined, codeHash: string): string {
@@ -44,7 +43,6 @@ export function createMemoryStore(config: ExtendedMemoryStoreConfig = {}): Memor
       const snippet = finding.location.snippet || finding.message || "";
       const codeHash = computeCodeHash(finding.ruleId, snippet);
 
-      // --- Tier 1: Local Exact AST Structural Hash ---
       const localKey = getLocalKey(activeProject, codeHash);
       const exactMatch = localHashMap.get(localKey);
       if (exactMatch) {
@@ -59,7 +57,6 @@ export function createMemoryStore(config: ExtendedMemoryStoreConfig = {}): Memor
         };
       }
 
-      // --- Tier 2: Supabase pgvector Semantic Lookup ---
       const supabase = config.supabaseClient;
       if (!supabase) {
         return { hit: false, hitType: "MISS" };
@@ -110,7 +107,6 @@ export function createMemoryStore(config: ExtendedMemoryStoreConfig = {}): Memor
             ? "VECTOR_HIGH_CONFIDENCE"
             : "VECTOR_CONTEXT";
 
-        // Cache in local map for instant subsequent lookups
         localHashMap.set(localKey, entry);
 
         return {
@@ -123,7 +119,7 @@ export function createMemoryStore(config: ExtendedMemoryStoreConfig = {}): Memor
           },
         };
       } catch {
-        // Fallback gracefully on network / RPC failure
+
         return { hit: false, hitType: "MISS" };
       }
     },
@@ -152,17 +148,14 @@ export function createMemoryStore(config: ExtendedMemoryStoreConfig = {}): Memor
         adjustedSeverity: verification.adjustedSeverity,
       };
 
-      // 1. Store in Tier 1 local map
       localHashMap.set(getLocalKey(activeProject, codeHash), entry);
 
-      // 2. Persist to Supabase if client available
       const supabase = config.supabaseClient;
       if (!supabase) return;
 
       try {
         const rowsToInsert: any[] = [];
 
-        // Project-specific record
         if (activeProject) {
           rowsToInsert.push({
             project_id: activeProject,
@@ -178,7 +171,6 @@ export function createMemoryStore(config: ExtendedMemoryStoreConfig = {}): Memor
           });
         }
 
-        // Cross-user global record (sanitized)
         if (isGlobal) {
           const { sanitizedSnippet, sanitizedRationale } =
             sanitizePatternForGlobalMemory(snippet, verification.rationale);
@@ -199,7 +191,7 @@ export function createMemoryStore(config: ExtendedMemoryStoreConfig = {}): Memor
 
         await supabase.from("agent_pattern_memory").insert(rowsToInsert);
       } catch {
-        // Ignore DB insert failure - circuit breaker
+
       }
     },
   };

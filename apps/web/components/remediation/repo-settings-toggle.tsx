@@ -141,7 +141,6 @@ export function RepoSettingsToggle({ repoName }: RepoSettingsToggleProps) {
         </div>
       </div>
 
-      {/* Safety Policy Notice */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4 border-t border-zinc-800/80 text-xs">
         <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800 flex items-start gap-2.5">
           <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />

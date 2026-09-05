@@ -18,7 +18,6 @@ test("dispatchScanJob creates queued response and initiates background processin
   assert.equal(result.scanId, scanId);
   assert.match(result.dashboardUrl, new RegExp(scanId));
 
-  // Verify scan record was created in the store
   const record = await getScanRecord(scanId);
   assert.ok(record);
   assert.equal(record.id, scanId);
@@ -31,7 +30,6 @@ test("dispatchScanJob processes scan through lifecycle stages in local fallback"
     targetPath: ".",
   });
 
-  // Give local background runner a tick to execute
   await new Promise((resolve) => setTimeout(resolve, 500));
 
   const events = await getScanEvents(scanId);

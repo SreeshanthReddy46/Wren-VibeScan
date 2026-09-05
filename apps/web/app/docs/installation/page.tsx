@@ -11,7 +11,7 @@ export const metadata = {
 export default function InstallationPage() {
   return (
     <div className="space-y-10">
-      {/* Header */}
+
       <div className="space-y-3 pb-6 border-b border-sky-200/60">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
           How to Run Wren on Your Computer
@@ -21,7 +21,6 @@ export default function InstallationPage() {
         </p>
       </div>
 
-      {/* Option 1: On-Demand with npx (Recommended for Beginners) */}
       <div className="sky-glow-card sky-glow-cyan p-6 sm:p-8 rounded-3xl border border-sky-200/80 bg-white/85 shadow-xs space-y-4 backdrop-blur-md">
         <h2 className="text-xl font-bold text-zinc-950">Method 1: Instant Scan (No Install Needed)</h2>
         <p className="text-sm text-zinc-700 leading-relaxed">
@@ -33,7 +32,6 @@ export default function InstallationPage() {
         </p>
       </div>
 
-      {/* Option 2: Global Installation */}
       <div className="p-6 sm:p-8 rounded-3xl border border-sky-200/80 bg-white/80 backdrop-blur-md space-y-4 shadow-xs">
         <h2 className="text-xl font-bold text-zinc-950">Method 2: Install Globally</h2>
         <p className="text-sm text-zinc-700 leading-relaxed">
@@ -46,7 +44,6 @@ export default function InstallationPage() {
         <CodeBlock code="wren-security check" title="Terminal" />
       </div>
 
-      {/* Beginner FAQ: Do I have Node.js? */}
       <div className="p-6 rounded-2xl border border-sky-200/70 bg-sky-50/60 space-y-3">
         <div className="flex items-center gap-2 font-bold text-sm text-sky-950">
           <HelpCircle className="h-4 w-4 text-sky-800" />
@@ -57,7 +54,6 @@ export default function InstallationPage() {
         </p>
       </div>
 
-      {/* Common Flags Explained in Plain English */}
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-zinc-950">Helpful Commands for Daily Use</h2>
         <div className="border border-sky-200/80 rounded-2xl overflow-hidden text-sm bg-white/80 backdrop-blur-md shadow-xs">
@@ -86,7 +82,6 @@ export default function InstallationPage() {
         </div>
       </div>
 
-      {/* Next Step */}
       <div className="pt-4 flex items-center justify-between p-6 rounded-2xl border border-sky-200/80 bg-white/80 backdrop-blur-md">
         <div>
           <div className="font-bold text-zinc-950 text-sm">Ready to understand scan results?</div>

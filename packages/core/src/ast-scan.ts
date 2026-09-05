@@ -16,7 +16,6 @@ export function runAstScan(files: DiscoveredFile[]): Finding[] {
 
     const relPath = file.relativePath.toLowerCase();
 
-    // 1. Next.js Route Handler Missing Authentication Checks
     if (
       (relPath.includes("api/") || relPath.includes("routes/")) &&
       (relPath.endsWith("route.ts") || relPath.endsWith("route.js"))
@@ -25,7 +24,7 @@ export function runAstScan(files: DiscoveredFile[]): Finding[] {
         /export\s+(?:async\s+)?function\s+(?:POST|DELETE|PUT|PATCH)\b/.test(content);
 
       if (hasMutatingHandler) {
-        // Check if authentication primitives exist
+
         const hasAuthCheck =
           /auth\(|getSession|getServerSession|currentUser|requireAuth|createClient.*auth|supabase\.auth\.getUser/i.test(
             content
@@ -68,7 +67,6 @@ export function runAstScan(files: DiscoveredFile[]): Finding[] {
       }
     }
 
-    // 2. Client-Side Supabase Service Role Key Usage
     if (
       (file.extension === ".tsx" || file.extension === ".jsx" || file.extension === ".ts") &&
       content.includes('"use client"')
@@ -109,7 +107,6 @@ export function runAstScan(files: DiscoveredFile[]): Finding[] {
       }
     }
 
-    // 3. Permissive Firestore Security Rules
     if (relPath.endsWith(".rules") || relPath.includes("firestore")) {
       const openRuleRegex = /allow\s+(?:read,\s*write|write|create|update|delete)\s*:\s*if\s+true\s*;/g;
       const lines = content.split(/\r?\n/);
@@ -143,7 +140,6 @@ export function runAstScan(files: DiscoveredFile[]): Finding[] {
       }
     }
 
-    // 4. Wildcard CORS Configuration on Sensitive Endpoints
     if (content.includes("Access-Control-Allow-Origin") && content.includes('"*"')) {
       const lines = content.split(/\r?\n/);
       for (let i = 0; i < lines.length; i++) {

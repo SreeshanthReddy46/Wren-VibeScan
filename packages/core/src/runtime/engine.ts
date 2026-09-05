@@ -2,9 +2,6 @@ import type { CustomerAgentEvent, RuntimeRuleViolation } from "@wren/shared-type
 import type { RuntimeRule, RuntimeEvaluationResult } from "./types";
 import { WREN_RUN_RULES } from "./rules";
 
-/**
- * Evaluates a live CustomerAgentEvent against security policies in <1ms
- */
 export function evaluateRuntimeAgentEvent(
   event: CustomerAgentEvent,
   customRules?: RuntimeRule[]
@@ -22,7 +19,7 @@ export function evaluateRuntimeAgentEvent(
         violations.push(violation);
       }
     } catch {
-      // Isolate rule failures
+
     }
   }
 

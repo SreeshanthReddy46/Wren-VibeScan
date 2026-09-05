@@ -7,13 +7,11 @@ import type { Finding } from "@wren/shared-types";
 test("End-to-End: Agent Loop investigates middleware.ts and eliminates false positive", async () => {
   const fixturePath = path.resolve(import.meta.dirname, "../fixtures/middleware-auth-test");
 
-  // 1. Run static scan first
   const staticScan = await runScan({
     targetPath: fixturePath,
     enableLlmReasoning: false,
   });
 
-  // Check if static findings exist or simulate static finding on route.ts
   const testFinding: Finding = {
     id: "f-route-auth",
     ruleId: "AUTH_UNPROTECTED_ROUTE",
@@ -30,17 +28,13 @@ test("End-to-End: Agent Loop investigates middleware.ts and eliminates false pos
     fix: { description: "Add auth", replacementCode: "" },
   };
 
-  // Mock Anthropic client behaving as the real agent:
-  // Step 1: Agent calls read_file on middleware.ts
-  // Step 2: Agent reads result and concludes
-  // Step 3: Verifier evaluates evidence and rules FALSE_POSITIVE
   let agentCalls = 0;
   const mockAnthropic = {
     messages: {
       create: async (params: any) => {
         agentCalls++;
         if (agentCalls === 1) {
-          // Investigator decides to inspect middleware.ts
+
           return {
             role: "assistant",
             stop_reason: "tool_use",
@@ -56,7 +50,7 @@ test("End-to-End: Agent Loop investigates middleware.ts and eliminates false pos
           };
         }
         if (agentCalls === 2) {
-          // Investigator finishes investigation after reading middleware
+
           return {
             role: "assistant",
             stop_reason: "end_turn",
@@ -68,7 +62,7 @@ test("End-to-End: Agent Loop investigates middleware.ts and eliminates false pos
             ],
           };
         }
-        // Verifier
+
         return {
           role: "assistant",
           content: [
@@ -94,7 +88,7 @@ test("End-to-End: Agent Loop investigates middleware.ts and eliminates false pos
   );
 
   assert.equal(agentResult.llmApplied, true);
-  // The false positive was successfully eliminated by the verifier, critic, & reporter!
+
   assert.equal(agentResult.findings.length, 0);
-  assert.equal(agentCalls, 4); // Planner, Investigator, Verifier, Critic
+  assert.equal(agentCalls, 4);
 });

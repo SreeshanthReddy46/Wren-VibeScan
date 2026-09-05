@@ -1,12 +1,8 @@
 import type { AgentTraceRecord, CriticRubric } from "@wren/shared-types";
 import { isSupabaseConfigured, getSupabaseClient } from "./supabase-client.ts";
 
-// In-memory trace store keyed by scanId
 const scanTracesStore = new Map<string, AgentTraceRecord[]>();
 
-/**
- * Record a single agent trace record into storage
- */
 export async function recordAgentTrace(
   scanId: string,
   trace: AgentTraceRecord
@@ -15,7 +11,6 @@ export async function recordAgentTrace(
   existing.push(trace);
   scanTracesStore.set(scanId, existing);
 
-  // If Supabase is configured and client available in environment, write to agent_traces table
   if (isSupabaseConfigured) {
     try {
       const client = (await getSupabaseClient()) as {
@@ -42,16 +37,13 @@ export async function recordAgentTrace(
         ]);
       }
     } catch {
-      // In-memory fallback is always preserved
+
     }
   }
 
   return trace;
 }
 
-/**
- * Record a batch of agent trace records into storage
- */
 export async function recordAgentTraceBatch(
   scanId: string,
   traces: AgentTraceRecord[]
@@ -85,16 +77,13 @@ export async function recordAgentTraceBatch(
         await client.from("agent_traces").insert(rows);
       }
     } catch {
-      // Fallback intact
+
     }
   }
 
   return traces.length;
 }
 
-/**
- * Retrieve all traces for a scan, with optional filtering by findingId
- */
 export async function getAgentTracesByScanId(
   scanId: string,
   findingId?: string
@@ -106,9 +95,6 @@ export async function getAgentTracesByScanId(
   return traces.filter((t) => t.findingId === findingId);
 }
 
-/**
- * Aggregates Critic evaluations across all recorded traces for a scan
- */
 export function summarizeCriticRubrics(traces: AgentTraceRecord[]): {
   criticCount: number;
   averageEvidenceQuality: number;
@@ -145,9 +131,6 @@ export function summarizeCriticRubrics(traces: AgentTraceRecord[]): {
   };
 }
 
-/**
- * Clear in-memory traces (used for unit testing isolation)
- */
 export function clearTracesForTesting(): void {
   scanTracesStore.clear();
 }

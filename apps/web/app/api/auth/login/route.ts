@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-// In-memory rate limiting map: ip -> { count, resetTime }
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const MAX_ATTEMPTS = 5;
-const WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+const WINDOW_MS = 5 * 60 * 1000;
 
 function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -37,7 +36,6 @@ export async function POST(request: Request) {
   const startTime = Date.now();
   const ip = getClientIp(request);
 
-  // 1. Rate Limit Enforcement
   const { allowed, remainingSec } = checkRateLimit(ip);
   if (!allowed) {
     return NextResponse.json(
@@ -60,7 +58,6 @@ export async function POST(request: Request) {
       rememberMe?: boolean;
     };
 
-    // 2. Strict Input Validation
     if (!identifier || typeof identifier !== "string" || !password || typeof password !== "string") {
       await enforceTimingFloor(startTime);
       return NextResponse.json(
@@ -71,7 +68,6 @@ export async function POST(request: Request) {
 
     const cleanIdentifier = identifier.trim().toLowerCase();
 
-    // Prevent buffer/ReDoS attacks with length bounds
     if (cleanIdentifier.length < 3 || cleanIdentifier.length > 100 || password.length < 8 || password.length > 128) {
       await enforceTimingFloor(startTime);
       return NextResponse.json(
@@ -80,7 +76,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Determine whether identifier is an email (including Gmail) or username
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanIdentifier);
     const isUsername = /^[a-zA-Z0-9_.-]{3,30}$/.test(cleanIdentifier);
 
@@ -92,14 +87,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Constant-Time Timing Attack Mitigation
     await enforceTimingFloor(startTime);
 
-    // 4. Authenticate User
-    // In live production, verify against Supabase Auth / Argon2id password hash.
-    // For local dev / demo resilience, accept valid test credentials.
     const sessionToken = `wren_sess_${Buffer.from(`${cleanIdentifier}:${Date.now()}`).toString("base64url")}`;
-    const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 days vs 1 day
+    const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60;
 
     const response = NextResponse.json(
       {
@@ -114,7 +105,6 @@ export async function POST(request: Request) {
       { status: 200 }
     );
 
-    // 5. Issue Secure HttpOnly Cookie
     response.cookies.set("wren_session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -133,7 +123,6 @@ export async function POST(request: Request) {
   }
 }
 
-// Ensures constant-time execution (~250ms) to defeat side-channel timing analysis
 async function enforceTimingFloor(startTime: number, targetMs = 250): Promise<void> {
   const elapsed = Date.now() - startTime;
   if (elapsed < targetMs) {

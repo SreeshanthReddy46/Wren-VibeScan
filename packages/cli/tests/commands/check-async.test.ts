@@ -15,7 +15,7 @@ test("runCheckCommand with async=true returns SUCCESS immediately with queued ou
     const elapsed = Date.now() - startTime;
 
     assert.equal(exitCode, ExitCode.SUCCESS);
-    // Should return very quickly (< 100ms) without executing full scan
+
     assert.ok(elapsed < 200, `Expected async return in < 200ms, took ${elapsed}ms`);
 
     const parsed = JSON.parse(loggedOutput.trim());

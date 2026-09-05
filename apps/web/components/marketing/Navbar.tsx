@@ -41,7 +41,7 @@ export function Navbar() {
         )}
         aria-label="Main Navigation"
       >
-        {/* Full Edge-to-Edge Sketched Bird Logo & Brand */}
+
         <Link
           href="/"
           className="flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-zinc-800 rounded-lg p-0.5 group"
@@ -59,7 +59,6 @@ export function Navbar() {
           <span className="font-semibold text-lg tracking-tight text-zinc-950">Wren</span>
         </Link>
 
-        {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-7">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
@@ -78,7 +77,6 @@ export function Navbar() {
           })}
         </div>
 
-        {/* CTA Button */}
         <div className="hidden md:flex items-center gap-3">
           <Link href="/login">
             <Button size="small" variant="ghost" className="rounded-full px-4 text-xs font-semibold text-zinc-800 hover:text-zinc-950 hover:bg-white/25">
@@ -92,7 +90,6 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile Hamburger Button */}
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -104,7 +101,6 @@ export function Navbar() {
         </button>
       </nav>
 
-      {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden fixed top-20 left-4 right-4 z-50 rounded-2xl border border-white/40 bg-white/80 p-6 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-200">
           <div className="flex flex-col gap-4">

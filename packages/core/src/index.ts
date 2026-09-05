@@ -30,30 +30,23 @@ export * from "./runtime/types";
 export * from "./runtime/rules";
 export * from "./runtime/engine";
 
-
 export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
   const targetDir = path.resolve(config.targetPath || process.cwd());
 
-  // 1. Discover files
   const files = discoverFiles(targetDir, config.ignorePaths || []);
 
-  // 2. Execute static pattern matching
   const staticFindings = runStaticScan(files);
 
-  // 3. Execute AST / structural scanning
   const astFindings = runAstScan(files);
 
-  // 4. Combine and deduplicate
   let allFindings: Finding[] = [...staticFindings, ...astFindings];
 
-  // Filter out ignored rules if specified
   if (config.ignoreRules && config.ignoreRules.length > 0) {
     const ignoredSet = new Set(config.ignoreRules);
     allFindings = allFindings.filter((f) => !ignoredSet.has(f.ruleId));
   }
 
-  // 5. Optional LLM reasoning enrichment with circuit breaker
   let llmApplied = false;
   if (config.enableLlmReasoning) {
     const llmResult = await enrichFindingsWithLlm(allFindings, {
@@ -65,7 +58,6 @@ export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
     llmApplied = llmResult.llmApplied;
   }
 
-  // 6. Sort findings by severity: critical > high > medium > low > info
   const severityRank: Record<Severity, number> = {
     critical: 5,
     high: 4,
@@ -76,7 +68,6 @@ export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
 
   allFindings.sort((a, b) => severityRank[b.severity] - severityRank[a.severity]);
 
-  // 7. Calculate summary
   const durationMs = Date.now() - startTime;
   const summary: ScanSummary = {
     totalFindings: allFindings.length,

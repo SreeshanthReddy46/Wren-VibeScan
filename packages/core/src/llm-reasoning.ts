@@ -10,13 +10,6 @@ export interface LlmEnrichmentOptions {
   timeoutMs?: number;
 }
 
-/**
- * Enriches findings using the autonomous 4-stage Agent Loop
- * (Planner -> Investigator -> Verifier -> Reporter) with native codebase tool-use.
- * Implements a strict Circuit Breaker: if no API key is provided, or if the
- * network request fails or times out, it gracefully falls back to static findings
- * without failing the scan.
- */
 export async function enrichFindingsWithLlm(
   findings: Finding[],
   options: LlmEnrichmentOptions = {}

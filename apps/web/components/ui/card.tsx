@@ -41,7 +41,7 @@ export function CornerSparks({ color = "cyan" }: { color?: SparkColor }) {
 
   return (
     <>
-      {/* Top-Left Spark */}
+
       <span className="corner-spark corner-spark-tl" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
           <path
@@ -51,7 +51,6 @@ export function CornerSparks({ color = "cyan" }: { color?: SparkColor }) {
         </svg>
       </span>
 
-      {/* Top-Right Spark */}
       <span className="corner-spark corner-spark-tr" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
           <path
@@ -61,7 +60,6 @@ export function CornerSparks({ color = "cyan" }: { color?: SparkColor }) {
         </svg>
       </span>
 
-      {/* Bottom-Left Spark */}
       <span className="corner-spark corner-spark-bl" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
           <path
@@ -71,7 +69,6 @@ export function CornerSparks({ color = "cyan" }: { color?: SparkColor }) {
         </svg>
       </span>
 
-      {/* Bottom-Right Spark */}
       <span className="corner-spark corner-spark-br" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
           <path
@@ -81,7 +78,6 @@ export function CornerSparks({ color = "cyan" }: { color?: SparkColor }) {
         </svg>
       </span>
 
-      {/* Unique SVG Gradients Definition */}
       <svg className="absolute w-0 h-0" aria-hidden="true">
         <defs>
           <linearGradient id={id1} x1="0%" y1="0%" x2="100%" y2="100%">

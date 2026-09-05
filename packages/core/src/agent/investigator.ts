@@ -127,7 +127,7 @@ Inspect the surrounding code, callers, or middleware to verify whether this vuln
 
         messages.push({ role: "user", content: toolResultBlocks });
       } else {
-        // End of investigation turn
+
         steps.push({
           turn,
           thought: thoughtText || undefined,

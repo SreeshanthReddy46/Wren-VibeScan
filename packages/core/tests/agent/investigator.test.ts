@@ -23,7 +23,6 @@ test("investigator runs multi-turn tool calling and accumulates context", async 
     fix: { description: "Add auth", replacementCode: "" },
   };
 
-  // Mock Anthropic client simulating 1 tool call then finish
   let callCount = 0;
   const mockClient = {
     messages: {
@@ -81,7 +80,6 @@ test("investigator respects maxToolTurns and gracefully terminates", async () =>
     fix: { description: "fix", replacementCode: "" },
   };
 
-  // Mock Anthropic client that always asks for tool use
   let calls = 0;
   const mockClient = {
     messages: {

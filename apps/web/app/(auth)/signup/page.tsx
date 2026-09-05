@@ -44,7 +44,6 @@ export default function SignupPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
 
-  // Handle Google OAuth (directs directly to Google Accounts / Gmail)
   const handleGoogleAuth = async () => {
     setError(null);
     setGoogleLoading(true);
@@ -63,7 +62,6 @@ export default function SignupPage() {
     }
   };
 
-  // Handle Credentials Signup
   const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -94,7 +92,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // In local dev/demo, simulate account creation and redirect to home
+
       setTimeout(() => {
         setSuccess(true);
         if (typeof window !== "undefined") {
@@ -119,7 +117,7 @@ export default function SignupPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+
       <div className="text-center space-y-1.5">
         <h1 className="text-2xl font-extrabold tracking-tight text-zinc-950">Create your account</h1>
         <p className="text-xs text-zinc-600">
@@ -127,7 +125,6 @@ export default function SignupPage() {
         </p>
       </div>
 
-      {/* Error Alert */}
       {error && (
         <div
           role="alert"
@@ -139,7 +136,6 @@ export default function SignupPage() {
         </div>
       )}
 
-      {/* Success Notice */}
       {success && (
         <div className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
@@ -147,7 +143,6 @@ export default function SignupPage() {
         </div>
       )}
 
-      {/* Google OAuth Action */}
       <div>
         <Button
           type="button"
@@ -165,7 +160,6 @@ export default function SignupPage() {
         </Button>
       </div>
 
-      {/* Divider */}
       <div className="relative flex items-center justify-center my-2">
         <div className="border-t border-sky-200/80 w-full" />
         <span className="bg-white/90 px-3 text-[11px] uppercase tracking-wider text-sky-900/80 font-bold absolute rounded-full">
@@ -173,9 +167,8 @@ export default function SignupPage() {
         </span>
       </div>
 
-      {/* Signup Form */}
       <form onSubmit={handleSignupSubmit} className="space-y-4" noValidate>
-        {/* Username */}
+
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
             <span>Username</span>
@@ -201,7 +194,6 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Email or Gmail */}
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
             <span>Email or Gmail</span>
@@ -227,7 +219,6 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Password */}
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
             <span>Password (min. 8 characters)</span>
@@ -261,7 +252,6 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Submit Button */}
         <Button
           type="submit"
           disabled={isAnyLoading}
@@ -278,7 +268,6 @@ export default function SignupPage() {
         </Button>
       </form>
 
-      {/* Footer Navigation */}
       <div className="text-center text-xs text-zinc-600 pt-1 space-y-2 border-t border-sky-100">
         <div>
           <span>Already have an account? </span>

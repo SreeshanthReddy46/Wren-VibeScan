@@ -26,7 +26,7 @@ test("POST /api/remediations returns 202 Accepted with queued remediationId", as
 });
 
 test("GET /api/remediations/[id] returns remediation record", async () => {
-  // Create remediation job first
+
   const req = new Request("http://localhost:3000/api/remediations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -58,7 +58,6 @@ test("GET and PATCH repo settings enforces default false for opt-in", async () =
   const data = await getRes.json();
   assert.equal(data.autoRemediateEnabled, false);
 
-  // Enable opt-in
   const patchReq = new Request("http://localhost:3000/api/repos/acme/vibe-shop/settings", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },

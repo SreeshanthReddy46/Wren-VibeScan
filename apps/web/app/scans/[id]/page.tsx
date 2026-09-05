@@ -55,11 +55,11 @@ export default function ScanDetailPage({
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white selection:bg-amber-500/30">
-      {/* Background radial gradient */}
+
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.12),rgba(255,255,255,0))] pointer-events-none" />
 
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Navigation & Status Breadcrumb */}
+
         <div className="flex items-center justify-between gap-4 mb-8">
           <Link
             href="/"
@@ -91,7 +91,6 @@ export default function ScanDetailPage({
           </div>
         </div>
 
-        {/* Scan Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 mb-1">
             <span>Scan ID:</span>
@@ -116,7 +115,6 @@ export default function ScanDetailPage({
           </div>
         </div>
 
-        {/* Metric Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
             <p className="text-xs text-zinc-400">Total Findings</p>
@@ -144,7 +142,6 @@ export default function ScanDetailPage({
           </div>
         </div>
 
-        {/* Findings Section */}
         <div className="space-y-4 mb-10">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -229,7 +226,6 @@ export default function ScanDetailPage({
                   </p>
                 </div>
 
-                {/* Location & Code Snippet */}
                 <div className="rounded-xl border border-zinc-800 bg-zinc-950/80 p-3 font-mono text-xs">
                   <div className="flex items-center gap-1.5 text-zinc-400 text-[11px] mb-2">
                     <FileCode className="w-3.5 h-3.5 text-zinc-500" />
@@ -242,7 +238,6 @@ export default function ScanDetailPage({
                   )}
                 </div>
 
-                {/* Suggested Fix Hint */}
                 {finding.fix && (
                   <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/20 text-xs">
                     <span className="font-semibold text-emerald-300 flex items-center gap-1 mb-1">
@@ -261,7 +256,6 @@ export default function ScanDetailPage({
           )}
         </div>
 
-        {/* Live Event Stream / Audit Log */}
         {events && events.length > 0 && (
           <div className="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800/80">
             <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -281,7 +275,6 @@ export default function ScanDetailPage({
         )}
       </main>
 
-      {/* Interactive Autonomous Remediation Modal */}
       <RemediationModal
         finding={selectedFinding}
         scanId={scanId}
@@ -290,7 +283,6 @@ export default function ScanDetailPage({
         onOpenChange={setModalOpen}
       />
 
-      {/* Agent Trace & Critic Rubric Drawer */}
       <TraceDrawer
         open={traceDrawerOpen}
         onOpenChange={setTraceDrawerOpen}

@@ -52,7 +52,7 @@ export function HeroSection() {
     <section id="hero" className="relative pt-36 pb-24 sm:pt-48 sm:pb-36 overflow-hidden">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col items-center text-center space-y-8">
-          {/* Main Headline with Light Yellow Word Cover & Reveal */}
+
           <h1
             id="hero-heading"
             data-bird-target="hero-heading"
@@ -61,12 +61,10 @@ export function HeroSection() {
             <RevealWords text={headlineText} baseDelay={100} stagger={60} />
           </h1>
 
-          {/* Subtitle with Staggered Light Yellow Word Cover & Reveal */}
           <p className="text-xl sm:text-2xl text-zinc-700 max-w-3xl font-normal leading-relaxed">
             <RevealWords text={subtitleText} baseDelay={750} stagger={30} />
           </p>
 
-          {/* Hero CTA Button */}
           <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
             <Link href="#waitlist">
               <Button
@@ -79,7 +77,6 @@ export function HeroSection() {
             </Link>
           </div>
 
-          {/* Terminal Screenshot Preview with Scroll 3D Perspective Animation */}
           <div className="w-full pt-12 sm:pt-16 max-w-5xl">
             <ScrollImageEffect maxTilt={14} scaleRange={[0.92, 1]}>
               <div className="sky-glow-card relative mx-auto rounded-3xl border border-sky-200/90 bg-white/90 p-2.5 sm:p-3 shadow-2xl transition-all duration-300 backdrop-blur-md">
