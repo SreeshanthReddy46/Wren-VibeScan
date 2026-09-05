@@ -25,6 +25,7 @@ export * from "./memory/embeddings";
 export * from "./memory/store";
 export * from "./remediation/syntax-validator";
 export * from "./remediation/patch-generator";
+export * from "./runtime/webhook-signer";
 
 export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
