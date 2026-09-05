@@ -1,22 +1,22 @@
-import { NextResponse } from "next/server";
-import { runScan } from "@wren/core";
-import type { ApiScanRequest, ApiScanResponse, ScanConfig } from "@wren/shared-types";
+import { dispatchScanJob, getScanRecord } from "../../../lib/scan-dispatcher.ts";
+import type { ApiScanRequest, ScanConfig } from "@wren/shared-types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  // Return recent scans
-  return NextResponse.json({
-    scans: [
+  // Return placeholder or recent scan
+  const sampleScan = await getScanRecord("scan-prod-001");
+  return Response.json({
+    scans: sampleScan ? [sampleScan] : [
       {
         id: "scan-prod-001",
-        repo: "user/vibe-shop",
+        repoName: "user/vibe-shop",
         branch: "main",
         status: "completed",
         findingsCount: 3,
-        critical: 1,
-        high: 1,
-        medium: 1,
+        criticalCount: 1,
+        highCount: 1,
+        mediumCount: 1,
         completedAt: new Date().toISOString(),
       },
     ],
@@ -27,31 +27,29 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
       path?: string;
+      scanId?: string;
+      repoName?: string;
+      branch?: string;
+      commitHash?: string;
       config?: ScanConfig;
       externalReport?: ApiScanRequest;
     };
 
-    if (body.externalReport) {
-      // CLI reporting to cloud
-      const scanId = `scan-${Date.now().toString(36)}`;
-      const response: ApiScanResponse = {
-        success: true,
-        scanId,
-        dashboardUrl: `/scans/${scanId}`,
-      };
-      return NextResponse.json(response, { status: 201 });
-    }
-
-    // Run in-process scan using @wren/core
-    const result = await runScan({
+    // Dispatch scan job to Inngest / background worker immediately
+    const jobResponse = await dispatchScanJob({
+      scanId: body.scanId,
       targetPath: body.path || process.cwd(),
-      ...body.config,
+      repoName: body.repoName,
+      branch: body.branch,
+      commitHash: body.commitHash,
+      config: body.config,
+      externalReport: body.externalReport,
     });
 
-    return NextResponse.json(result, { status: 200 });
+    return Response.json(jobResponse, { status: 202 });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to execute scan" },
+    return Response.json(
+      { error: error instanceof Error ? error.message : "Failed to queue scan" },
       { status: 500 }
     );
   }
