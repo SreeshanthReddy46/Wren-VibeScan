@@ -108,3 +108,47 @@ export interface ApiScanResponse {
   scanId: string;
   dashboardUrl?: string;
 }
+
+export type ScanLifecycleStatus =
+  | "queued"
+  | "discovering"
+  | "static_analysis"
+  | "agent_investigating"
+  | "verifying"
+  | "completed"
+  | "failed";
+
+export interface ScanJobRequest {
+  scanId?: string;
+  targetPath?: string;
+  repoName?: string;
+  branch?: string;
+  commitHash?: string;
+  config?: ScanConfig;
+  externalReport?: ApiScanRequest;
+}
+
+export interface ScanJobResponse {
+  success: boolean;
+  scanId: string;
+  status: ScanLifecycleStatus;
+  dashboardUrl: string;
+  message?: string;
+}
+
+export interface ScanStepEvent {
+  id: string;
+  scanId: string;
+  eventType:
+    | "scan.started"
+    | "finding.discovered"
+    | "finding.verified"
+    | "scan.completed"
+    | "scan.failed";
+  stage?: string;
+  stepIndex?: number;
+  message?: string;
+  payload?: Record<string, unknown>;
+  timestamp: string;
+}
+
