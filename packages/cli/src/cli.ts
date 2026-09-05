@@ -1,5 +1,6 @@
 import { cac } from "cac";
 import { runCheckCommand } from "./commands/check";
+import { runFixCommand } from "./commands/fix";
 import { runInitCommand } from "./commands/init";
 import { runLoginCommand } from "./commands/login";
 import { runLogoutCommand } from "./commands/logout";
@@ -68,6 +69,30 @@ cli
   .action(() => {
     try {
       runLogoutCommand();
+    } catch (error) {
+      reportCrash(error);
+      process.exit(ExitCode.FATAL_ERROR);
+    }
+  });
+
+// 5. wren fix [findingId]
+cli
+  .command("fix [findingId]", "Generate and apply remediation patches or open GitHub PRs")
+  .option("--dry-run", "Preview the patch without modifying any files")
+  .option("--apply-locally", "Apply the patch directly to local working tree")
+  .option("--open-pr", "Dispatch autonomous remediation agent to open a pull request")
+  .option("--repo <repo>", "Target GitHub repository (owner/repo)")
+  .option("--file <file>", "Target file path to patch")
+  .action(async (findingId, options) => {
+    try {
+      const exitCode = await runFixCommand(findingId, {
+        dryRun: options.dryRun,
+        applyLocally: options.applyLocally,
+        openPr: options.openPr,
+        repo: options.repo,
+        file: options.file,
+      });
+      process.exit(exitCode);
     } catch (error) {
       reportCrash(error);
       process.exit(ExitCode.FATAL_ERROR);
