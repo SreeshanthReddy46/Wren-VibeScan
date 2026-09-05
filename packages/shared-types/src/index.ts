@@ -186,3 +186,39 @@ export interface RepoRemediationSettings {
   branchPrefix?: string;
 }
 
+export type AgentTraceStep =
+  | "planner"
+  | "investigator"
+  | "verifier"
+  | "critic"
+  | "reporter";
+
+export interface CriticRubric {
+  evidenceQuality: number;
+  falsePositiveRisk: number;
+  confidenceScore: number;
+  critique: string;
+}
+
+export interface CriticEvaluationResult {
+  rubric: CriticRubric;
+  isOverruled: boolean;
+  originalVerdict: string;
+  finalVerdict: string;
+  adjustedRationale: string;
+}
+
+export interface AgentTraceRecord {
+  id: string;
+  scanId: string;
+  findingId?: string;
+  step: AgentTraceStep;
+  input: Record<string, unknown> | string;
+  output: Record<string, unknown> | string;
+  reasoning: string;
+  confidenceScore?: number;
+  rubric?: CriticRubric;
+  durationMs: number;
+  timestamp: string;
+}
+

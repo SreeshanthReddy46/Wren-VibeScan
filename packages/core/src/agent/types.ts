@@ -1,13 +1,14 @@
 import type { Finding, Severity, SuggestedFix } from "@wren/shared-types";
 
 export interface AgentProgressEvent {
-  stage: "planner" | "investigator" | "verifier" | "reporter";
+  stage: "planner" | "investigator" | "verifier" | "critic" | "reporter";
   findingId?: string;
   message: string;
 }
 
 export interface AgentScanConfig {
   targetPath: string;
+  scanId?: string;
   projectId?: string;
   apiKey?: string;
   apiUrl?: string;
@@ -18,7 +19,7 @@ export interface AgentScanConfig {
   onProgress?: (event: AgentProgressEvent) => void;
 }
 
-export const DEFAULT_AGENT_CONFIG: Required<Omit<AgentScanConfig, "apiKey" | "apiUrl" | "onProgress" | "memoryStore" | "projectId">> = {
+export const DEFAULT_AGENT_CONFIG: Required<Omit<AgentScanConfig, "apiKey" | "apiUrl" | "onProgress" | "memoryStore" | "projectId" | "scanId">> = {
   targetPath: ".",
   model: "claude-3-5-sonnet-latest",
   maxToolTurns: 4,
