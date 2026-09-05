@@ -15,6 +15,7 @@ export * from "./agent/tools";
 export * from "./agent/planner";
 export * from "./agent/investigator";
 export * from "./agent/verifier";
+export * from "./agent/critic";
 export * from "./agent/reporter";
 export * from "./memory/types";
 export * from "./memory/hash";
