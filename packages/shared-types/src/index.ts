@@ -153,3 +153,36 @@ export interface ScanStepEvent {
   timestamp: string;
 }
 
+export type RemediationStatus =
+  | "queued"
+  | "generating_patch"
+  | "syntax_verifying"
+  | "pr_opened"
+  | "failed";
+
+export interface RemediationRequest {
+  scanId: string;
+  findingId: string;
+  repoName?: string;
+  branch?: string;
+  targetPath?: string;
+}
+
+export interface RemediationResponse {
+  success: boolean;
+  remediationId: string;
+  status: RemediationStatus;
+  prUrl?: string;
+  prNumber?: number;
+  patchDiff?: string;
+  message?: string;
+}
+
+export interface RepoRemediationSettings {
+  repoName: string;
+  installationId?: number;
+  autoRemediateEnabled: boolean;
+  minSeverity: Severity;
+  branchPrefix?: string;
+}
+
