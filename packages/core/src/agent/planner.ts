@@ -1,5 +1,5 @@
 import type { Finding } from "@wren/shared-types";
-import type { PlannerResult } from "./types.ts";
+import type { PlannerResult } from "./types";
 
 /**
  * Rules and categories that require cross-file codebase investigation.

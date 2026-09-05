@@ -1,9 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { verifyInvestigation } from "../../src/agent/verifier.ts";
-import { synthesizeFindings } from "../../src/agent/reporter.ts";
+import { verifyInvestigation, synthesizeFindings } from "../../dist/index.js";
 import type { Finding } from "@wren/shared-types";
-import type { InvestigationResult, VerificationResult } from "../../src/agent/types.ts";
+import type { InvestigationResult, VerificationResult } from "../../dist/index";
 
 test("verifier classifies finding as FALSE_POSITIVE when middleware mitigates it", async () => {
   const finding: Finding = {

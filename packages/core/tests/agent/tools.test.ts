@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
-import { createCodebaseTools } from "../../src/agent/tools.ts";
+import { createCodebaseTools } from "../../dist/index.js";
 
 test("CodebaseTools rejects path traversal outside targetPath", async () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "wren-test-"));

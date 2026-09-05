@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { investigateFinding } from "../../src/agent/investigator.ts";
-import { createCodebaseTools } from "../../src/agent/tools.ts";
+import { investigateFinding, createCodebaseTools } from "../../dist/index.js";
 import type { Finding } from "@wren/shared-types";
 import * as path from "path";
 import * as fs from "fs";

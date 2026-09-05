@@ -1,5 +1,5 @@
 import type { Finding } from "@wren/shared-types";
-import type { VerificationResult } from "./types.ts";
+import type { VerificationResult } from "./types";
 
 export function synthesizeFindings(
   originalFindings: Finding[],

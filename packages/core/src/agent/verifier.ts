@@ -5,8 +5,8 @@ import type {
   InvestigationResult,
   VerificationResult,
   VerdictStatus,
-} from "./types.ts";
-import { DEFAULT_AGENT_CONFIG } from "./types.ts";
+} from "./types";
+import { DEFAULT_AGENT_CONFIG } from "./types";
 
 export async function verifyInvestigation(
   finding: Finding,

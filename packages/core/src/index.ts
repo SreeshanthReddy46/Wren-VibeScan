@@ -9,6 +9,13 @@ export * from "./file-discovery";
 export * from "./static-scan";
 export * from "./ast-scan";
 export * from "./llm-reasoning";
+export * from "./agent/types";
+export * from "./agent/loop";
+export * from "./agent/tools";
+export * from "./agent/planner";
+export * from "./agent/investigator";
+export * from "./agent/verifier";
+export * from "./agent/reporter";
 
 export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
@@ -38,6 +45,7 @@ export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
     const llmResult = await enrichFindingsWithLlm(allFindings, {
       apiKey: config.apiKey,
       apiUrl: config.apiUrl,
+      targetPath: targetDir,
     });
     allFindings = llmResult.findings;
     llmApplied = llmResult.llmApplied;

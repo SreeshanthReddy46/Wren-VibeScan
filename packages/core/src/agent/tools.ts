@@ -5,7 +5,7 @@ import type {
   CodebaseTools,
   ToolCallRequest,
   ToolCallResult,
-} from "./types.ts";
+} from "./types";
 
 const IGNORED_DIRS = new Set([
   ".git",

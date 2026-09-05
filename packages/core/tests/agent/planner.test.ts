@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { Finding } from "@wren/shared-types";
-import { planInvestigation } from "../../src/agent/planner.ts";
+import { planInvestigation } from "../../dist/index.js";
 
 test("planInvestigation routes contextual findings to investigation queue and hardcoded secrets directly", () => {
   const findings: Finding[] = [
