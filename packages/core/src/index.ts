@@ -26,6 +26,10 @@ export * from "./memory/store";
 export * from "./remediation/syntax-validator";
 export * from "./remediation/patch-generator";
 export * from "./runtime/webhook-signer";
+export * from "./runtime/types";
+export * from "./runtime/rules";
+export * from "./runtime/engine";
+
 
 export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
