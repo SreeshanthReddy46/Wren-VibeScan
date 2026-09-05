@@ -18,6 +18,7 @@ export * from "./agent/verifier";
 export * from "./agent/reporter";
 export * from "./memory/types";
 export * from "./memory/hash";
+export * from "./memory/anonymizer";
 
 export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
