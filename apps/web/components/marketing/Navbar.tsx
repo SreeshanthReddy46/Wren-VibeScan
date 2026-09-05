@@ -27,6 +27,7 @@ export function Navbar() {
     { label: "Demo", href: "/#demo" },
     { label: "Pricing", href: "/#pricing" },
     { label: "Docs", href: "/docs" },
+    { label: "Runtime Audit", href: "/audit" },
   ];
 
   return (

@@ -62,6 +62,24 @@ export type RemediationFailedData = {
   error: string;
 };
 
+export type AgentActionLoggedData = {
+  eventId: string;
+  agentId: string;
+  action: string;
+  arguments: Record<string, unknown>;
+  declaredIntent?: string;
+  timestamp: string;
+};
+
+export type RuntimeAlertTriggeredData = {
+  alertId: string;
+  eventId: string;
+  agentId: string;
+  ruleId: string;
+  severity: string;
+  evidence: string;
+};
+
 export type Events = {
   "scan.requested": { data: ScanRequestedData };
   "scan.progress": { data: ScanProgressData };
@@ -72,5 +90,8 @@ export type Events = {
   "remediation.requested": { data: RemediationRequestedData };
   "remediation.completed": { data: RemediationCompletedData };
   "remediation.failed": { data: RemediationFailedData };
+  "agent.action.logged": { data: AgentActionLoggedData };
+  "runtime.alert.triggered": { data: RuntimeAlertTriggeredData };
 };
+
 

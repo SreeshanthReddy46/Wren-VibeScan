@@ -10,7 +10,7 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "pretest": "pnpm run build",
-    "test": "node --experimental-strip-types --test tests/agent/*.test.ts tests/memory/*.test.ts",
+    "test": "node --experimental-strip-types --test tests/agent/*.test.ts tests/memory/*.test.ts tests/runtime/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
