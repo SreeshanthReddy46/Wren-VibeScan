@@ -2,26 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { Navbar } from "@/components/marketing/Navbar";
+import { Footer } from "@/components/marketing/Footer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose } from "@/components/ui/dialog";
 import type { CustomerAgentEvent, RuntimeAlert } from "@wren/shared-types";
 import {
   ShieldAlert,
   ShieldCheck,
-  Radio,
   ArrowLeft,
-  AlertTriangle,
   BellRing,
   Code2,
-  Clock,
-  ExternalLink,
   CheckCircle2,
-  Activity,
   Terminal,
-  FileCode,
   RefreshCw,
   Search,
-  Filter,
 } from "lucide-react";
 
 export default function RuntimeAuditDashboardPage() {
@@ -30,7 +25,6 @@ export default function RuntimeAuditDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CustomerAgentEvent | null>(null);
-  const [selectedAlert, setSelectedAlert] = useState<RuntimeAlert | null>(null);
   const [agentFilter, setAgentFilter] = useState("");
 
   async function fetchData() {
@@ -54,7 +48,6 @@ export default function RuntimeAuditDashboardPage() {
         }
       }
     } catch {
-
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -82,7 +75,6 @@ export default function RuntimeAuditDashboardPage() {
         );
       }
     } catch {
-
     }
   }
 
@@ -98,46 +90,37 @@ export default function RuntimeAuditDashboardPage() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white selection:bg-amber-500/30">
+    <div className="min-h-screen flex flex-col bg-transparent selection:bg-sky-900 selection:text-white relative overflow-x-clip">
+      <Navbar />
 
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.12),rgba(255,255,255,0))] pointer-events-none" />
-
-      <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
-        <div className="flex items-center justify-between gap-4 mb-8">
+      <main className="flex-1 pt-28 sm:pt-36 pb-20 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex items-center justify-between gap-4 mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Scanner
+            Back to Home
           </Link>
 
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Radio className="w-3.5 h-3.5 animate-pulse" />
-              Runtime Stream Active
-            </span>
-            <Link
-              href="/settings/webhooks"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-zinc-800/80 text-zinc-300 hover:text-white border border-zinc-700/50 transition-colors"
+          <Link href="/settings/webhooks">
+            <Button
+              variant="outline"
+              size="small"
+              className="rounded-full bg-white/80 border-sky-200 text-zinc-700 hover:text-zinc-950 shadow-xs gap-1.5"
             >
-              <BellRing className="w-3.5 h-3.5 text-amber-400" />
+              <BellRing className="w-3.5 h-3.5 text-sky-600" />
               Webhook Settings
-            </Link>
-          </div>
+            </Button>
+          </Link>
         </div>
 
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-3">
-              <Activity className="w-3.5 h-3.5" />
-              Wren v2.0 Runtime Audit Engine
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
               Live Agent Execution & Threat Audit
             </h1>
-            <p className="text-sm text-zinc-400 mt-2 max-w-2xl">
+            <p className="text-sm sm:text-base text-zinc-600 mt-2 max-w-2xl leading-relaxed">
               Real-time audit stream monitoring customer production agent tool
               calls against declared intent, detecting unsanctioned destructive
               actions and credential exfiltration.
@@ -151,7 +134,7 @@ export default function RuntimeAuditDashboardPage() {
               setRefreshing(true);
               fetchData();
             }}
-            className="border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:text-white gap-2 self-start md:self-auto"
+            className="rounded-full bg-white/80 border-sky-200 text-zinc-700 hover:text-zinc-950 shadow-xs gap-2 self-start md:self-auto"
           >
             <RefreshCw
               className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`}
@@ -161,42 +144,52 @@ export default function RuntimeAuditDashboardPage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-            <p className="text-xs text-zinc-400">Total Ingested Actions</p>
-            <p className="text-2xl font-bold text-white mt-1">
+          <div className="p-5 rounded-2xl bg-white/80 border border-sky-200/70 backdrop-blur-md shadow-xs">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              Total Ingested Actions
+            </p>
+            <p className="text-2xl sm:text-3xl font-bold text-zinc-950 mt-1">
               {events.length}
             </p>
           </div>
-          <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-            <p className="text-xs text-zinc-400">Active Security Alerts</p>
+          <div className="p-5 rounded-2xl bg-white/80 border border-sky-200/70 backdrop-blur-md shadow-xs">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              Active Security Alerts
+            </p>
             <p
-              className={`text-2xl font-bold mt-1 ${
-                activeAlerts.length > 0 ? "text-rose-400" : "text-emerald-400"
+              className={`text-2xl sm:text-3xl font-bold mt-1 ${
+                activeAlerts.length > 0 ? "text-rose-600" : "text-emerald-600"
               }`}
             >
               {activeAlerts.length}
             </p>
           </div>
-          <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-            <p className="text-xs text-zinc-400">Critical Threat Rules</p>
-            <p className="text-2xl font-bold text-rose-400 mt-1">
+          <div className="p-5 rounded-2xl bg-white/80 border border-sky-200/70 backdrop-blur-md shadow-xs">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              Critical Threat Rules
+            </p>
+            <p className="text-2xl sm:text-3xl font-bold text-rose-600 mt-1">
               {criticalAlertsCount}
             </p>
           </div>
-          <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-            <p className="text-xs text-zinc-400">Ingestion Ingest SLA</p>
-            <p className="text-2xl font-bold text-cyan-400 mt-1">&lt; 10ms</p>
+          <div className="p-5 rounded-2xl bg-white/80 border border-sky-200/70 backdrop-blur-md shadow-xs">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              Ingestion Ingest SLA
+            </p>
+            <p className="text-2xl sm:text-3xl font-bold text-sky-600 mt-1">
+              &lt; 10ms
+            </p>
           </div>
         </div>
 
         {activeAlerts.length > 0 && (
           <div className="mb-10 space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-rose-400 flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-rose-400 animate-pulse" />
+              <h2 className="text-base font-bold text-rose-950 flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 text-rose-600 animate-pulse" />
                 Active Security Threat Alerts ({activeAlerts.length})
               </h2>
-              <span className="text-xs font-mono text-zinc-400">
+              <span className="text-xs font-mono text-zinc-500">
                 Webhook dispatched automatically via HMAC-SHA256
               </span>
             </div>
@@ -205,19 +198,19 @@ export default function RuntimeAuditDashboardPage() {
               {activeAlerts.map((alert) => (
                 <div
                   key={alert.id}
-                  className="p-5 rounded-2xl bg-rose-950/20 border border-rose-500/30 space-y-3"
+                  className="p-5 rounded-2xl bg-rose-50/90 border border-rose-200/90 shadow-xs space-y-3"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                        {alert.severity}
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span className="font-mono text-xs font-bold text-rose-800">
+                        {alert.severity.toUpperCase()}
                       </span>
-                      <span className="text-xs font-mono text-amber-400 font-bold">
+                      <span className="text-xs font-mono text-zinc-600">
                         {alert.ruleId}
                       </span>
-                      <span className="text-xs text-zinc-300">
+                      <span className="text-xs text-zinc-700">
                         Agent:{" "}
-                        <strong className="text-white font-mono">
+                        <strong className="text-zinc-950 font-mono">
                           {alert.agentId}
                         </strong>
                       </span>
@@ -227,7 +220,7 @@ export default function RuntimeAuditDashboardPage() {
                       variant="outline"
                       size="small"
                       onClick={() => handleAcknowledgeAlert(alert.id)}
-                      className="border-rose-500/40 bg-rose-900/20 hover:bg-rose-900/40 text-rose-200 text-xs font-semibold gap-1.5 self-start sm:self-auto"
+                      className="rounded-full bg-white hover:bg-rose-100/60 border-rose-300 text-rose-800 text-xs font-semibold gap-1.5 self-start sm:self-auto"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       Acknowledge Alert
@@ -235,20 +228,20 @@ export default function RuntimeAuditDashboardPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-bold text-white">
+                    <h3 className="text-sm font-bold text-rose-950">
                       {alert.ruleName}
                     </h3>
-                    <p className="text-xs text-zinc-300 mt-1">
+                    <p className="text-xs text-rose-800 mt-1">
                       {alert.description}
                     </p>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-xs text-rose-300 overflow-x-auto">
+                  <div className="p-3 rounded-xl bg-white/95 border border-rose-200 font-mono text-xs text-rose-900 overflow-x-auto">
                     Evidence: {alert.evidence}
                   </div>
 
-                  <div className="text-[11px] text-zinc-400">
-                    <span className="font-semibold text-zinc-300">
+                  <div className="text-xs text-rose-900">
+                    <span className="font-semibold text-rose-950">
                       Suggested Action:
                     </span>{" "}
                     {alert.suggestedAction}
@@ -261,61 +254,61 @@ export default function RuntimeAuditDashboardPage() {
 
         <div className="space-y-4 mb-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-amber-400" />
+            <h2 className="text-xl font-bold text-zinc-950 flex items-center gap-2.5">
+              <Terminal className="w-5 h-5 text-sky-600" />
               Live Ingested Agent Action Stream ({filteredEvents.length})
             </h2>
 
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
                 <input
                   type="text"
                   placeholder="Filter by agentId..."
                   value={agentFilter}
                   onChange={(e) => setAgentFilter(e.target.value)}
-                  className="pl-8 pr-3 py-1.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500/60 font-mono w-48"
+                  className="pl-9 pr-4 py-2 rounded-full bg-white/90 border border-sky-200/80 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 font-mono shadow-xs w-56 sm:w-64"
                 />
               </div>
             </div>
           </div>
 
           {filteredEvents.length === 0 ? (
-            <div className="p-12 rounded-2xl bg-zinc-900/30 border border-zinc-800/80 text-center">
-              <ShieldCheck className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-base font-semibold text-white">
+            <div className="p-12 rounded-3xl bg-white/80 border border-sky-200/70 backdrop-blur-md text-center shadow-xs">
+              <ShieldCheck className="w-12 h-12 text-emerald-600 mx-auto mb-3" />
+              <h3 className="text-base font-semibold text-zinc-950">
                 No runtime actions logged yet
               </h3>
-              <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">
+              <p className="text-xs text-zinc-600 mt-1 max-w-sm mx-auto">
                 Send your first customer agent tool execution to{" "}
-                <code className="text-amber-400 font-mono">
+                <code className="text-sky-700 font-mono font-medium">
                   POST /api/v1/agent-events
                 </code>{" "}
                 to begin auditing live actions.
               </p>
             </div>
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {filteredEvents.map((evt) => (
                 <div
                   key={evt.id}
-                  className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="p-4 sm:p-5 rounded-2xl bg-white/85 border border-sky-200/70 hover:border-sky-300/90 shadow-xs hover:shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md"
                 >
                   <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-mono text-xs font-bold text-amber-400">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span className="font-mono text-sm font-bold text-sky-950">
                         {evt.action}
                       </span>
-                      <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300">
+                      <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200/80 text-sky-900 font-medium">
                         {evt.agentId}
                       </span>
-                      <span className="text-[10px] font-mono text-zinc-500">
+                      <span className="text-xs font-mono text-zinc-400">
                         {new Date(evt.timestamp).toLocaleTimeString()}
                       </span>
                     </div>
 
                     {evt.declaredIntent && (
-                      <p className="text-xs text-zinc-400 truncate max-w-xl">
+                      <p className="text-xs text-zinc-600 truncate max-w-xl">
                         Declared Intent: &ldquo;{evt.declaredIntent}&rdquo;
                       </p>
                     )}
@@ -325,9 +318,9 @@ export default function RuntimeAuditDashboardPage() {
                     variant="outline"
                     size="small"
                     onClick={() => setSelectedEvent(evt)}
-                    className="border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:text-white font-semibold text-xs gap-1.5 self-start sm:self-auto shrink-0"
+                    className="rounded-full bg-white/90 border-sky-200 text-zinc-800 hover:text-zinc-950 font-semibold text-xs gap-1.5 self-start sm:self-auto shrink-0 shadow-xs"
                   >
-                    <Code2 className="w-3.5 h-3.5 text-cyan-400" />
+                    <Code2 className="w-3.5 h-3.5 text-sky-600" />
                     Inspect Payload
                   </Button>
                 </div>
@@ -337,59 +330,65 @@ export default function RuntimeAuditDashboardPage() {
         </div>
       </main>
 
+      <Footer />
+
       <Dialog
         open={Boolean(selectedEvent)}
         onOpenChange={(open) => {
           if (!open) setSelectedEvent(null);
         }}
+        className="rounded-3xl bg-white text-zinc-950 border border-sky-200 shadow-2xl p-6 sm:p-8 max-h-[85vh] overflow-y-auto"
       >
-        <DialogClose onClose={() => setSelectedEvent(null)} />
+        <DialogClose
+          onClose={() => setSelectedEvent(null)}
+          className="hover:bg-zinc-100 text-zinc-400 hover:text-zinc-700"
+        />
         {selectedEvent && (
-          <div className="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="space-y-4">
             <div>
-              <span className="text-xs font-mono text-amber-400 font-bold">
+              <span className="text-xs font-mono text-sky-700 font-semibold">
                 Event ID: {selectedEvent.id}
               </span>
-              <h2 className="text-xl font-bold text-white mt-1 flex items-center gap-2">
-                <Code2 className="w-5 h-5 text-cyan-400" />
+              <h2 className="text-xl font-bold text-zinc-950 mt-1 flex items-center gap-2">
+                <Code2 className="w-5 h-5 text-sky-600" />
                 Action: {selectedEvent.action}
               </h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-500 mt-1">
                 Agent:{" "}
-                <span className="text-white font-mono">
+                <span className="text-zinc-900 font-mono font-medium">
                   {selectedEvent.agentId}
                 </span>{" "}
                 • Environment:{" "}
-                <span className="text-emerald-400 font-mono">
+                <span className="text-emerald-700 font-mono font-medium">
                   {selectedEvent.environment || "production"}
                 </span>
               </p>
             </div>
 
             {selectedEvent.declaredIntent && (
-              <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 text-xs">
-                <span className="font-semibold text-zinc-400 uppercase tracking-wider text-[10px] block mb-1">
+              <div className="p-3 rounded-xl bg-sky-50/70 border border-sky-200/70 text-xs">
+                <span className="font-semibold text-zinc-500 uppercase tracking-wider text-[10px] block mb-1">
                   Declared Intent:
                 </span>
-                <p className="text-white">&ldquo;{selectedEvent.declaredIntent}&rdquo;</p>
+                <p className="text-zinc-900 font-medium">&ldquo;{selectedEvent.declaredIntent}&rdquo;</p>
               </div>
             )}
 
             <div>
-              <span className="font-semibold text-zinc-400 uppercase tracking-wider text-[10px] block mb-1">
+              <span className="font-semibold text-zinc-500 uppercase tracking-wider text-[10px] block mb-1">
                 Input Arguments Payload:
               </span>
-              <pre className="p-3.5 rounded-xl bg-zinc-950 font-mono text-xs text-emerald-400 overflow-x-auto border border-zinc-800/80">
+              <pre className="p-4 rounded-2xl bg-zinc-950 font-mono text-xs text-emerald-400 overflow-x-auto border border-zinc-800 shadow-inner">
                 {JSON.stringify(selectedEvent.arguments, null, 2)}
               </pre>
             </div>
 
             {selectedEvent.result && (
               <div>
-                <span className="font-semibold text-zinc-400 uppercase tracking-wider text-[10px] block mb-1">
+                <span className="font-semibold text-zinc-500 uppercase tracking-wider text-[10px] block mb-1">
                   Execution Result:
                 </span>
-                <pre className="p-3.5 rounded-xl bg-zinc-950 font-mono text-xs text-zinc-300 overflow-x-auto border border-zinc-800/80">
+                <pre className="p-4 rounded-2xl bg-zinc-950 font-mono text-xs text-zinc-300 overflow-x-auto border border-zinc-800 shadow-inner">
                   {JSON.stringify(selectedEvent.result, null, 2)}
                 </pre>
               </div>
