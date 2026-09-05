@@ -4,6 +4,7 @@ import React, { use, useState } from "react";
 import Link from "next/link";
 import { useScanRealtime } from "@/hooks/use-scan-realtime";
 import { RemediationModal } from "@/components/remediation/remediation-modal";
+import { TraceDrawer } from "@/components/traces/trace-drawer";
 import { Button } from "@/components/ui/button";
 import type { Finding } from "@wren/shared-types";
 import {
@@ -19,6 +20,7 @@ import {
   Sparkles,
   AlertTriangle,
   Radio,
+  Scale,
 } from "lucide-react";
 
 export default function ScanDetailPage({
@@ -34,6 +36,8 @@ export default function ScanDetailPage({
 
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [traceDrawerOpen, setTraceDrawerOpen] = useState(false);
+  const [traceFinding, setTraceFinding] = useState<Finding | null>(null);
 
   const criticalCount = findings.filter((f) => f.severity === "critical").length;
   const highCount = findings.filter((f) => f.severity === "high").length;
@@ -42,6 +46,11 @@ export default function ScanDetailPage({
   function handleFixWithPr(finding: Finding) {
     setSelectedFinding(finding);
     setModalOpen(true);
+  }
+
+  function handleViewTrace(finding?: Finding) {
+    setTraceFinding(finding || null);
+    setTraceDrawerOpen(true);
   }
 
   return (
@@ -94,6 +103,17 @@ export default function ScanDetailPage({
           <p className="text-sm text-zinc-400 mt-2 max-w-2xl">
             Automated deep security analysis with cross-scan memory and autonomous GitHub App pull request remediation.
           </p>
+          <div className="flex flex-wrap items-center gap-3 mt-4">
+            <Button
+              variant="outline"
+              size="small"
+              onClick={() => handleViewTrace(undefined)}
+              className="border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:bg-zinc-800 hover:text-white font-semibold gap-1.5"
+            >
+              <Scale className="w-3.5 h-3.5 text-amber-400" />
+              View Agent Reasoning & Critic Rubric
+            </Button>
+          </div>
         </div>
 
         {/* Metric Cards */}
@@ -178,15 +198,26 @@ export default function ScanDetailPage({
                     )}
                   </div>
 
-                  <Button
-                    variant="primary"
-                    size="small"
-                    onClick={() => handleFixWithPr(finding)}
-                    className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-semibold gap-1.5 self-start sm:self-auto"
-                  >
-                    <GitPullRequest className="w-3.5 h-3.5" />
-                    Fix with PR
-                  </Button>
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <Button
+                      variant="outline"
+                      size="small"
+                      onClick={() => handleViewTrace(finding)}
+                      className="border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:bg-zinc-800 hover:text-white font-semibold gap-1.5"
+                    >
+                      <Scale className="w-3.5 h-3.5 text-amber-400" />
+                      Trace & Rubric
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="small"
+                      onClick={() => handleFixWithPr(finding)}
+                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-semibold gap-1.5"
+                    >
+                      <GitPullRequest className="w-3.5 h-3.5" />
+                      Fix with PR
+                    </Button>
+                  </div>
                 </div>
 
                 <div>
@@ -257,6 +288,14 @@ export default function ScanDetailPage({
         repoName={scan?.repoName || "demo-user/sample-app"}
         open={modalOpen}
         onOpenChange={setModalOpen}
+      />
+
+      {/* Agent Trace & Critic Rubric Drawer */}
+      <TraceDrawer
+        open={traceDrawerOpen}
+        onOpenChange={setTraceDrawerOpen}
+        scanId={scanId}
+        finding={traceFinding}
       />
     </div>
   );
