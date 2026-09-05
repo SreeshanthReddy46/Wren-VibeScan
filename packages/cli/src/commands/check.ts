@@ -16,6 +16,7 @@ export interface CheckCommandOptions {
   llm?: boolean;
   output?: string;
   apiKey?: string;
+  async?: boolean;
 }
 
 export async function runCheckCommand(
@@ -24,6 +25,31 @@ export async function runCheckCommand(
 ): Promise<number> {
   const userConfig = loadUserConfig();
   const format: OutputFormat = options.format || "terminal";
+
+  // Fast asynchronous execution mode: queues scan job and returns immediately
+  if (options.async) {
+    const scanId = `scan-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    const baseDashboardUrl = userConfig.apiUrl
+      ? userConfig.apiUrl.replace(/\/api\/?$/, "")
+      : "http://localhost:3000";
+    const dashboardUrl = `${baseDashboardUrl}/scans/${scanId}`;
+
+    if (format === "json") {
+      console.log(
+        JSON.stringify({
+          success: true,
+          scanId,
+          status: "queued",
+          dashboardUrl,
+        })
+      );
+    } else {
+      console.log(pc.green("✔ Scan submitted in background"));
+      console.log(pc.cyan(`Scan ID: ${scanId}`));
+      console.log(pc.cyan(`Live Dashboard: ${dashboardUrl}`));
+    }
+    return ExitCode.SUCCESS;
+  }
 
   const config: ScanConfig = {
     targetPath,

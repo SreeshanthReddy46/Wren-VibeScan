@@ -38,6 +38,8 @@
     "build": "tsup",
     "dev": "tsup --watch --onSuccess \"node dist/cli.js\"",
     "typecheck": "tsc --noEmit",
+    "pretest": "pnpm run build",
+    "test": "node --test tests/**/*.test.ts",
     "prepublishOnly": "pnpm build && node ../../scripts/smoke-test.mjs",
     "test:smoke": "node ../../scripts/smoke-test.mjs"
   },

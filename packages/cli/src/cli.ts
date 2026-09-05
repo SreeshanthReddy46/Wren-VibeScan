@@ -17,6 +17,7 @@ cli
   .option("--fail-on <severity>", "Exit with code 1 if issues at or above severity are found (critical, high, medium)")
   .option("--format <format>", "Output format: terminal, json, or sarif (default: terminal)")
   .option("--llm", "Enable LLM reasoning enrichment")
+  .option("--async", "Submit scan asynchronously and return immediately with dashboard link")
   .option("-o, --output <file>", "Write report to output file")
   .option("--api-key <key>", "Wren or Claude API key")
   .action(async (targetPath = ".", options) => {
@@ -28,6 +29,7 @@ cli
         llm: options.llm,
         output: options.output,
         apiKey: options.apiKey,
+        async: options.async,
       });
       process.exit(exitCode);
     } catch (error) {
