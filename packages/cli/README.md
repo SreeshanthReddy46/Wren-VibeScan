@@ -78,9 +78,23 @@ wren-security check --format json -o wren-report.json
 # Asynchronous background scan with real-time status
 wren-security check --async
 
-# Enable LLM-assisted reasoning
+# Enable Deep Reasoning Mode (agentic verification loop)
 wren-security check --llm
 ```
+
+### Deep Reasoning Mode (`agentic-verification-loop`)
+
+> **"Wren now investigates before it reports — not just pattern-matches."**
+
+When `--llm` is enabled, Wren replaces simple one-shot evaluation with an autonomous investigative verification loop:
+
+- 🔍 **Multi-Turn Codebase Investigation**: Wren explores callers, sanitizers, middleware, and route handlers before deciding if a finding is a genuine vulnerability or a mitigated false positive.
+- 🛡️ **Strictly Read-Only Guarantee**: The agent is restricted to three read-only tools:
+  - `read_file(path)`: Inspects project files inside a strict path-traversal sandbox.
+  - `search_codebase(pattern)`: Searches project files for patterns, sanitizers, and symbols.
+  - `get_call_sites(function_name)`: Traces invocation call sites across the codebase.
+  *The agent can never write, mutate, execute, or delete code.*
+- ⏱️ **Bounded Cost & Safe Fallback**: Capped at a maximum of 5 tool calls per finding. If an ambiguous case cannot be concluded within 5 steps, Wren stops, marks the finding for manual review (`[Needs Manual Review]`), and records complete trace diagnostics in `agent_traces`.
 
 #### CLI Options:
 

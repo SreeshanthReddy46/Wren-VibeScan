@@ -1,7 +1,19 @@
 import type { AgentTraceRecord, CriticRubric } from "@wren/shared-types";
 import { isSupabaseConfigured, getSupabaseClient } from "./supabase-client.ts";
 
+export interface AgentTraceStepRow {
+  id?: string;
+  scan_id?: string;
+  step_number: number;
+  tool_called: string | null;
+  tool_input: string | null;
+  tool_output: string | null;
+  reasoning: string;
+  created_at?: string;
+}
+
 const scanTracesStore = new Map<string, AgentTraceRecord[]>();
+const deepTracesStore = new Map<string, AgentTraceStepRow[]>();
 
 export async function recordAgentTrace(
   scanId: string,
@@ -22,23 +34,23 @@ export async function recordAgentTrace(
       if (client) {
         await client.from("agent_traces").insert([
           {
-            id: trace.id,
             scan_id: scanId,
-            finding_id: trace.findingId,
-            step: trace.step,
-            input: typeof trace.input === "string" ? trace.input : JSON.stringify(trace.input),
-            output: typeof trace.output === "string" ? trace.output : JSON.stringify(trace.output),
+            step_number: existing.length,
+            tool_called: trace.step,
+            tool_input:
+              typeof trace.input === "string"
+                ? trace.input
+                : JSON.stringify(trace.input),
+            tool_output:
+              typeof trace.output === "string"
+                ? trace.output
+                : JSON.stringify(trace.output),
             reasoning: trace.reasoning,
-            confidence_score: trace.confidenceScore,
-            rubric: trace.rubric,
-            duration_ms: trace.durationMs,
-            timestamp: trace.timestamp,
+            created_at: trace.timestamp || new Date().toISOString(),
           },
         ]);
       }
-    } catch {
-
-    }
+    } catch {}
   }
 
   return trace;
@@ -61,27 +73,102 @@ export async function recordAgentTraceBatch(
       } | null;
 
       if (client) {
-        const rows = traces.map((trace) => ({
-          id: trace.id,
+        const rows = traces.map((trace, idx) => ({
           scan_id: scanId,
-          finding_id: trace.findingId,
-          step: trace.step,
-          input: typeof trace.input === "string" ? trace.input : JSON.stringify(trace.input),
-          output: typeof trace.output === "string" ? trace.output : JSON.stringify(trace.output),
+          step_number: existing.length - traces.length + idx + 1,
+          tool_called: trace.step,
+          tool_input:
+            typeof trace.input === "string"
+              ? trace.input
+              : JSON.stringify(trace.input),
+          tool_output:
+            typeof trace.output === "string"
+              ? trace.output
+              : JSON.stringify(trace.output),
           reasoning: trace.reasoning,
-          confidence_score: trace.confidenceScore,
-          rubric: trace.rubric,
-          duration_ms: trace.durationMs,
-          timestamp: trace.timestamp,
+          created_at: trace.timestamp || new Date().toISOString(),
         }));
         await client.from("agent_traces").insert(rows);
       }
-    } catch {
-
-    }
+    } catch {}
   }
 
   return traces.length;
+}
+
+export async function recordDeepReasoningTrace(
+  scanId: string,
+  trace: AgentTraceStepRow
+): Promise<AgentTraceStepRow> {
+  const existing = deepTracesStore.get(scanId) || [];
+  existing.push(trace);
+  deepTracesStore.set(scanId, existing);
+
+  if (isSupabaseConfigured) {
+    try {
+      const client = (await getSupabaseClient()) as {
+        from: (table: string) => {
+          insert: (records: unknown[]) => Promise<{ error: unknown }>;
+        };
+      } | null;
+
+      if (client) {
+        await client.from("agent_traces").insert([
+          {
+            scan_id: scanId,
+            step_number: trace.step_number,
+            tool_called: trace.tool_called,
+            tool_input: trace.tool_input,
+            tool_output: trace.tool_output,
+            reasoning: trace.reasoning,
+            created_at: trace.created_at || new Date().toISOString(),
+          },
+        ]);
+      }
+    } catch {}
+  }
+
+  return trace;
+}
+
+export async function recordDeepReasoningTraces(
+  scanId: string,
+  traces: AgentTraceStepRow[]
+): Promise<number> {
+  const existing = deepTracesStore.get(scanId) || [];
+  existing.push(...traces);
+  deepTracesStore.set(scanId, existing);
+
+  if (isSupabaseConfigured && traces.length > 0) {
+    try {
+      const client = (await getSupabaseClient()) as {
+        from: (table: string) => {
+          insert: (records: unknown[]) => Promise<{ error: unknown }>;
+        };
+      } | null;
+
+      if (client) {
+        const rows = traces.map((t) => ({
+          scan_id: scanId,
+          step_number: t.step_number,
+          tool_called: t.tool_called,
+          tool_input: t.tool_input,
+          tool_output: t.tool_output,
+          reasoning: t.reasoning,
+          created_at: t.created_at || new Date().toISOString(),
+        }));
+        await client.from("agent_traces").insert(rows);
+      }
+    } catch {}
+  }
+
+  return traces.length;
+}
+
+export async function getDeepReasoningTraces(
+  scanId: string
+): Promise<AgentTraceStepRow[]> {
+  return deepTracesStore.get(scanId) || [];
 }
 
 export async function getAgentTracesByScanId(
@@ -133,4 +220,5 @@ export function summarizeCriticRubrics(traces: AgentTraceRecord[]): {
 
 export function clearTracesForTesting(): void {
   scanTracesStore.clear();
+  deepTracesStore.clear();
 }

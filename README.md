@@ -54,10 +54,13 @@ Wren combines sub-second AST parsing, autonomous multi-step agent verification, 
 - Specialized heuristic rules targeting AI-generated code vulnerabilities.
 - Native SARIF 2.1.0 output for seamless GitHub Code Scanning and Security Tab integration.
 
-### 2. Autonomous Agentic Reasoning & Critic Loop
-- **Multi-step codebase investigation**: When LLM reasoning is enabled, an autonomous agent inspects call hierarchies, sanitizers, and middleware using sandboxed codebase tools (`ripgrep`, `ast-grep`, file discovery).
+### 2. Deep Reasoning Mode (`agentic-verification-loop`)
+> *"Wren now investigates before it reports — not just pattern-matches."*
+- **Multi-step codebase investigation**: When `--llm` is enabled, an autonomous agent inspects call hierarchies, sanitizers, and middleware before finalizing verdicts.
+- **Strictly Read-Only Guarantee**: Three dedicated sandboxed tools (`read_file`, `search_codebase`, `get_call_sites`) allow inspection without any capability to write, modify, execute, or delete files.
+- **Bounded Cost & Safe Fallback**: Capped at 5 tool calls per finding. Ambiguous findings reaching the limit are flagged for manual review with detailed traces stored in `agent_traces`.
 - **Adversarial Critic Judge**: Every finding is evaluated against a strict rubric (`evidenceQuality`, `falsePositiveRisk`, `confidenceScore`) with overrule protection to eliminate false positives before alerting.
-- **Trace Observability**: Full execution span metrics and reasoning steps persisted to local disk and visible in the web dashboard trace drawer.
+- **Trace Observability**: Full execution step metrics, tool inputs/outputs, and reasoning steps persisted to local disk and visible in the web dashboard trace drawer.
 
 ### 3. Dual-Tier Cross-Scan Agent Memory
 - **Tier 1 (Instant Local Hash)**: Normalized AST structural hashing checks prior scan verdicts in `<1ms` without making any network calls.
