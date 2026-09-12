@@ -94,8 +94,13 @@ cli
     }
   });
 
+let version = "1.1.0";
+try {
+  version = require("../package.json").version;
+} catch {}
+
 cli.help();
-cli.version("1.0.0");
+cli.version(version);
 
 try {
   cli.parse();

@@ -17,10 +17,15 @@ const packOutput = execSync("pnpm pack", {
 });
 console.log(packOutput.trim());
 
+const cliPkg = JSON.parse(
+  fs.readFileSync(path.join(cliPkgDir, "package.json"), "utf8")
+);
+const currentVersion = cliPkg.version;
+
 const possibleTarballs = [
-  "wren-security-1.0.0.tgz",
-  "wren-cli-1.0.0.tgz",
-  "wren-1.0.0.tgz",
+  `wren-security-${currentVersion}.tgz`,
+  `wren-cli-${currentVersion}.tgz`,
+  `wren-${currentVersion}.tgz`,
 ];
 
 let tarballPath = null;
@@ -37,30 +42,48 @@ for (const name of possibleTarballs) {
   }
 }
 
+if (!tarballPath) {
+  const tgzFile = fs.readdirSync(cliPkgDir).find((f) => f.endsWith(".tgz"));
+  if (tgzFile) {
+    tarballPath = path.join(cliPkgDir, tgzFile);
+  }
+}
+
 if (!tarballPath || !fs.existsSync(tarballPath)) {
   throw new Error(`Tarball not found after pack in ${cliPkgDir}`);
 }
 console.log(`2. Successfully created release tarball: ${tarballPath}`);
 
 console.log("3. Executing CLI binary '--version'...");
-const versionOutput = execSync(`node "${path.join(cliPkgDir, "dist", "cli.js")}" --version`, {
-  encoding: "utf8",
-}).trim();
+const versionOutput = execSync(
+  `node "${path.join(cliPkgDir, "dist", "cli.js")}" --version`,
+  {
+    encoding: "utf8",
+  }
+).trim();
 console.log(`   Binary responded with version: ${versionOutput}`);
 
 console.log("4. Executing CLI binary '--help'...");
-const helpOutput = execSync(`node "${path.join(cliPkgDir, "dist", "cli.js")}" --help`, {
-  encoding: "utf8",
-}).trim();
+const helpOutput = execSync(
+  `node "${path.join(cliPkgDir, "dist", "cli.js")}" --help`,
+  {
+    encoding: "utf8",
+  }
+).trim();
 
-if (versionOutput.includes("1.0.0") && (helpOutput.includes("wren-security [path]") || helpOutput.includes("wren-cli [path]") || helpOutput.includes("wren [path]"))) {
-  console.log("✔ Smoke test passed! CLI binary is verified and ready for npm publish.");
+if (
+  versionOutput.includes(currentVersion) &&
+  (helpOutput.includes("wren-security [path]") ||
+    helpOutput.includes("wren-cli [path]") ||
+    helpOutput.includes("wren [path]"))
+) {
+  console.log(
+    "✔ Smoke test passed! CLI binary is verified and ready for npm publish."
+  );
 } else {
   throw new Error(`Unexpected smoke test output:\n${helpOutput}`);
 }
 
 try {
   if (fs.existsSync(tarballPath)) fs.unlinkSync(tarballPath);
-} catch {
-
-}
+} catch {}

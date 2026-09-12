@@ -1,6 +1,6 @@
 {
   "name": "wren-security",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Security scanning for AI-generated code, from your terminal.",
   "bin": {
     "wren-security": "./dist/cli.js",
