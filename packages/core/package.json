@@ -16,7 +16,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "0.123.0",
     "@wren/shared-types": "workspace:*",
-    "ignore": "7.0.3"
+    "ignore": "7.0.9"
   },
   "devDependencies": {
     "@types/node": "22.13.4",
