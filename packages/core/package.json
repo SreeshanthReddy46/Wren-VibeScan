@@ -19,7 +19,7 @@
     "ignore": "7.0.3"
   },
   "devDependencies": {
-    "@types/node": "22.13.4",
+    "@types/node": "26.5.1",
     "@wren/config": "workspace:*",
     "tsup": "8.4.0",
     "typescript": "5.7.3"
