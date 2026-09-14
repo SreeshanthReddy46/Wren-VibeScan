@@ -10,6 +10,7 @@ import { inngest } from "../inngest/client.ts";
 
 export interface ScanRecord {
   id: string;
+  userId?: string;
   repoName?: string;
   branch?: string;
   commitHash?: string;
@@ -30,8 +31,16 @@ const findingsStore = new Map<string, Finding[]>();
 const eventsStore = new Map<string, ScanStepEvent[]>();
 const eventSubscribers = new Map<string, Set<(event: ScanStepEvent) => void>>();
 
-export async function getScanRecord(scanId: string): Promise<ScanRecord | null> {
-  return scansStore.get(scanId) || null;
+export async function getScanRecord(
+  scanId: string,
+  requestingUserId?: string
+): Promise<ScanRecord | null> {
+  const scan = scansStore.get(scanId) || null;
+  if (!scan) return null;
+  if (scan.userId && requestingUserId && scan.userId !== requestingUserId) {
+    return null;
+  }
+  return scan;
 }
 
 export async function getScanFindings(scanId: string): Promise<Finding[]> {
@@ -187,6 +196,7 @@ export async function dispatchScanJob(request: ScanJobRequest): Promise<ScanJobR
     `scan-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
   await updateScanStatus(scanId, "queued", {
+    userId: request.userId,
     repoName: request.repoName,
     branch: request.branch,
     commitHash: request.commitHash,

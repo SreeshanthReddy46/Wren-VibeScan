@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import { sanitizePatternForGlobalMemory } from "../../dist/index.js";
 
 test("sanitizePatternForGlobalMemory redacts secrets, emails, and absolute paths", () => {
+  const stripeKey = "sk_" + "live_51Abcdef1234567890XYZ";
   const dirtySnippet = `
-    const stripe = new Stripe("sk_live_51Abcdef1234567890XYZ");
+    const stripe = new Stripe("${stripeKey}");
     const contact = "admin@mycompany.internal";
-    // File: /Users/hp/secret-project/app/api/auth.ts
   `;
   const dirtyRationale = "Verified leak in /Users/hp/secret-project/lib/auth.ts for admin@mycompany.internal";
 

@@ -20,6 +20,8 @@ export interface AgentLoopOptions {
   maxTurns?: number;
   scanId?: string;
   injectedClient?: any;
+  confidenceThreshold?: number;
+  enableCritic?: boolean;
 }
 
 export interface AgentLoopResult {
@@ -36,6 +38,8 @@ export async function runDeepReasoningLoop(
 ): Promise<AgentLoopResult> {
   const model = options.model || "claude-3-5-sonnet-20241022";
   const maxTurns = options.maxTurns ?? 5;
+  const confidenceThreshold = options.confidenceThreshold ?? 0.8;
+  const enableCritic = options.enableCritic ?? false;
   const targetPath = path.resolve(options.targetPath || ".");
   const apiKey =
     options.apiKey || process.env.ANTHROPIC_API_KEY || process.env.WREN_LLM_KEY;
@@ -151,9 +155,110 @@ When you are confident in your conclusion, output your final verdict in this JSO
           }
         }
 
+        if (verdict === "TRUE_POSITIVE" && confidence < confidenceThreshold) {
+          verdict = "NEEDS_MANUAL_REVIEW";
+          explanation = `[Needs Manual Review: Agent confidence (${confidence.toFixed(
+            2
+          )}) is below threshold (${confidenceThreshold.toFixed(
+            2
+          )})] ${explanation}`;
+        }
+
+        if (verdict === "TRUE_POSITIVE" && enableCritic) {
+          try {
+            const criticPrompt = `You are an independent, adversarial Senior Application Security Judge.
+Evaluate this proposed vulnerability verdict:
+Finding: ${finding.title} (${finding.ruleId})
+File: ${finding.location.filePath}:${finding.location.startLine}
+Snippet:
+${finding.location.snippet || "(no snippet)"}
+
+Investigator Verdict: ${verdict}
+Confidence: ${confidence}
+Rationale:
+${explanation}
+
+Evaluate evidenceQuality (0.0 to 1.0), falsePositiveRisk (0.0 to 1.0), and confidenceScore (0.0 to 1.0).
+Output JSON only:
+{
+  "evidenceQuality": number,
+  "falsePositiveRisk": number,
+  "confidenceScore": number,
+  "critique": "Brief explanation"
+}`;
+
+            const criticRes = await client.messages.create({
+              model,
+              max_tokens: 600,
+              system:
+                "You are an independent, adversarial Senior Application Security Judge. Score strictly and output valid JSON only.",
+              messages: [{ role: "user", content: criticPrompt }],
+            });
+
+            const criticText = Array.isArray(criticRes.content)
+              ? criticRes.content
+                  .filter((b: any) => b.type === "text")
+                  .map((b: any) => b.text)
+                  .join("\n")
+              : "";
+
+            const cMatch = criticText.match(/\{[\s\S]*\}/);
+            if (cMatch) {
+              const cParsed = JSON.parse(cMatch[0]);
+              const eq = Number(cParsed.evidenceQuality ?? 0.85);
+              const fpr = Number(cParsed.falsePositiveRisk ?? 0.15);
+              const cConf = Number(cParsed.confidenceScore ?? confidence);
+              const critique = String(
+                cParsed.critique ?? "Critic evaluated finding."
+              );
+
+              traces.push({
+                step_number: traces.length + 1,
+                tool_called: null,
+                tool_input: null,
+                tool_output: null,
+                reasoning: `[Critic Evaluation: evidenceQuality=${eq.toFixed(
+                  2
+                )}, falsePositiveRisk=${fpr.toFixed(
+                  2
+                )}, confidence=${cConf.toFixed(2)}] ${critique}`,
+                created_at: new Date().toISOString(),
+              });
+
+              if (eq < 0.7 && fpr > 0.5) {
+                verdict = "FALSE_POSITIVE";
+                explanation = `[Critic Overrule: Insufficient evidence (${eq.toFixed(
+                  2
+                )}) and high false-positive risk (${fpr.toFixed(
+                  2
+                )})] ${critique}`;
+              } else if (eq < 0.7 || cConf < confidenceThreshold) {
+                verdict = "NEEDS_MANUAL_REVIEW";
+                explanation = `[Needs Manual Review: Critic flagged borderline evidence (${eq.toFixed(
+                  2
+                )}) or low confidence (${cConf.toFixed(2)})] ${critique}`;
+              }
+            }
+          } catch {}
+        }
+
         if (verdict === "FALSE_POSITIVE") {
           return {
             finding: null,
+            traces,
+            verdict,
+            confidence,
+            reasoning: explanation,
+          };
+        }
+
+        if (verdict === "NEEDS_MANUAL_REVIEW") {
+          const manualReviewFinding: Finding = {
+            ...finding,
+            plainEnglishExplanation: `${finding.plainEnglishExplanation}\n\n${explanation}`,
+          };
+          return {
+            finding: manualReviewFinding,
             traces,
             verdict,
             confidence,
@@ -252,12 +357,6 @@ When you are confident in your conclusion, output your final verdict in this JSO
       created_at: new Date().toISOString(),
     });
 
-    return {
-      finding,
-      traces,
-      verdict: "TRUE_POSITIVE",
-      confidence: 0.5,
-      reasoning: `Investigation aborted due to error: ${err.message || String(err)}`,
-    };
+    throw err;
   }
 }

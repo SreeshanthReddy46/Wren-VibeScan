@@ -85,13 +85,69 @@ export const TOOL_DEFINITIONS: CodebaseToolDefinition[] = [
   },
 ];
 
+const PROHIBITED_TOOLS = new Set([
+  "write_file",
+  "delete_file",
+  "exec",
+  "spawn",
+  "eval",
+  "chmod",
+  "unlink",
+  "rm",
+  "shell",
+  "bash",
+  "sh",
+  "run_command",
+  "run_script",
+  "modify_file",
+  "create_file",
+  "append_file",
+]);
+
+const SENSITIVE_FILE_NAMES = new Set([
+  ".env",
+  ".env.local",
+  ".env.production",
+  ".env.development",
+  ".env.test",
+  "id_rsa",
+  "id_ed25519",
+  "id_ecdsa",
+  "id_dsa",
+  ".npmrc",
+  ".gitconfig",
+  "credentials.json",
+  "service-account.json",
+]);
+
+function isSensitivePath(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, "/").toLowerCase();
+  const base = path.basename(normalized);
+  if (SENSITIVE_FILE_NAMES.has(base)) return true;
+  if (base.startsWith(".env")) return true;
+  if (base.endsWith(".pem") || base.endsWith(".key")) return true;
+  if (
+    normalized.includes("/.git/") ||
+    normalized.startsWith(".git/") ||
+    normalized === ".git" ||
+    (base === "config" && normalized.includes(".git"))
+  ) {
+    return true;
+  }
+  if (normalized.includes("/.ssh/") || normalized.startsWith(".ssh/")) return true;
+  if (normalized.includes("/.aws/") || normalized.startsWith(".aws/")) return true;
+  return false;
+}
+
 function getAllFiles(dir: string, baseDir: string = dir): string[] {
   const results: string[] = [];
   try {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
       if (IGNORED_DIRS.has(entry.name)) continue;
+      if (isSensitivePath(entry.name)) continue;
       const fullPath = path.join(dir, entry.name);
+      if (isSensitivePath(fullPath)) continue;
       if (entry.isDirectory()) {
         results.push(...getAllFiles(fullPath, baseDir));
       } else if (entry.isFile()) {
@@ -109,8 +165,15 @@ export function createCodebaseTools(targetPath: string): CodebaseTools {
 
   function ensureSafePath(filePath: string): { safePath: string; error?: string } {
     const resolved = path.resolve(rootDir, filePath);
-    if (resolved !== rootDir && !resolved.startsWith(rootDir + path.sep)) {
+    const rel = path.relative(rootDir, resolved);
+    if (rel.startsWith("..") || path.isAbsolute(rel)) {
       return { safePath: resolved, error: "Access denied: path traverses outside workspace" };
+    }
+    if (isSensitivePath(filePath) || isSensitivePath(resolved) || isSensitivePath(rel)) {
+      return {
+        safePath: resolved,
+        error: "Security Error: Access to credential and secret files is strictly prohibited.",
+      };
     }
     return { safePath: resolved };
   }
@@ -248,7 +311,18 @@ export function createCodebaseTools(targetPath: string): CodebaseTools {
   return {
     definitions: TOOL_DEFINITIONS,
     async execute(request: ToolCallRequest): Promise<ToolCallResult> {
-      switch (request.toolName) {
+      const normalizedName = (request.toolName || "").trim().toLowerCase();
+      if (PROHIBITED_TOOLS.has(normalizedName)) {
+        return {
+          toolName: request.toolName,
+          success: false,
+          content: "",
+          error:
+            "Security Error: Mutation and execution tools are strictly prohibited. Agent operates under a strict read-only constraint.",
+        };
+      }
+
+      switch (normalizedName) {
         case "read_file":
           return readFileTool(request.args);
         case "search_codebase":

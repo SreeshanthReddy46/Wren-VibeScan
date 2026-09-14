@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS scans (
   id TEXT PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   repo_name TEXT NULL,
   branch TEXT NULL,
   commit_hash TEXT NULL,
@@ -44,6 +45,26 @@ CREATE TABLE IF NOT EXISTS scan_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+ALTER TABLE scans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE scan_findings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE scan_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY scans_tenant_isolation ON scans
+  FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY scan_findings_tenant_isolation ON scan_findings
+  FOR ALL
+  USING (EXISTS (SELECT 1 FROM scans WHERE scans.id = scan_findings.scan_id AND scans.user_id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM scans WHERE scans.id = scan_findings.scan_id AND scans.user_id = auth.uid()));
+
+CREATE POLICY scan_events_tenant_isolation ON scan_events
+  FOR ALL
+  USING (EXISTS (SELECT 1 FROM scans WHERE scans.id = scan_events.scan_id AND scans.user_id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM scans WHERE scans.id = scan_events.scan_id AND scans.user_id = auth.uid()));
+
 ALTER PUBLICATION supabase_realtime ADD TABLE scans;
 ALTER PUBLICATION supabase_realtime ADD TABLE scan_findings;
 ALTER PUBLICATION supabase_realtime ADD TABLE scan_events;
+

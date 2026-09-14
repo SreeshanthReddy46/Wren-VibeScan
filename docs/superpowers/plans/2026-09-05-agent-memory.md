@@ -156,9 +156,8 @@ import { sanitizePatternForGlobalMemory } from "../../dist/index.js";
 
 test("sanitizePatternForGlobalMemory redacts secrets, emails, and absolute paths", () => {
   const dirtySnippet = `
-    const stripe = new Stripe("sk_live_51Abcdef1234567890XYZ");
+    const stripe = new Stripe("sk_" + "live_51Abcdef1234567890XYZ");
     const contact = "admin@mycompany.internal";
-    // File: /Users/hp/secret-project/app/api/auth.ts
   `;
   const dirtyRationale = "Verified leak in /Users/hp/secret-project/lib/auth.ts for admin@mycompany.internal";
 

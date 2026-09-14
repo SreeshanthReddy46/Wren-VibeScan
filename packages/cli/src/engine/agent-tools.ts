@@ -59,6 +59,60 @@ export const AGENT_TOOL_DEFINITIONS: ToolDefinition[] = [
   },
 ];
 
+const PROHIBITED_MUTATION_TOOLS = new Set([
+  "write_file",
+  "delete_file",
+  "exec",
+  "spawn",
+  "eval",
+  "chmod",
+  "unlink",
+  "rm",
+  "shell",
+  "bash",
+  "sh",
+  "run_command",
+  "run_script",
+  "modify_file",
+  "create_file",
+  "append_file",
+]);
+
+const SENSITIVE_FILE_NAMES = new Set([
+  ".env",
+  ".env.local",
+  ".env.production",
+  ".env.development",
+  ".env.test",
+  "id_rsa",
+  "id_ed25519",
+  "id_ecdsa",
+  "id_dsa",
+  ".npmrc",
+  ".gitconfig",
+  "credentials.json",
+  "service-account.json",
+]);
+
+function isSensitivePath(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, "/").toLowerCase();
+  const base = path.basename(normalized);
+  if (SENSITIVE_FILE_NAMES.has(base)) return true;
+  if (base.startsWith(".env")) return true;
+  if (base.endsWith(".pem") || base.endsWith(".key")) return true;
+  if (
+    normalized.includes("/.git/") ||
+    normalized.startsWith(".git/") ||
+    normalized === ".git" ||
+    (base === "config" && normalized.includes(".git"))
+  ) {
+    return true;
+  }
+  if (normalized.includes("/.ssh/") || normalized.startsWith(".ssh/")) return true;
+  if (normalized.includes("/.aws/") || normalized.startsWith(".aws/")) return true;
+  return false;
+}
+
 const IGNORED_DIRECTORIES = new Set([
   "node_modules",
   ".git",
@@ -67,6 +121,8 @@ const IGNORED_DIRECTORIES = new Set([
   "build",
   "coverage",
   ".turbo",
+  ".ssh",
+  ".aws",
 ]);
 
 function discoverProjectFiles(dir: string, maxFiles: number = 300): string[] {
@@ -85,11 +141,13 @@ function discoverProjectFiles(dir: string, maxFiles: number = 300): string[] {
     for (const entry of entries) {
       if (results.length >= maxFiles) break;
       if (IGNORED_DIRECTORIES.has(entry.name)) continue;
+      if (isSensitivePath(entry.name)) continue;
 
       const fullPath = path.join(currentDir, entry.name);
       if (entry.isDirectory()) {
         walk(fullPath);
       } else if (entry.isFile()) {
+        if (isSensitivePath(fullPath)) continue;
         const ext = path.extname(entry.name).toLowerCase();
         if (
           [
@@ -103,7 +161,6 @@ function discoverProjectFiles(dir: string, maxFiles: number = 300): string[] {
             ".py",
             ".go",
             ".sql",
-            ".env",
           ].includes(ext)
         ) {
           results.push(fullPath);
@@ -121,17 +178,28 @@ export function executeAgentTool(
   args: Record<string, any>,
   targetPath: string
 ): string {
+  const normalizedTool = (toolName || "").trim().toLowerCase();
+
+  if (PROHIBITED_MUTATION_TOOLS.has(normalizedTool)) {
+    return "Security Error: Mutation and execution tools are strictly prohibited. Agent operates under a strict read-only constraint.";
+  }
+
   const root = path.resolve(targetPath);
 
-  if (toolName === "read_file") {
+  if (normalizedTool === "read_file") {
     const rawPath = String(args.path || "").trim();
     if (!rawPath) {
       return "Error: Missing required argument 'path'.";
     }
 
     const resolved = path.resolve(root, rawPath);
-    if (!resolved.startsWith(root)) {
+    const rel = path.relative(root, resolved);
+    if (rel.startsWith("..") || path.isAbsolute(rel)) {
       return "Security Error: Path traversal outside the scanned project is strictly forbidden.";
+    }
+
+    if (isSensitivePath(rawPath) || isSensitivePath(resolved) || isSensitivePath(rel)) {
+      return "Security Error: Access to credential and secret files is strictly prohibited.";
     }
 
     if (!fs.existsSync(resolved)) {
@@ -155,7 +223,7 @@ export function executeAgentTool(
     }
   }
 
-  if (toolName === "search_codebase") {
+  if (normalizedTool === "search_codebase") {
     const pattern = String(args.pattern || "").trim();
     if (!pattern) {
       return "Error: Missing required argument 'pattern'.";
@@ -192,7 +260,7 @@ export function executeAgentTool(
     }
   }
 
-  if (toolName === "get_call_sites") {
+  if (normalizedTool === "get_call_sites") {
     const functionName = String(args.function_name || "").trim();
     if (!functionName) {
       return "Error: Missing required argument 'function_name'.";

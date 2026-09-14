@@ -64,7 +64,7 @@ test("enrichFindingsWithDeepReasoning runs multi-step loop and records traces", 
 
   assert.equal(result.llmApplied, true);
   assert.equal(result.findings.length, 1);
-  assert.equal(result.traces.length, 1);
+  assert.equal(result.traces.length, 2);
   assert.equal(result.traces[0].step_number, 1);
   assert.equal(result.traces[0].tool_called, null);
 });

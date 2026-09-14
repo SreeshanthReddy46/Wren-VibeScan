@@ -7,14 +7,16 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
+    "eval": "node scripts/run-eval.mjs",
+    "test:eval": "node scripts/run-eval.mjs --assert-thresholds",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.12",
-    "turbo": "^2.4.4",
-    "typescript": "^5.7.3"
+    "@changesets/cli": "2.27.12",
+    "turbo": "2.4.4",
+    "typescript": "5.7.3"
   },
   "packageManager": "pnpm@11.4.0",
   "version": "1.0.0"

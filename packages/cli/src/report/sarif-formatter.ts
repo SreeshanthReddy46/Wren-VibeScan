@@ -63,6 +63,21 @@ export function formatSarifReport(result: ScanResult): string {
             },
           ],
         })),
+        invocations: [
+          {
+            executionSuccessful: true,
+            ...(result.llmReasoningNote
+              ? {
+                  toolExecutionNotifications: [
+                    {
+                      message: { text: result.llmReasoningNote },
+                      level: "warning" as const,
+                    },
+                  ],
+                }
+              : {}),
+          },
+        ],
       },
     ],
   };

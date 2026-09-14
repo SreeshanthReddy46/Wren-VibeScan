@@ -8,12 +8,16 @@ export interface DeepReasoningOptions {
   model?: string;
   maxTurns?: number;
   injectedClient?: any;
+  confidenceThreshold?: number;
+  enableCritic?: boolean;
+  timeoutMs?: number;
 }
 
 export interface DeepReasoningResult {
   findings: Finding[];
   llmApplied: boolean;
   traces: AgentTraceStepRow[];
+  llmReasoningNote?: string;
 }
 
 export async function enrichFindingsWithDeepReasoning(
@@ -28,32 +32,57 @@ export async function enrichFindingsWithDeepReasoning(
       findings,
       llmApplied: false,
       traces: [],
+      llmReasoningNote: "LLM reasoning unavailable, showing pattern-based findings only",
     };
   }
 
   const enrichedFindings: Finding[] = [];
   const allTraces: AgentTraceStepRow[] = [];
+  const timeoutMs = options.timeoutMs || 15000;
 
-  for (const finding of findings) {
-    const result = await runDeepReasoningLoop(finding, {
-      targetPath: options.targetPath,
-      apiKey: options.apiKey,
-      apiUrl: options.apiUrl,
-      model: options.model,
-      maxTurns: options.maxTurns,
-      injectedClient: options.injectedClient,
+  try {
+    const loopPromise = (async () => {
+      for (const finding of findings) {
+        const result = await runDeepReasoningLoop(finding, {
+          targetPath: options.targetPath,
+          apiKey: options.apiKey,
+          apiUrl: options.apiUrl,
+          model: options.model,
+          maxTurns: options.maxTurns,
+          injectedClient: options.injectedClient,
+          confidenceThreshold: options.confidenceThreshold,
+          enableCritic: options.enableCritic ?? true,
+        });
+
+        allTraces.push(...result.traces);
+
+        if (result.finding !== null) {
+          enrichedFindings.push(result.finding);
+        }
+      }
+      return { findings: enrichedFindings, traces: allTraces };
+    })();
+
+    let timer: NodeJS.Timeout | undefined;
+    const timeoutPromise = new Promise<{ findings: Finding[]; traces: AgentTraceStepRow[] }>((_, reject) => {
+      timer = setTimeout(() => reject(new Error("LLM reasoning timed out")), timeoutMs);
     });
 
-    allTraces.push(...result.traces);
+    const completed = await Promise.race([loopPromise, timeoutPromise]).finally(() => {
+      if (timer) clearTimeout(timer);
+    });
 
-    if (result.finding !== null) {
-      enrichedFindings.push(result.finding);
-    }
+    return {
+      findings: completed.findings,
+      llmApplied: true,
+      traces: completed.traces,
+    };
+  } catch {
+    return {
+      findings,
+      llmApplied: false,
+      traces: allTraces,
+      llmReasoningNote: "LLM reasoning unavailable, showing pattern-based findings only",
+    };
   }
-
-  return {
-    findings: enrichedFindings,
-    llmApplied: true,
-    traces: allTraces,
-  };
 }

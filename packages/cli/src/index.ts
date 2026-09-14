@@ -1,4 +1,5 @@
 export * from "@wren/core";
+export { runScan, createCodebaseTools } from "@wren/core";
 export * from "@wren/shared-types";
 export { runCheckCommand } from "./commands/check";
 export { runFixCommand } from "./commands/fix";
@@ -23,3 +24,11 @@ export type {
   DeepReasoningOptions,
   DeepReasoningResult,
 } from "./engine/llm-reasoning";
+export {
+  reportCrash,
+  parseDsn,
+  isTelemetryEnabled,
+  sanitizeArg,
+  buildSentryPayload,
+} from "./telemetry/crash-reporter";
+export { saveUserConfig, loadUserConfig } from "./auth/token-storage";

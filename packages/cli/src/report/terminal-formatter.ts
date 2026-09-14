@@ -18,6 +18,11 @@ export function formatTerminalReport(result: ScanResult): string {
   lines.push(pc.dim(`Scanned ${result.summary.filesScanned} files in ${result.summary.scanDurationMs}ms`));
   lines.push("");
 
+  if (result.llmReasoningNote) {
+    lines.push(pc.yellow(`⚠ ${result.llmReasoningNote}`));
+    lines.push("");
+  }
+
   if (result.findings.length === 0) {
     lines.push(pc.green(pc.bold("✔ No vulnerabilities found! Your codebase looks safe to deploy.")));
     lines.push("");

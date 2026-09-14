@@ -1,4 +1,5 @@
 import { cac } from "cac";
+import pc from "picocolors";
 import { runCheckCommand } from "./commands/check";
 import { runFixCommand } from "./commands/fix";
 import { runInitCommand } from "./commands/init";
@@ -6,6 +7,17 @@ import { runLoginCommand } from "./commands/login";
 import { runLogoutCommand } from "./commands/logout";
 import { reportCrash } from "./telemetry/crash-reporter";
 import { ExitCode } from "./utils/exit-codes";
+
+function handleCliError(error: unknown): void {
+  reportCrash(error);
+  const isDebug = Boolean(process.env.DEBUG || process.env.WREN_VERBOSE);
+  if (isDebug && error instanceof Error && error.stack) {
+    console.error(error.stack);
+  } else {
+    console.error(pc.red(`Error: ${error instanceof Error ? error.message : String(error)}`));
+  }
+  process.exit(ExitCode.FATAL_ERROR);
+}
 
 const cli = cac("wren-security");
 
@@ -33,8 +45,7 @@ cli
       });
       process.exit(exitCode);
     } catch (error) {
-      reportCrash(error);
-      process.exit(ExitCode.FATAL_ERROR);
+      handleCliError(error);
     }
   });
 
@@ -44,8 +55,7 @@ cli
     try {
       runInitCommand();
     } catch (error) {
-      reportCrash(error);
-      process.exit(ExitCode.FATAL_ERROR);
+      handleCliError(error);
     }
   });
 
@@ -55,8 +65,7 @@ cli
     try {
       await runLoginCommand(token);
     } catch (error) {
-      reportCrash(error);
-      process.exit(ExitCode.FATAL_ERROR);
+      handleCliError(error);
     }
   });
 
@@ -66,8 +75,7 @@ cli
     try {
       runLogoutCommand();
     } catch (error) {
-      reportCrash(error);
-      process.exit(ExitCode.FATAL_ERROR);
+      handleCliError(error);
     }
   });
 
@@ -89,12 +97,11 @@ cli
       });
       process.exit(exitCode);
     } catch (error) {
-      reportCrash(error);
-      process.exit(ExitCode.FATAL_ERROR);
+      handleCliError(error);
     }
   });
 
-let version = "1.1.0";
+let version = "2.1.0";
 try {
   version = require("../package.json").version;
 } catch {}
@@ -105,7 +112,5 @@ cli.version(version);
 try {
   cli.parse();
 } catch (error) {
-  reportCrash(error);
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exit(ExitCode.FATAL_ERROR);
+  handleCliError(error);
 }

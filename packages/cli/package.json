@@ -1,6 +1,6 @@
 {
   "name": "wren-security",
-  "version": "1.1.0",
+  "version": "2.1.0",
   "description": "Security scanning for AI-generated code, from your terminal.",
   "bin": {
     "wren-security": "./dist/cli.js",
@@ -44,16 +44,16 @@
     "test:smoke": "node ../../scripts/smoke-test.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.123.0",
-    "cac": "^6.7.14",
-    "picocolors": "^1.1.1"
+    "@anthropic-ai/sdk": "0.123.0",
+    "cac": "6.7.14",
+    "picocolors": "1.1.1"
   },
   "devDependencies": {
-    "@types/node": "^22.13.4",
+    "@types/node": "22.13.4",
     "@wren/config": "workspace:*",
     "@wren/core": "workspace:*",
     "@wren/shared-types": "workspace:*",
-    "tsup": "^8.4.0",
-    "typescript": "^5.7.3"
+    "tsup": "8.4.0",
+    "typescript": "5.7.3"
   }
 }

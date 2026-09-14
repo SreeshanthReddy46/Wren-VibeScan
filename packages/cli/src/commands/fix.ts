@@ -152,6 +152,7 @@ export async function runFixCommand(
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(10000),
         body: JSON.stringify({
           repoName: repo,
           findingId: finding.id,
@@ -169,8 +170,12 @@ export async function runFixCommand(
           prUrl = data.prUrl;
         }
       }
-    } catch {
-
+    } catch (netErr: any) {
+      if (netErr?.name === "TimeoutError") {
+        console.warn(pc.yellow("⚠ Warning: Remediation service request timed out; using local fallback branch reference."));
+      } else {
+        console.warn(pc.yellow(`⚠ Warning: Unable to communicate with remediation API (${netErr?.message || String(netErr)}); local patch prepared.`));
+      }
     }
 
     console.log(pc.green(`✔ Pull request opened successfully: ${prUrl}`));
@@ -183,11 +188,19 @@ export async function runFixCommand(
       ? patch.filePath
       : path.resolve(targetDir, patch.filePath);
 
-    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-    fs.writeFileSync(fullPath, patch.patchedContent, "utf-8");
-
-    console.log(pc.green(`✔ Successfully applied patch locally to ${patch.filePath}`));
-    return ExitCode.SUCCESS;
+    try {
+      fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+      fs.writeFileSync(fullPath, patch.patchedContent, "utf-8");
+      console.log(pc.green(`✔ Successfully applied patch locally to ${patch.filePath}`));
+      return ExitCode.SUCCESS;
+    } catch (writeErr: any) {
+      if (writeErr?.code === "EACCES" || writeErr?.code === "EPERM") {
+        console.error(pc.red(`✖ Permission denied: Cannot write patch to ${fullPath}`));
+      } else {
+        console.error(pc.red(`✖ Failed to apply patch locally: ${writeErr?.message || String(writeErr)}`));
+      }
+      return ExitCode.FATAL_ERROR;
+    }
   }
 
   console.log(pc.yellow("ℹ Dry-run preview: No files were changed on disk."));

@@ -33,20 +33,29 @@ export function runInitCommand(): void {
 
   let createdCount = 0;
 
-  if (!fs.existsSync(ignorePath)) {
-    fs.writeFileSync(ignorePath, DEFAULT_WRENIGNORE, "utf8");
-    logger.success(`Created ${pc.cyan(".wrenignore")}`);
-    createdCount++;
-  } else {
-    logger.info(".wrenignore already exists, skipping.");
-  }
+  try {
+    if (!fs.existsSync(ignorePath)) {
+      fs.writeFileSync(ignorePath, DEFAULT_WRENIGNORE, "utf8");
+      logger.success(`Created ${pc.cyan(".wrenignore")}`);
+      createdCount++;
+    } else {
+      logger.info(".wrenignore already exists, skipping.");
+    }
 
-  if (!fs.existsSync(configPath)) {
-    fs.writeFileSync(configPath, JSON.stringify(DEFAULT_WRENRC, null, 2), "utf8");
-    logger.success(`Created ${pc.cyan(".wrenrc.json")}`);
-    createdCount++;
-  } else {
-    logger.info(".wrenrc.json already exists, skipping.");
+    if (!fs.existsSync(configPath)) {
+      fs.writeFileSync(configPath, JSON.stringify(DEFAULT_WRENRC, null, 2), "utf8");
+      logger.success(`Created ${pc.cyan(".wrenrc.json")}`);
+      createdCount++;
+    } else {
+      logger.info(".wrenrc.json already exists, skipping.");
+    }
+  } catch (err: any) {
+    if (err?.code === "EACCES" || err?.code === "EPERM") {
+      logger.error("Permission denied: Unable to create initialization files in current directory.");
+    } else {
+      logger.error(`Failed to initialize configuration: ${err?.message || String(err)}`);
+    }
+    return;
   }
 
   if (createdCount > 0) {

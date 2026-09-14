@@ -14,6 +14,18 @@ export async function GET(
       return Response.json({ error: `Scan '${id}' not found` }, { status: 404 });
     }
 
+    const authHeader = request.headers.get("authorization") || "";
+    const requestingUserId =
+      request.headers.get("x-user-id") ||
+      (authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null);
+
+    if (scan.userId && requestingUserId && scan.userId !== requestingUserId) {
+      return Response.json(
+        { error: "Forbidden: Access denied to scan owned by another user" },
+        { status: 403 }
+      );
+    }
+
     const findings = await getScanFindings(id);
     const events = await getScanEvents(id);
 

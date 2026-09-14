@@ -29,6 +29,10 @@ export * from "./runtime/webhook-signer";
 export * from "./runtime/types";
 export * from "./runtime/rules";
 export * from "./runtime/engine";
+export * from "./eval/types";
+export * from "./eval/dataset";
+export * from "./eval/metrics";
+export * from "./eval/runner";
 
 export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
@@ -48,14 +52,37 @@ export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   }
 
   let llmApplied = false;
+  let llmReasoningNote: string | undefined;
+
   if (config.enableLlmReasoning) {
-    const llmResult = await enrichFindingsWithLlm(allFindings, {
-      apiKey: config.apiKey,
-      apiUrl: config.apiUrl,
-      targetPath: targetDir,
-    });
-    allFindings = llmResult.findings;
-    llmApplied = llmResult.llmApplied;
+    const timeoutMs = config.llmTimeoutMs || 15000;
+    try {
+      const llmPromise = enrichFindingsWithLlm(allFindings, {
+        apiKey: config.apiKey,
+        apiUrl: config.apiUrl,
+        targetPath: targetDir,
+        timeoutMs,
+      });
+
+      let timer: NodeJS.Timeout | undefined;
+      const timeoutPromise = new Promise<{ findings: Finding[]; llmApplied: boolean }>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("LLM reasoning timed out")), timeoutMs);
+      });
+
+      const llmResult = await Promise.race([llmPromise, timeoutPromise]).finally(() => {
+        if (timer) clearTimeout(timer);
+      });
+
+      allFindings = llmResult.findings;
+      llmApplied = llmResult.llmApplied;
+
+      if (!llmApplied) {
+        llmReasoningNote = "LLM reasoning unavailable, showing pattern-based findings only";
+      }
+    } catch {
+      llmApplied = false;
+      llmReasoningNote = "LLM reasoning unavailable, showing pattern-based findings only";
+    }
   }
 
   const severityRank: Record<Severity, number> = {
@@ -89,5 +116,6 @@ export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
     findings: allFindings,
     engineVersion: "1.0.0",
     llmReasoningApplied: llmApplied,
+    ...(llmReasoningNote ? { llmReasoningNote } : {}),
   };
 }

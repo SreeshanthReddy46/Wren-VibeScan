@@ -17,5 +17,7 @@ jobs:
           node-version: 20
           cache: "pnpm"
       - run: pnpm install
+      - run: pnpm audit --prod
+        continue-on-error: true
       - run: pnpm turbo lint typecheck test
       - run: pnpm turbo build

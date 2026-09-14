@@ -59,6 +59,7 @@ export interface ScanResult {
   findings: Finding[];
   engineVersion: string;
   llmReasoningApplied?: boolean;
+  llmReasoningNote?: string;
 }
 
 export type OutputFormat = "terminal" | "json" | "sarif";
@@ -73,6 +74,7 @@ export interface ScanConfig {
   apiKey?: string;
   apiUrl?: string;
   outputFile?: string;
+  llmTimeoutMs?: number;
 }
 
 export interface WrenUserConfig {
@@ -93,6 +95,7 @@ export interface HealthCheckResponse {
 }
 
 export interface ApiScanRequest {
+  userId?: string;
   targetRepoName?: string;
   branch?: string;
   commitHash?: string;
@@ -118,6 +121,7 @@ export type ScanLifecycleStatus =
 
 export interface ScanJobRequest {
   scanId?: string;
+  userId?: string;
   targetPath?: string;
   repoName?: string;
   branch?: string;

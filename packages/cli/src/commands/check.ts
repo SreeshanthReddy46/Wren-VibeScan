@@ -50,6 +50,11 @@ export async function runCheckCommand(
     return ExitCode.SUCCESS;
   }
 
+  if (!fs.existsSync(targetPath)) {
+    logger.error(`Target path does not exist: ${targetPath}`);
+    return ExitCode.FATAL_ERROR;
+  }
+
   const config: ScanConfig = {
     targetPath,
     format,
@@ -75,9 +80,18 @@ export async function runCheckCommand(
     }
 
     if (options.output) {
-      fs.writeFileSync(options.output, outputText, "utf8");
-      if (format === "terminal") {
-        logger.success(`Report written to ${options.output}`);
+      try {
+        fs.writeFileSync(options.output, outputText, "utf8");
+        if (format === "terminal") {
+          logger.success(`Report written to ${options.output}`);
+        }
+      } catch (writeErr: any) {
+        if (writeErr?.code === "EACCES" || writeErr?.code === "EPERM") {
+          logger.error(`Permission denied: Unable to write report to ${options.output}`);
+        } else {
+          logger.error(`Failed to write report: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`);
+        }
+        return ExitCode.FATAL_ERROR;
       }
     } else {
       console.log(outputText);
@@ -109,8 +123,19 @@ export async function runCheckCommand(
     }
 
     return ExitCode.SUCCESS;
-  } catch (error) {
-    logger.error(`Scan execution failed: ${error instanceof Error ? error.message : String(error)}`);
+  } catch (error: any) {
+    const errCode = error?.code;
+    if (errCode === "EACCES" || errCode === "EPERM") {
+      logger.error(`Permission denied: Unable to access files at '${targetPath}'.`);
+    } else if (
+      errCode === "ENOTFOUND" ||
+      errCode === "ECONNREFUSED" ||
+      (error instanceof Error && error.message.includes("fetch failed"))
+    ) {
+      logger.error("Network error: Unable to connect to Wren service. Please check your internet connection.");
+    } else {
+      logger.error(`Scan execution failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
     return ExitCode.FATAL_ERROR;
   }
 }
