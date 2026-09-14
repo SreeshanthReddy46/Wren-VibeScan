@@ -53,7 +53,7 @@
     "@wren/config": "workspace:*",
     "@wren/core": "workspace:*",
     "@wren/shared-types": "workspace:*",
-    "tsup": "8.4.0",
+    "tsup": "8.5.1",
     "typescript": "5.7.3"
   }
 }
