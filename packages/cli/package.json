@@ -49,7 +49,7 @@
     "picocolors": "1.1.1"
   },
   "devDependencies": {
-    "@types/node": "22.13.4",
+    "@types/node": "26.6.1",
     "@wren/config": "workspace:*",
     "@wren/core": "workspace:*",
     "@wren/shared-types": "workspace:*",
