@@ -38,13 +38,37 @@ export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   const startTime = Date.now();
   const targetDir = path.resolve(config.targetPath || process.cwd());
 
+  const discStart = Date.now();
+  config.onProgress?.({ stage: "discovery_start" });
   const files = discoverFiles(targetDir, config.ignorePaths || []);
+  const discDuration = Date.now() - discStart;
+  config.onProgress?.({
+    stage: "discovery_complete",
+    fileCount: files.length,
+    durationMs: discDuration,
+  });
+
+  const staticStart = Date.now();
+  for (let i = 0; i < files.length; i++) {
+    config.onProgress?.({
+      stage: "scan_file",
+      current: i + 1,
+      total: files.length,
+      filePath: files[i].relativePath,
+    });
+  }
 
   const staticFindings = runStaticScan(files);
 
   const astFindings = runAstScan(files);
 
   let allFindings: Finding[] = [...staticFindings, ...astFindings];
+  const staticDuration = Date.now() - staticStart;
+  config.onProgress?.({
+    stage: "static_complete",
+    findingsCount: allFindings.length,
+    durationMs: staticDuration,
+  });
 
   if (config.ignoreRules && config.ignoreRules.length > 0) {
     const ignoredSet = new Set(config.ignoreRules);
@@ -55,6 +79,12 @@ export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
   let llmReasoningNote: string | undefined;
 
   if (config.enableLlmReasoning) {
+    const reasoningStart = Date.now();
+    config.onProgress?.({
+      stage: "reasoning_start",
+      candidateCount: allFindings.length,
+    });
+
     const timeoutMs = config.llmTimeoutMs || 15000;
     try {
       const llmPromise = enrichFindingsWithLlm(allFindings, {
@@ -82,6 +112,11 @@ export async function runScan(config: ScanConfig = {}): Promise<ScanResult> {
     } catch {
       llmApplied = false;
       llmReasoningNote = "LLM reasoning unavailable, showing pattern-based findings only";
+    } finally {
+      config.onProgress?.({
+        stage: "reasoning_complete",
+        durationMs: Date.now() - reasoningStart,
+      });
     }
   }
 

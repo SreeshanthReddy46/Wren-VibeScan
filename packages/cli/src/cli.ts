@@ -27,7 +27,8 @@ cli
   .alias("scan")
   .option("--fail-on-critical", "Exit with code 1 if critical vulnerabilities are found")
   .option("--fail-on <severity>", "Exit with code 1 if issues at or above severity are found (critical, high, medium)")
-  .option("--format <format>", "Output format: terminal, json, or sarif (default: terminal)")
+  .option("--format <format>", "Output format: terminal, table, json, or sarif (default: terminal)")
+  .option("-q, --quiet", "Suppress spinners and progress output")
   .option("--llm", "Enable LLM reasoning enrichment")
   .option("--async", "Submit scan asynchronously and return immediately with dashboard link")
   .option("-o, --output <file>", "Write report to output file")
@@ -42,6 +43,7 @@ cli
         output: options.output,
         apiKey: options.apiKey,
         async: options.async,
+        quiet: options.quiet,
       });
       process.exit(exitCode);
     } catch (error) {

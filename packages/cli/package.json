@@ -1,6 +1,6 @@
 {
   "name": "wren-security",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "description": "Security scanning for AI-generated code, from your terminal.",
   "bin": {
     "wren-security": "./dist/cli.js",
@@ -45,7 +45,11 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.123.0",
+    "boxen": "7.1.1",
     "cac": "6.7.14",
+    "chalk": "5.3.0",
+    "cli-table3": "0.6.5",
+    "ora": "8.1.1",
     "picocolors": "1.1.1"
   },
   "devDependencies": {

@@ -13,5 +13,12 @@ export default defineConfig({
       };
     }
   },
-  noExternal: ["@wren/core", "@wren/shared-types"],
+  noExternal: [
+    "ora",
+    "chalk",
+    "boxen",
+    "cli-table3",
+    "@wren/core",
+    "@wren/shared-types",
+  ],
 });

@@ -62,7 +62,15 @@ export interface ScanResult {
   llmReasoningNote?: string;
 }
 
-export type OutputFormat = "terminal" | "json" | "sarif";
+export type OutputFormat = "terminal" | "json" | "sarif" | "table";
+
+export type ScanProgressEvent =
+  | { stage: "discovery_start" }
+  | { stage: "discovery_complete"; fileCount: number; durationMs: number }
+  | { stage: "scan_file"; current: number; total: number; filePath: string }
+  | { stage: "static_complete"; findingsCount: number; durationMs: number }
+  | { stage: "reasoning_start"; candidateCount: number }
+  | { stage: "reasoning_complete"; durationMs: number };
 
 export interface ScanConfig {
   targetPath?: string;
@@ -75,6 +83,7 @@ export interface ScanConfig {
   apiUrl?: string;
   outputFile?: string;
   llmTimeoutMs?: number;
+  onProgress?: (event: ScanProgressEvent) => void;
 }
 
 export interface WrenUserConfig {

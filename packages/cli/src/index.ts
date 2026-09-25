@@ -5,8 +5,13 @@ export { runCheckCommand } from "./commands/check";
 export { runFixCommand } from "./commands/fix";
 export type { FixCommandOptions } from "./commands/fix";
 export { formatTerminalReport } from "./report/terminal-formatter";
+export { formatTableReport } from "./report/table-formatter";
 export { formatJsonReport } from "./report/json-formatter";
 export { formatSarifReport } from "./report/sarif-formatter";
+export { formatSeverityBadge } from "./report/severity-colors";
+export { renderBoxenSummary } from "./report/boxen-summary";
+export { TerminalSpinnerManager } from "./report/spinner-manager";
+export type { SpinnerManagerOptions } from "./report/spinner-manager";
 export { ExitCode } from "./utils/exit-codes";
 export {
   AGENT_TOOL_DEFINITIONS,

@@ -1,8 +1,10 @@
 import { runScan } from "@wren/core";
 import type { OutputFormat, ScanConfig, Severity } from "@wren/shared-types";
 import { formatTerminalReport } from "../report/terminal-formatter";
+import { formatTableReport } from "../report/table-formatter";
 import { formatJsonReport } from "../report/json-formatter";
 import { formatSarifReport } from "../report/sarif-formatter";
+import { TerminalSpinnerManager } from "../report/spinner-manager";
 import { ExitCode } from "../utils/exit-codes";
 import { logger } from "../utils/logger";
 import { loadUserConfig } from "../auth/token-storage";
@@ -17,6 +19,7 @@ export interface CheckCommandOptions {
   output?: string;
   apiKey?: string;
   async?: boolean;
+  quiet?: boolean;
 }
 
 export async function runCheckCommand(
@@ -55,15 +58,21 @@ export async function runCheckCommand(
     return ExitCode.FATAL_ERROR;
   }
 
+  const spinnerManager = new TerminalSpinnerManager({ quiet: options.quiet });
+  if (format === "terminal" || format === "table") {
+    spinnerManager.start();
+  }
+
   const config: ScanConfig = {
     targetPath,
     format,
     enableLlmReasoning: options.llm || false,
     apiKey: options.apiKey || userConfig.apiKey,
     failOnSeverity: options.failOn || (options.failOnCritical ? "critical" : undefined),
+    onProgress: (event) => spinnerManager.handleProgress(event),
   };
 
-  if (format === "terminal") {
+  if (!options.quiet && format === "terminal") {
     console.log(pc.cyan("🔍 Scanning for AI-generated code vulnerabilities..."));
   }
 
@@ -75,6 +84,8 @@ export async function runCheckCommand(
       outputText = formatJsonReport(result);
     } else if (format === "sarif") {
       outputText = formatSarifReport(result);
+    } else if (format === "table") {
+      outputText = formatTableReport(result);
     } else {
       outputText = formatTerminalReport(result);
     }
@@ -82,7 +93,7 @@ export async function runCheckCommand(
     if (options.output) {
       try {
         fs.writeFileSync(options.output, outputText, "utf8");
-        if (format === "terminal") {
+        if (!options.quiet && (format === "terminal" || format === "table")) {
           logger.success(`Report written to ${options.output}`);
         }
       } catch (writeErr: any) {
@@ -113,7 +124,7 @@ export async function runCheckCommand(
       );
 
       if (hasFailingFinding) {
-        if (format === "terminal") {
+        if (!options.quiet && (format === "terminal" || format === "table")) {
           logger.error(
             `Scan failed: Found findings at or above '${failSeverity}' threshold.`
           );
@@ -137,5 +148,7 @@ export async function runCheckCommand(
       logger.error(`Scan execution failed: ${error instanceof Error ? error.message : String(error)}`);
     }
     return ExitCode.FATAL_ERROR;
+  } finally {
+    spinnerManager.stop();
   }
 }

@@ -1,13 +1,7 @@
 import type { Finding, ScanResult, Severity } from "@wren/shared-types";
 import pc from "picocolors";
-
-const SEVERITY_BADGE: Record<Severity, string> = {
-  critical: pc.bgRed(pc.white(pc.bold(" CRITICAL "))),
-  high: pc.bgYellow(pc.black(pc.bold(" HIGH "))),
-  medium: pc.bgMagenta(pc.white(pc.bold(" MEDIUM "))),
-  low: pc.bgCyan(pc.black(pc.bold(" LOW "))),
-  info: pc.bgBlue(pc.white(pc.bold(" INFO "))),
-};
+import { formatSeverityBadge } from "./severity-colors";
+import { renderBoxenSummary } from "./boxen-summary";
 
 export function formatTerminalReport(result: ScanResult): string {
   const lines: string[] = [];
@@ -24,7 +18,7 @@ export function formatTerminalReport(result: ScanResult): string {
   }
 
   if (result.findings.length === 0) {
-    lines.push(pc.green(pc.bold("✔ No vulnerabilities found! Your codebase looks safe to deploy.")));
+    lines.push(renderBoxenSummary(result));
     lines.push("");
     return lines.join("\n");
   }
@@ -41,7 +35,7 @@ export function formatTerminalReport(result: ScanResult): string {
   lines.push("");
 
   result.findings.forEach((finding, idx) => {
-    const badge = SEVERITY_BADGE[finding.severity] || finding.severity.toUpperCase();
+    const badge = formatSeverityBadge(finding.severity);
     lines.push(`${badge} ${pc.bold(finding.title)}`);
     lines.push(
       `  ${pc.dim("at")} ${pc.cyan(finding.location.filePath)}:${pc.yellow(finding.location.startLine.toString())}`
@@ -80,16 +74,7 @@ export function formatTerminalReport(result: ScanResult): string {
   });
 
   lines.push("");
-  lines.push(pc.dim("─".repeat(70)));
-  lines.push(
-    pc.bold("Summary: ") +
-      pc.red(`${result.summary.critical} Critical`) +
-      ", " +
-      pc.yellow(`${result.summary.high} High`) +
-      ", " +
-      pc.magenta(`${result.summary.medium} Medium`) +
-      pc.dim(` (Duration: ${result.summary.scanDurationMs}ms)`)
-  );
+  lines.push(renderBoxenSummary(result));
   lines.push("");
 
   return lines.join("\n");
