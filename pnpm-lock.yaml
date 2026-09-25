@@ -33,8 +33,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       inngest:
-        specifier: 4.19.0
-        version: 4.19.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(next@15.1.7(@opentelemetry/api@1.9.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(typescript@5.7.3)(zod@4.5.4)
+        specifier: 4.20.0
+        version: 4.20.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(next@15.1.7(@opentelemetry/api@1.9.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(typescript@5.7.3)(zod@4.5.4)
       lucide-react:
         specifier: 0.475.0
         version: 0.475.0(react@19.0.0)
@@ -1352,9 +1352,6 @@ packages:
   '@types/node@22.13.4':
     resolution: {integrity: sha512-ywP2X0DYtX3y08eFVx5fNIw7/uIv8hYUKgXoK8oayJlLnKcRfEYCxWMVE1XagUdVtCJlZT1AU4LXEABW+L1Peg==}
 
-  '@types/node@22.20.1':
-    resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
-
   '@types/pg-pool@2.0.7':
     resolution: {integrity: sha512-U4CwmGVQcbEuqpyju8/ptOKg6gEC+Tqsvj2xS9o1g71bUh8twxnC6ZL5rZKCsGN0iyH0CwgUyc9VR5owNQF9Ng==}
 
@@ -1639,8 +1636,8 @@ packages:
     resolution: {integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==}
     engines: {node: '>= 0.4'}
 
-  es-module-lexer@2.3.2:
-    resolution: {integrity: sha512-poHGpORABojJJucnV9KbOavETW8lBVnphkW77ER5/BQ5Fz7oXSoCNek7IH3vR5nRjdsEz926ibFYX8KtLQmdyw==}
+  es-module-lexer@3.0.2:
+    resolution: {integrity: sha512-BuIB67FngDSyQ/dpQNOZybwdEBDUGJQvOqwWr4ha/ufYiqzuEwPkKO2zLhRAgay28tStRIHUeWmszZAJo3GCOg==}
 
   esbuild@0.25.12:
     resolution: {integrity: sha512-bbPBYYrtZbkt6Os6FiTLCTFxvq4tt3JKall1vRwshA3fdVztsLAatFaZobhkBC8/BrPetoa0oksYoKXoG4ryJg==}
@@ -1800,15 +1797,15 @@ packages:
   import-in-the-middle@1.15.0:
     resolution: {integrity: sha512-bpQy+CrsRmYmoPMAE/0G33iwRqwW4ouqdRg8jgbH3aKuCtOc8lxgmYXg2dMM92CRiGP660EtBcymH/eVUpCSaA==}
 
-  import-in-the-middle@3.4.0:
-    resolution: {integrity: sha512-Xfjwfarhe+LGmoaof+sexeNo3sGRysb5x56WrZLwHtmqT0OilSKtVWkv0lrCcMgSKyKP9oBogBAisHZvtJH0aw==}
+  import-in-the-middle@3.5.0:
+    resolution: {integrity: sha512-O6wo8l0lhBuytKz3x8S65TvacFtoopji+gCVeEBbjCaRy75gkk4bCBQoVmY7OEZ63cbFK+yf77pDCTWaadV7hQ==}
     engines: {node: '>=18'}
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
-  inngest@4.19.0:
-    resolution: {integrity: sha512-P8xN0pBk4+0xPTsA3rtJqQh4QJXY9ODHuLOtQfyY8+xmDXGkEO5TllGDG1u1yX/4stZUiVPAwfnmI6D2e6ZCIA==}
+  inngest@4.20.0:
+    resolution: {integrity: sha512-U6ro6cG+Y2ys79Qxo6hliDhjSjU/616XO1QzaViinSj8jGOpaei+iQ7cB66bL/M3sLceumn2r5i/SKfrevdbsw==}
     engines: {node: '>=20'}
     peerDependencies:
       '@sveltejs/kit': '>=1.27.3'
@@ -2432,8 +2429,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  systeminformation@5.33.8:
-    resolution: {integrity: sha512-v4F6OGYGh7wDvV68YmjOmZwGixV9A/GQ7d2b84t0UF4CaOy9jipNWIJDkHqYDYiTPuiojqlwVQd0hfUKOUN7tQ==}
+  systeminformation@5.33.10:
+    resolution: {integrity: sha512-/NXbMVASt2UbSVgmWto4aBTIAeuYY7zOELpZybmNxqpsrbo5uYHpuEPf5nkyrPng0uG5YOb+Yv6s0FyKY4mDQg==}
     engines: {node: '>=10.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
@@ -2565,9 +2562,6 @@ packages:
 
   undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
-
-  undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
   universalify@0.1.2:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
@@ -3349,7 +3343,7 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/instrumentation': 0.222.0(@opentelemetry/api@1.9.1)
-      systeminformation: 5.33.8
+      systeminformation: 5.33.10
     transitivePeerDependencies:
       - supports-color
 
@@ -3583,7 +3577,7 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.222.0
-      import-in-the-middle: 3.4.0
+      import-in-the-middle: 3.5.0
       require-in-the-middle: 8.0.1
     transitivePeerDependencies:
       - supports-color
@@ -3906,7 +3900,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.20.1
+      '@types/node': 22.13.4
 
   '@types/debug@4.1.13':
     dependencies:
@@ -3916,7 +3910,7 @@ snapshots:
 
   '@types/memcached@2.2.10':
     dependencies:
-      '@types/node': 22.20.1
+      '@types/node': 22.13.4
 
   '@types/ms@2.1.0': {}
 
@@ -3926,17 +3920,13 @@ snapshots:
     dependencies:
       undici-types: 6.20.0
 
-  '@types/node@22.20.1':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/pg-pool@2.0.7':
     dependencies:
       '@types/pg': 8.15.6
 
   '@types/pg@8.15.6':
     dependencies:
-      '@types/node': 22.20.1
+      '@types/node': 22.13.4
       pg-protocol: 1.16.0
       pg-types: 2.2.0
 
@@ -4181,7 +4171,7 @@ snapshots:
 
   es-errors@1.3.0: {}
 
-  es-module-lexer@2.3.2: {}
+  es-module-lexer@3.0.2: {}
 
   esbuild@0.25.12:
     optionalDependencies:
@@ -4374,15 +4364,15 @@ snapshots:
       cjs-module-lexer: 1.4.3
       module-details-from-path: 1.0.4
 
-  import-in-the-middle@3.4.0:
+  import-in-the-middle@3.5.0:
     dependencies:
       cjs-module-lexer: 2.2.1
-      es-module-lexer: 2.3.2
+      es-module-lexer: 3.0.2
       module-details-from-path: 1.0.4
 
   inherits@2.0.4: {}
 
-  inngest@4.19.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(next@15.1.7(@opentelemetry/api@1.9.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(typescript@5.7.3)(zod@4.5.4):
+  inngest@4.20.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(next@15.1.7(@opentelemetry/api@1.9.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(typescript@5.7.3)(zod@4.5.4):
     dependencies:
       '@bufbuild/protobuf': 2.14.1
       '@inngest/ai': 0.1.8
@@ -4750,7 +4740,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.2
-      '@types/node': 22.20.1
+      '@types/node': 22.13.4
       long: 5.3.2
 
   punycode@2.3.1: {}
@@ -4969,7 +4959,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  systeminformation@5.33.8: {}
+  systeminformation@5.33.10: {}
 
   tailwind-merge@3.0.1: {}
 
@@ -5106,8 +5096,6 @@ snapshots:
   ulid@2.4.0: {}
 
   undici-types@6.20.0: {}
-
-  undici-types@6.21.0: {}
 
   universalify@0.1.2: {}
 
