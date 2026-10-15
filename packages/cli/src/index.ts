@@ -37,3 +37,12 @@ export {
   buildSentryPayload,
 } from "./telemetry/crash-reporter";
 export { saveUserConfig, loadUserConfig } from "./auth/token-storage";
+export { enterAlternateScreen, exitAlternateScreen } from "./ui/screen-buffer";
+export { sortFindingsBySeverity } from "./ui/model";
+export { Header } from "./ui/components/Header";
+export { FindingsList } from "./ui/components/FindingsList";
+export { FindingDetail } from "./ui/components/FindingDetail";
+export { StatusBar } from "./ui/components/StatusBar";
+export { appendIgnoreRule } from "./ui/ignore-handler";
+export { App } from "./ui/App";
+export { startInteractiveTui, shouldLaunchTui } from "./ui/index";

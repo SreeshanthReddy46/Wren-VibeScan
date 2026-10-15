@@ -1,23 +1,15 @@
-
 import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: ["src/cli.ts", "src/index.ts"],
-  format: ["cjs"],
+  format: ["esm"],
   dts: true,
   clean: true,
-  banner: ({ format }) => {
-    if (format === "cjs") {
-      return {
-        js: "#!/usr/bin/env node",
-      };
-    }
+  outExtension: () => ({ js: ".js" }),
+  banner: {
+    js: `#!/usr/bin/env node\nimport { createRequire as __wrenCreateRequire } from "node:module";\nimport { fileURLToPath as __wrenFileURLToPath } from "node:url";\nimport { dirname as __wrenDirname } from "node:path";\nconst require = __wrenCreateRequire(import.meta.url);\nconst __filename = __wrenFileURLToPath(import.meta.url);\nconst __dirname = __wrenDirname(__filename);`,
   },
   noExternal: [
-    "ora",
-    "chalk",
-    "boxen",
-    "cli-table3",
     "@wren/core",
     "@wren/shared-types",
   ],

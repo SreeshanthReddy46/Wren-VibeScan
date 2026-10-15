@@ -556,5 +556,129 @@
         "falsePositiveRate": 0
       }
     }
+  },
+  {
+    "timestamp": "2026-10-14T15:20:37.975Z",
+    "engineVersion": "1.1.0",
+    "durationMs": 624,
+    "overall": {
+      "total": 100,
+      "truePositives": 50,
+      "falsePositives": 0,
+      "trueNegatives": 50,
+      "falseNegatives": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1Score": 1,
+      "falsePositiveRate": 0
+    },
+    "byCategory": {
+      "secret": {
+        "total": 17,
+        "truePositives": 8,
+        "falsePositives": 0,
+        "trueNegatives": 9,
+        "falseNegatives": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1Score": 1,
+        "falsePositiveRate": 0
+      },
+      "auth": {
+        "total": 30,
+        "truePositives": 15,
+        "falsePositives": 0,
+        "trueNegatives": 15,
+        "falseNegatives": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1Score": 1,
+        "falsePositiveRate": 0
+      },
+      "database": {
+        "total": 33,
+        "truePositives": 17,
+        "falsePositives": 0,
+        "trueNegatives": 16,
+        "falseNegatives": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1Score": 1,
+        "falsePositiveRate": 0
+      },
+      "configuration": {
+        "total": 20,
+        "truePositives": 10,
+        "falsePositives": 0,
+        "trueNegatives": 10,
+        "falseNegatives": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1Score": 1,
+        "falsePositiveRate": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-10-15T08:09:39.858Z",
+    "engineVersion": "1.1.0",
+    "durationMs": 591,
+    "overall": {
+      "total": 100,
+      "truePositives": 50,
+      "falsePositives": 0,
+      "trueNegatives": 50,
+      "falseNegatives": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1Score": 1,
+      "falsePositiveRate": 0
+    },
+    "byCategory": {
+      "secret": {
+        "total": 17,
+        "truePositives": 8,
+        "falsePositives": 0,
+        "trueNegatives": 9,
+        "falseNegatives": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1Score": 1,
+        "falsePositiveRate": 0
+      },
+      "auth": {
+        "total": 30,
+        "truePositives": 15,
+        "falsePositives": 0,
+        "trueNegatives": 15,
+        "falseNegatives": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1Score": 1,
+        "falsePositiveRate": 0
+      },
+      "database": {
+        "total": 33,
+        "truePositives": 17,
+        "falsePositives": 0,
+        "trueNegatives": 16,
+        "falseNegatives": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1Score": 1,
+        "falsePositiveRate": 0
+      },
+      "configuration": {
+        "total": 20,
+        "truePositives": 10,
+        "falsePositives": 0,
+        "trueNegatives": 10,
+        "falseNegatives": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1Score": 1,
+        "falsePositiveRate": 0
+      }
+    }
   }
 ]
