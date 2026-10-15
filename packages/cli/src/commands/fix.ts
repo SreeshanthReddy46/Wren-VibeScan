@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as readline from "node:readline/promises";
 import { execSync } from "child_process";
 import pc from "picocolors";
 import { generateRemediationPatch } from "@wren/core";
@@ -11,11 +12,24 @@ export interface FixCommandOptions {
   dryRun?: boolean;
   applyLocally?: boolean;
   openPr?: boolean;
+  yes?: boolean;
   repo?: string;
   apiUrl?: string;
   targetPath?: string;
   file?: string;
   finding?: Finding;
+}
+
+async function promptConfirmation(query: string): Promise<string> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  try {
+    return (await rl.question(query)).trim().toLowerCase();
+  } finally {
+    rl.close();
+  }
 }
 
 function detectGitRepository(cwd: string = process.cwd()): string {
@@ -183,7 +197,18 @@ export async function runFixCommand(
     return ExitCode.SUCCESS;
   }
 
-  if (options.applyLocally) {
+  if (options.dryRun) {
+    console.log(pc.yellow("ℹ Dry-run preview: No files were changed on disk."));
+    console.log(
+      pc.dim("  • Run with --yes or -y to apply this fix to your working tree.")
+    );
+    console.log(
+      pc.dim("  • Run with --open-pr to create a GitHub pull request with this patch.\n")
+    );
+    return ExitCode.SUCCESS;
+  }
+
+  const applyPatchToDisk = (): number => {
     const fullPath = path.isAbsolute(patch.filePath)
       ? patch.filePath
       : path.resolve(targetDir, patch.filePath);
@@ -201,15 +226,30 @@ export async function runFixCommand(
       }
       return ExitCode.FATAL_ERROR;
     }
+  };
+
+  if (options.yes || options.applyLocally) {
+    return applyPatchToDisk();
   }
 
-  console.log(pc.yellow("ℹ Dry-run preview: No files were changed on disk."));
-  console.log(
-    pc.dim("  • Run with --apply-locally to apply this fix to your working tree.")
-  );
-  console.log(
-    pc.dim("  • Run with --open-pr to create a GitHub pull request with this patch.\n")
+  if (!process.stdin.isTTY) {
+    console.log(
+      pc.yellow(`ℹ Non-interactive environment: Use --yes or -y to apply patch to ${patch.filePath}.`)
+    );
+    return ExitCode.SUCCESS;
+  }
+
+  const answer = await promptConfirmation(
+    pc.bold(pc.cyan(`Apply patch to ${patch.filePath}? [y/n/q] › `))
   );
 
-  return ExitCode.SUCCESS;
+  if (answer === "y" || answer === "yes") {
+    return applyPatchToDisk();
+  } else if (answer === "q" || answer === "quit") {
+    console.log(pc.dim("Aborted."));
+    return ExitCode.SUCCESS;
+  } else {
+    console.log(pc.dim(`ℹ Skipped patch for ${patch.filePath}.`));
+    return ExitCode.SUCCESS;
+  }
 }

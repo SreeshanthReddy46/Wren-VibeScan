@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import * as path from "path";
-import type { Finding } from "@wren/shared-types";
+import type { Finding, ScanProgressEvent } from "@wren/shared-types";
 import { AGENT_TOOL_DEFINITIONS, executeAgentTool } from "./agent-tools";
 
 export interface AgentTraceStepRow {
@@ -22,6 +22,7 @@ export interface AgentLoopOptions {
   injectedClient?: any;
   confidenceThreshold?: number;
   enableCritic?: boolean;
+  onProgress?: (event: ScanProgressEvent) => void;
 }
 
 export interface AgentLoopResult {
@@ -43,6 +44,12 @@ export async function runDeepReasoningLoop(
   const targetPath = path.resolve(options.targetPath || ".");
   const apiKey =
     options.apiKey || process.env.ANTHROPIC_API_KEY || process.env.WREN_LLM_KEY;
+
+  options.onProgress?.({
+    stage: "investigation_start",
+    target: `${finding.location.filePath}:${finding.location.startLine}`,
+    ruleId: finding.ruleId,
+  });
 
   let client: any = options.injectedClient;
   if (!client) {
@@ -243,6 +250,13 @@ Output JSON only:
         }
 
         if (verdict === "FALSE_POSITIVE") {
+          options.onProgress?.({
+            stage: "investigation_verdict",
+            target: `${finding.location.filePath}:${finding.location.startLine}`,
+            verdict,
+            severity: finding.severity,
+            explanation: explanation.replace(/\s+/g, " ").trim(),
+          });
           return {
             finding: null,
             traces,
@@ -253,6 +267,13 @@ Output JSON only:
         }
 
         if (verdict === "NEEDS_MANUAL_REVIEW") {
+          options.onProgress?.({
+            stage: "investigation_verdict",
+            target: `${finding.location.filePath}:${finding.location.startLine}`,
+            verdict,
+            severity: finding.severity,
+            explanation: explanation.replace(/\s+/g, " ").trim(),
+          });
           const manualReviewFinding: Finding = {
             ...finding,
             plainEnglishExplanation: `${finding.plainEnglishExplanation}\n\n${explanation}`,
@@ -278,6 +299,16 @@ Output JSON only:
             : finding.fix,
         };
 
+        options.onProgress?.({
+          stage: "investigation_verdict",
+          target: `${finding.location.filePath}:${finding.location.startLine}`,
+          verdict,
+          severity: finding.severity,
+          explanation: (explanation || finding.plainEnglishExplanation)
+            .replace(/\s+/g, " ")
+            .trim(),
+        });
+
         return {
           finding: updatedFinding,
           traces,
@@ -298,6 +329,23 @@ Output JSON only:
           toolUse.input || {},
           targetPath
         );
+
+        const inputSummary = String(
+          toolUse.input?.filePath ||
+            toolUse.input?.query ||
+            toolUse.input?.symbol ||
+            JSON.stringify(toolUse.input || {})
+        );
+        const outStr = String(toolOutput);
+        const outputSummary =
+          outStr.length > 50 ? `${outStr.slice(0, 47)}...` : outStr;
+
+        options.onProgress?.({
+          stage: "investigation_step",
+          tool: toolUse.name,
+          inputSummary,
+          outputSummary,
+        });
 
         traces.push({
           step_number: traces.length + 1,
@@ -338,6 +386,15 @@ Output JSON only:
       ...finding,
       plainEnglishExplanation: `${finding.plainEnglishExplanation}\n\n[Needs Manual Review: Investigation budget reached without automated conclusion]`,
     };
+
+    options.onProgress?.({
+      stage: "investigation_verdict",
+      target: `${finding.location.filePath}:${finding.location.startLine}`,
+      verdict: "NEEDS_MANUAL_REVIEW",
+      severity: finding.severity,
+      explanation:
+        "Investigation budget reached without automated conclusion",
+    });
 
     return {
       finding: manualReviewFinding,

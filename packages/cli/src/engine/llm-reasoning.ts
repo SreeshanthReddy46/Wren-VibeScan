@@ -1,4 +1,4 @@
-import type { Finding } from "@wren/shared-types";
+import type { Finding, ScanProgressEvent } from "@wren/shared-types";
 import { runDeepReasoningLoop, AgentTraceStepRow } from "./agent-loop";
 
 export interface DeepReasoningOptions {
@@ -11,6 +11,7 @@ export interface DeepReasoningOptions {
   confidenceThreshold?: number;
   enableCritic?: boolean;
   timeoutMs?: number;
+  onProgress?: (event: ScanProgressEvent) => void;
 }
 
 export interface DeepReasoningResult {
@@ -52,6 +53,7 @@ export async function enrichFindingsWithDeepReasoning(
           injectedClient: options.injectedClient,
           confidenceThreshold: options.confidenceThreshold,
           enableCritic: options.enableCritic ?? true,
+          onProgress: options.onProgress,
         });
 
         allTraces.push(...result.traces);

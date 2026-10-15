@@ -70,6 +70,9 @@ export type ScanProgressEvent =
   | { stage: "scan_file"; current: number; total: number; filePath: string }
   | { stage: "static_complete"; findingsCount: number; durationMs: number }
   | { stage: "reasoning_start"; candidateCount: number }
+  | { stage: "investigation_start"; target: string; ruleId: string }
+  | { stage: "investigation_step"; tool: string; inputSummary: string; outputSummary: string }
+  | { stage: "investigation_verdict"; target: string; verdict: string; severity: Severity; explanation: string }
   | { stage: "reasoning_complete"; durationMs: number };
 
 export interface ScanConfig {

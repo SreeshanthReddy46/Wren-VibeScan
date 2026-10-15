@@ -5,6 +5,7 @@ import { runFixCommand } from "./commands/fix";
 import { runInitCommand } from "./commands/init";
 import { runLoginCommand } from "./commands/login";
 import { runLogoutCommand } from "./commands/logout";
+import { runWatchCommand } from "./commands/watch";
 import { reportCrash } from "./telemetry/crash-reporter";
 import { ExitCode } from "./utils/exit-codes";
 import { startInteractiveTui, shouldLaunchTui } from "./ui/index";
@@ -95,6 +96,7 @@ if (shouldLaunchTui(args)) {
 
   cli
     .command("fix [findingId]", "Generate and apply remediation patches or open GitHub PRs")
+    .option("-y, --yes", "Apply fix automatically without interactive prompt")
     .option("--dry-run", "Preview the patch without modifying any files")
     .option("--apply-locally", "Apply the patch directly to local working tree")
     .option("--open-pr", "Dispatch autonomous remediation agent to open a pull request")
@@ -103,6 +105,7 @@ if (shouldLaunchTui(args)) {
     .action(async (findingId, options) => {
       try {
         const exitCode = await runFixCommand(findingId, {
+          yes: options.yes,
           dryRun: options.dryRun,
           applyLocally: options.applyLocally,
           openPr: options.openPr,
@@ -115,7 +118,17 @@ if (shouldLaunchTui(args)) {
       }
     });
 
-  let version = "2.11.2";
+  cli
+    .command("watch [path]", "Watch codebase for file changes and re-scan automatically")
+    .action(async (targetPath = ".") => {
+      try {
+        await runWatchCommand(targetPath);
+      } catch (error) {
+        handleCliError(error);
+      }
+    });
+
+  let version = "3.0.0";
   try {
     version = require("../package.json").version;
   } catch {}

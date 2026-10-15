@@ -1,4 +1,5 @@
 import ora, { type Ora } from "ora";
+import pc from "picocolors";
 import type { ScanProgressEvent } from "@wren/shared-types";
 
 export interface SpinnerManagerOptions {
@@ -58,6 +59,28 @@ export class TerminalSpinnerManager {
           `Reasoning on ${event.candidateCount} flagged candidates with Deep Reasoning...`
         ).start();
         break;
+      case "investigation_start":
+        if (this.spinner) {
+          this.spinner.stop();
+          this.spinner = null;
+        }
+        console.log(pc.cyan(`\n⠋ Investigating ${event.target}`));
+        break;
+      case "investigation_step":
+        console.log(
+          `  ${pc.cyan("→")} ${pc.yellow(event.tool.padEnd(12))} ${pc.dim(event.inputSummary)} ${pc.dim(`(${event.outputSummary})`)}`
+        );
+        break;
+      case "investigation_verdict": {
+        const badge =
+          event.verdict === "FALSE_POSITIVE"
+            ? pc.green("FALSE_POSITIVE")
+            : event.verdict === "NEEDS_MANUAL_REVIEW"
+            ? pc.yellow("NEEDS_REVIEW")
+            : pc.red(event.severity.toUpperCase());
+        console.log(`  ${pc.cyan("→")} ${pc.bold("verdict")}    ${badge} · ${pc.dim(event.explanation)}\n`);
+        break;
+      }
       case "reasoning_complete":
         if (this.spinner) {
           this.spinner.succeed(`Investigation complete (${event.durationMs}ms)`);

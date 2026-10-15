@@ -46,3 +46,13 @@ export { StatusBar } from "./ui/components/StatusBar";
 export { appendIgnoreRule } from "./ui/ignore-handler";
 export { App } from "./ui/App";
 export { startInteractiveTui, shouldLaunchTui } from "./ui/index";
+export {
+  loadIgnoreStore,
+  addIgnoreEntry,
+  isFindingIgnored,
+  migrateLegacyWrenignore,
+  PRESET_IGNORE_REASONS,
+} from "./ignore/ignore-store";
+export type { IgnoreEntry, IgnoreStore } from "./ignore/ignore-store";
+export { runWatchCommand, isWatchableFile } from "./commands/watch";
+export type { WatchCommandOptions } from "./commands/watch";
