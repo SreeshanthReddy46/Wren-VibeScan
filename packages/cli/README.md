@@ -1,11 +1,27 @@
 # wren-security 🦅
 
-> **Security scanning for AI-generated code, directly from your terminal.**  
+> **Security scanning & autonomous remediation for AI-generated code, directly from your terminal.**  
 > Catch what Cursor, Lovable, Bolt, and v0 leave behind — before it reaches production.
 
 [![npm version](https://img.shields.io/npm/v/wren-security.svg?style=flat-square&color=0284c7)](https://www.npmjs.com/package/wren-security)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Node Version](https://img.shields.io/node/v/wren-security.svg?style=flat-square)](https://nodejs.org)
+
+---
+
+## What's New in Wren 3.0
+
+- 🔍 **Live Investigation View**: Transparent multi-step agent reasoning streamed live to your terminal:
+  ```text
+  ⠋ Investigating /api/users/[id]
+    → read_file  app/api/users/[id]/route.ts
+    → search     "requireAuth"  (0 matches)
+    → verdict    HIGH · no auth check in any call path
+  ```
+- 🔧 **Interactive `wren fix` with Colored Diff**: Review verified unified diff patches and confirm application (`[y/n/q]`). Nothing is ever applied silently.
+- 👀 **Incremental Watch Mode (`wren watch`)**: Automatically monitors your workspace and re-scans modified files on save with a live dashboard.
+- 🧠 **Structured Ignore Memory (`.wren/ignore.json`)**: Persistent ignore records with explicit reasons so false positives never nag twice. Automatically migrates legacy `.wrenignore` files.
+- 🖥️ **Full-Screen Interactive Terminal UI**: Run `wren` without arguments in any interactive terminal for split-pane navigation, tabbed detail views, and one-key ignores.
 
 ---
 
@@ -24,79 +40,45 @@ npm install -g wren-security
 wren-security check
 ```
 
+Or launch the interactive terminal UI:
+
+```bash
+wren
+```
+
 ---
 
 ## Why Wren?
 
 AI code generators prioritize **speed** and **making the UI work immediately**. In doing so, they systematically leave critical security holes:
 
-1. **Hardcoding secrets & API keys** (`sk-...`, `sk_live_...`) directly in source code.
+1. **Hardcoding secrets & API keys** (`sk-...`, `sk_live_...`, database URIs) directly in source code.
 2. **Generating backend mutating endpoints** (`POST`, `PUT`, `DELETE`) without verifying authenticated user sessions.
-3. **Leaking admin credentials** by prefixing server keys with `NEXT_PUBLIC_` or using Supabase Service Role keys inside client components.
+3. **Leaking admin credentials** by prefixing server keys with `NEXT_PUBLIC_` or referencing Supabase Service Role keys in client bundles.
 4. **Defaulting database security rules** to wide-open permissions (`allow read, write: if true;`) so tests pass during prompting.
 
-**Wren scans your codebase in milliseconds, flags high-risk AI patterns, and outputs exact copy-paste code diffs to fix them.**
-
----
-
-## Features
-
-- ⚡ **Zero-Config & Instant**: Runs locally in sub-seconds. No heavy daemon, no remote code upload required.
-- 🛡️ **AI-Specific Static & AST Engine**: Tailored heuristics targeting the signature mistakes of LLM-generated code.
-- 🚦 **CI/CD Built-In**: `--fail-on-critical` returns a non-zero exit code to automatically block dangerous PRs.
-- 📊 **GitHub Code Scanning (SARIF 2.1.0)**: Export findings directly into GitHub's Security Tab.
-- 🔒 **Zero Data Retention**: Your source code never leaves your machine. Local scanning is 100% offline.
-- 💡 **Actionable Remediations**: Every finding includes a human-readable explanation, CWE reference, and an exact unified diff fix.
+**Wren scans your codebase in milliseconds, flags high-risk AI patterns, and provides AST-verified patches to fix them.**
 
 ---
 
 ## Commands & Usage
 
-### 1. `wren-security check [path]` (or `wren-security scan`)
+### 1. `wren-security check [path]` (or `wren check`)
 
-Scans your files for security vulnerabilities.
+Scans your files for security vulnerabilities:
 
 ```bash
-# Scan current directory
 wren-security check
-
-# Scan a specific folder
 wren-security check ./src
-
-# Exit with code 1 if critical vulnerabilities exist (perfect for CI/CD)
 wren-security check --fail-on-critical
-
-# Fail on high or critical issues
 wren-security check --fail-on high
-
-# Output as SARIF for GitHub Security Tab
 wren-security check --format sarif -o results.sarif
-
-# Output as machine-readable JSON
 wren-security check --format json -o wren-report.json
-
-# Asynchronous background scan with real-time status
-wren-security check --async
-
-# Enable Deep Reasoning Mode (agentic verification loop)
 wren-security check --llm
+wren-security check --async
 ```
 
-### Deep Reasoning Mode (`agentic-verification-loop`)
-
-> **"Wren now investigates before it reports — not just pattern-matches."**
-
-When `--llm` is enabled, Wren replaces simple one-shot evaluation with an autonomous investigative verification loop:
-
-- 🔍 **Multi-Turn Codebase Investigation**: Wren explores callers, sanitizers, middleware, and route handlers before deciding if a finding is a genuine vulnerability or a mitigated false positive.
-- 🛡️ **Strictly Read-Only Guarantee**: The agent is restricted to three read-only tools:
-  - `read_file(path)`: Inspects project files inside a strict path-traversal sandbox.
-  - `search_codebase(pattern)`: Searches project files for patterns, sanitizers, and symbols.
-  - `get_call_sites(function_name)`: Traces invocation call sites across the codebase.
-  *The agent can never write, mutate, execute, or delete code.*
-- ⏱️ **Bounded Cost & Safe Fallback**: Capped at a maximum of 5 tool calls per finding. If an ambiguous case cannot be concluded within 5 steps, Wren stops, marks the finding for manual review (`[Needs Manual Review]`), and records complete trace diagnostics in `agent_traces`.
-
-#### CLI Options:
+#### Scan Options:
 
 | Flag | Type | Description | Default |
 |---|---|---|---|
@@ -104,28 +86,44 @@ When `--llm` is enabled, Wren replaces simple one-shot evaluation with an autono
 | `--async` | `boolean` | Dispatch scan to background queue and stream progress | `false` |
 | `--fail-on-critical` | `boolean` | Exit code `1` if critical findings are found | `false` |
 | `--fail-on <severity>` | `string` | Exit code `1` if findings at or above threshold exist (`critical`, `high`, `medium`) | — |
-| `--format <format>` | `string` | Output format: `terminal`, `json`, or `sarif` | `terminal` |
-| `--llm` | `boolean` | Enrich findings with contextual LLM reasoning & agent loop | `false` |
+| `--format <format>` | `string` | Output format: `terminal`, `table`, `json`, or `sarif` | `terminal` |
+| `--llm` | `boolean` | Enable multi-step Deep Reasoning investigation with live terminal steps | `false` |
 | `-o, --output <file>` | `string` | Write report output directly to a file | stdout |
+| `-q, --quiet` | `boolean` | Suppress spinners and non-essential progress output | `false` |
 | `--api-key <key>` | `string` | Wren Cloud or Anthropic API key | — |
 | `-v, --version` | `boolean` | Display version number | — |
 | `-h, --help` | `boolean` | Show help and options | — |
 
 ---
 
-### 2. `wren-security fix [findingId]`
+### 2. `wren-security watch [path]` (or `wren watch`)
 
-Generates an AST syntax-verified remediation patch and applies it or dispatches a GitHub Pull Request:
+Starts incremental watch mode, monitoring your project for file modifications and re-scanning automatically on save:
 
 ```bash
-# Preview proposed unified diff patch without touching disk
+wren-security watch
+wren-security watch ./src
+```
+
+- Sub-second incremental feedback loop.
+- Automatically clears and updates terminal dashboard on change.
+- Respects `.gitignore` and `.wren/ignore.json`.
+
+---
+
+### 3. `wren-security fix [findingId]` (or `wren fix`)
+
+Generates AST syntax-verified remediation patches with colored diff preview:
+
+```bash
+# Preview diff and prompt interactively before applying [y/n/q]
+wren-security fix
+
+# Automatically apply fix without prompting (for CI/CD)
+wren-security fix --yes
+
+# Preview diff only without touching files on disk
 wren-security fix --dry-run
-
-# Apply verified patch directly to local disk
-wren-security fix --apply-locally
-
-# Remediate a specific finding by ID
-wren-security fix hardcoded-secret-abc123 --apply-locally
 
 # Dispatch an isolated branch and Pull Request via GitHub App
 wren-security fix --open-pr --repo owner/repo
@@ -136,44 +134,41 @@ wren-security fix --open-pr --repo owner/repo
 | Flag | Type | Description | Default |
 |---|---|---|---|
 | `[findingId]` | `string` | ID of the finding to remediate | First finding |
+| `-y, --yes` | `boolean` | Apply patch directly without interactive confirmation | `false` |
 | `--dry-run` | `boolean` | Preview unified diff patch without writing to disk | `false` |
 | `--apply-locally` | `boolean` | Apply verified patch directly to the target file on disk | `false` |
 | `--open-pr` | `boolean` | Create a branch and open a GitHub Pull Request | `false` |
 | `--repo <owner/repo>`| `string` | Target GitHub repository (auto-detected from git remote) | Local remote |
+| `--file <file>` | `string` | Target file path to patch | — |
 | `--api-url <url>` | `string` | Custom Wren Cloud API endpoint | `http://localhost:3000` |
 
 ---
 
-### 3. `wren-security init`
+### 4. `wren-security init` (or `wren init`)
 
-Initializes Wren configuration in your repository:
+Initializes modern Wren 3.0 configuration inside `.wren/`:
 
 ```bash
 wren-security init
 ```
 
 Creates:
-- `.wrenignore`: Excludes test fixtures, mock data, or build directories.
-- `.wrenrc.json`: Configures failure thresholds and rule overrides.
+- `.wren/ignore.json`: Structured persistent ignore memory with rule IDs and rationale.
+- `.wren/config.json`: Project scan rules and severity failure thresholds.
 
 ---
 
-### 4. `wren-security login [token]` & `wren-security logout`
+### 5. `wren-security login [token]` & `wren-security logout`
 
 Connect your CLI to your Wren Cloud dashboard:
 
 ```bash
-# Interactive token prompt
 wren-security login
-
-# Or pass token directly
 wren-security login <your-api-token>
-
-# Remove stored credentials
 wren-security logout
 ```
 
-Stored securely in `~/.wren/config.json` (respects `XDG_CONFIG_HOME`).
+Credentials are saved in `~/.wren/config.json` (respects `XDG_CONFIG_HOME`).
 
 ---
 
@@ -197,7 +192,7 @@ Stored securely in `~/.wren/config.json` (respects `XDG_CONFIG_HOME`).
 
 ## GitHub Actions CI/CD Integration
 
-Add Wren to your `.github/workflows/security.yml` to automatically scan every Pull Request:
+Add Wren to `.github/workflows/security.yml` to automatically scan every Pull Request:
 
 ```yaml
 name: Wren Security Scan
@@ -212,7 +207,7 @@ jobs:
   wren-scan:
     runs-on: ubuntu-latest
     permissions:
-      security-events: write # Required for SARIF upload
+      security-events: write
       contents: read
 
     steps:
@@ -236,47 +231,19 @@ jobs:
 
 ---
 
-## Programmatic Node.js API
-
-You can also use Wren programmatically inside Node.js or build scripts:
-
-```typescript
-import { runScan } from "wren-security";
-
-async function audit() {
-  const result = await runScan({
-    targetPath: "./src",
-    failOnSeverity: "critical",
-  });
-
-  console.log(`Scanned ${result.summary.filesScanned} files.`);
-  console.log(`Total Findings: ${result.summary.totalFindings}`);
-
-  for (const finding of result.findings) {
-    console.log(`[${finding.severity.toUpperCase()}] ${finding.title}`);
-    console.log(`  File: ${finding.location.filePath}:${finding.location.startLine}`);
-    console.log(`  Fix: ${finding.fix.description}`);
-  }
-}
-
-audit();
-```
-
----
-
-## Configuration (`.wrenrc.json`)
+## Ignore Memory Configuration (`.wren/ignore.json`)
 
 ```json
 {
-  "$schema": "https://wren.dev/schema.json",
-  "version": 1,
-  "failOn": "critical",
-  "ignoreRules": [
-    "WREN-CONF-001"
-  ],
-  "ignorePaths": [
-    "fixtures/**",
-    "**/*.test.ts"
+  "version": "1.0.0",
+  "ignores": [
+    {
+      "id": "ign-fixtures",
+      "ruleId": "*",
+      "filePath": "fixtures/**",
+      "reason": "Test fixture mock code",
+      "ignoredAt": "2026-10-15T12:00:00.000Z"
+    }
   ]
 }
 ```
@@ -293,7 +260,7 @@ audit();
 ## Contributing & Issues
 
 - Issues & Feature Requests: [GitHub Issues](https://github.com/SreeshanthReddy46/Wren-VibeScan/issues)
-- Web Platform & Docs: [https://wren.dev](https://wren.dev)
+- Web Platform: [https://wren.dev](https://wren.dev)
 
 ## License
 
