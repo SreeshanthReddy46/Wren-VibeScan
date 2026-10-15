@@ -64,6 +64,6 @@
     "@wren/shared-types": "workspace:*",
     "ink-testing-library": "^4.0.0",
     "tsup": "8.4.0",
-    "typescript": "5.7.3"
+    "typescript": "7.0.2"
   }
 }
